@@ -1,3 +1,4 @@
+# Set working directory to current folder
 setwd(dirname(sys.frame(1)$ofile)) 
 
 source("utils.R")
@@ -13,8 +14,8 @@ filenames = paste(dataDir,filenames,sep="")
 
 # verbose variable
 verbose = TRUE
-df <- load_list_of_xlsx_files(filenames,verbose)
-cat(paste("N records = ",nrow(df),"\n",sep=""))
+data.df <- load_list_of_xlsx_files(filenames,verbose)
+cat(paste("N records = ",nrow(data.df),"\n",sep=""))
 
 # Now some preprocessing
 
@@ -34,6 +35,10 @@ columns_to_drop <- c("search",
                      "no. of comments",
                      "no. of engagements")
 
-df <- df[,-match(columns_to_drop,names(df))]
-print(names(df))
+data.df <- data.df[,-match(columns_to_drop,names(data.df))]
+print(names(data.df))
 
+
+# Create a sub dataframe with only 'id' and 'content' columns : content.df
+
+content.df <- subset(data.df, select=c("id", "content"))
