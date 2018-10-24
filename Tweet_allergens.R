@@ -1,5 +1,7 @@
 # Set working directory to current folder
-setwd(dirname(sys.frame(1)$ofile)) 
+#setwd(dirname(sys.frame(1)$ofile)) 
+
+setwd("~/Google Drive/S2DS/FSA-Virtual-Oct18/")
 
 source("utils.R")
 
@@ -38,7 +40,45 @@ columns_to_drop <- c("search",
 data.df <- data.df[,-match(columns_to_drop,names(data.df))]
 print(names(data.df))
 
-
-# Create a sub dataframe with only 'id' and 'content' columns : content.df
-
+# Subset dataframe with only 'id' and 'content' columns : content.df
 content.df <- subset(data.df, select=c("id", "content"))
+
+library(stringi)
+
+#small test dataset
+test.df <- content.df[1:100,]
+
+#Convert to lowercase
+test.df$content <- stri_trans_tolower(test.df$content) 
+
+#Remove Usernames starting with @ & rt
+test.df$content <- gsub("@\\w+ *","", test.df$content)
+test.df$content <- gsub("^rt ", "", test.df$content)
+
+#Remove all punctuation
+test.df$content <- stri_replace_all(test.df$content, "", regex = "[[:punct:]]")
+
+#Remove http links that have been collapsed into words
+test.df$content <- gsub("http\\w+","", test.df$content)
+
+
+
+
+
+
+
+
+
+
+
+
+                      
+library(quanteda)
+
+
+
+
+
+
+
+
