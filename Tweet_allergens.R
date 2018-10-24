@@ -1,6 +1,6 @@
-setwd(getSrcDirectory()[1])
+setwd(dirname(sys.frame(1)$ofile)) 
 
-source("LoadingData.R")
+source("utils.R")
 
 # path where the data is located
 dataDir   = "Data/"
