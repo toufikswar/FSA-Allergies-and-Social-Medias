@@ -1,4 +1,4 @@
-setwd("/home/aperez/Documentos_importantes/Cosas_Importantes/Reconversion_Profesional/S2DS_Virtual_2018/FSA_project/Code/FSA-Virtual-Oct18/")
+setwd(getSrcDirectory()[1])
 
 source("LoadingData.R")
 
