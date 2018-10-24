@@ -4,6 +4,9 @@
 
 *  [readxl](https://github.com/tidyverse/readxl)
 * [quanteda](https://github.com/quanteda/quanteda)
+* [stringi](https://github.com/gagolews/stringi)
 
-Prior to installation run:
-`install.packages(c("readxl","quanteda"))`
+
+
+Prior to Running script run:
+`install.packages(c("readxl","stringi","quanteda"))`
