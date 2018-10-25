@@ -42,28 +42,37 @@ print(names(data.df))
 
 # Subset dataframe with only 'id' and 'content' columns : content.df
 content.df <- subset(data.df, select=c("id", "content"))
-
+content.df2 <- content.df
 # Subset dataframe containing metadata only
 metadata.df <- data.df[ , ! colnames(data.df) %in% c("content") ]
 
 
 library(stringi)
 
-#small test dataset
-test.df <- content.df[1:100,]
-
 #Convert to lowercase
-test.df$content <- stri_trans_tolower(test.df$content) 
+content.df$content <- stri_trans_tolower(test.df$content) 
+
+library(qdap)
+#Expand acronyms
+acronym_key <- read.csv("acronyms.csv", header=FALSE,col.names = c("abv","repl"))
+content.df <- replace_abbreviation(content.df, acronym_key)
 
 #Remove Usernames starting with @ & rt
-test.df$content <- gsub("@\\w+ *","", test.df$content)
-test.df$content <- gsub("^rt ", "", test.df$content)
+content.df$content <- gsub("@\\w+ *","", content.df$content)
+content.df$content <- gsub("^rt ", "", content.df$content)
 
 #Remove all punctuation
-test.df$content <- stri_replace_all(test.df$content, "", regex = "[[:punct:]]")
+content.df$content <- stri_replace_all(content.df$content, "", regex = "[[:punct:]]")
 
 #Remove http links that have been collapsed into words
-test.df$content <- gsub("http\\w+","", test.df$content)
+content.df$content <- gsub("http\\w+","", content.df$content)
+
+
+
+
+
+
+
 
 library(quanteda)
 
