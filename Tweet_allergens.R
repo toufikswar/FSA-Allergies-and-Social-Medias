@@ -55,7 +55,7 @@ content.df$content <- stri_trans_tolower(test.df$content)
 library(qdap)
 #Expand acronyms
 acronym_key <- read.csv("acronyms.csv", header=FALSE,col.names = c("abv","repl"))
-content.df <- replace_abbreviation(content.df, acronym_key)
+content.df$content <- replace_abbreviation(content.df$content, acronym_key)
 
 #Remove Usernames starting with @ & rt
 content.df$content <- gsub("@\\w+ *","", content.df$content)
