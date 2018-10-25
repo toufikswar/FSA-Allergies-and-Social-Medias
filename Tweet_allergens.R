@@ -47,7 +47,7 @@ columns_to_drop <- c("search",
                      "no. of engagements")
 
 data.df <- data.df[,-match(columns_to_drop,names(data.df))]
-print(names(data.df))
+#print(names(data.df))
 
 # Subset dataframe with only 'id' and 'content' columns : content.df
 content.df <- subset(data.df, select=c("id", "content"))
@@ -57,23 +57,24 @@ content.df <- content.df[1:1000,]
 metadata.df <- data.df[ , ! colnames(data.df) %in% c("content") ]
 
 end_time1 <- Sys.time()
+cat("\n\n")
 print(paste("Loading time:       ",round(end_time1 - start_time1,5)," secs",sep=""))
 
 # Start text pre-preprocessing
-#Convert to lowercase
-start_time1 <- Sys.time()
-content.df$content <- stri_trans_tolower(content.df$content)
 
-#Expand acronyms
 start_time1 <- Sys.time()
-acronym_key        <- read.csv("acronyms.csv", header=FALSE,col.names = c("abv","repl"))  # acronyms map
-content.df$content <- replace_abbreviation(content.df$content, acronym_key)
+#Convert to lowercase
+content.df$content <- stri_trans_tolower(content.df$content)
 
 #Remove Usernames starting with @, rt, #
 content.df$content <- gsub("@\\w+|#\\w+|^rt ","", content.df$content)
 
 #Replace ~ by whitespace
 content.df$content <- stri_replace_all_fixed(content.df$content, "~", " ")
+
+# expand acronyms
+acronym_key        <- read.csv("acronyms.csv", header=FALSE,col.names = c("abv","repl"))  # acronyms map
+content.df$content <- replace_abbreviation(content.df$content, acronym_key)
 
 #Remove all punctuation
 content.df$content <- stri_replace_all(content.df$content, "", regex = "[[:punct:]]")
@@ -88,33 +89,36 @@ end_time1 <- Sys.time()
 print(paste("1st preprocessing:  ",round(end_time1 - start_time1,5)," secs",sep=""))
 
 start_time1 <- Sys.time()
-# stemming & stopword removing
+# stemming & stopword + emojis removing
+# Convert tweets text to ascii format
+#content.df$content <- iconv(content.df$content, from = "latin1", to = "ascii", sub = "byte")
+# list of engish stop words
+words_to_remove   <- stopwords("english")
+# Emojis emoji_dictionary from (https://raw.githubusercontent.com/lyons7/emojidictionary/master/emoji_dictionary.csv)
+emoticons         <- read.csv("emoji_dictionary.csv", header = TRUE) # emojis emoji_dictionary
+# combining english stops words and emojis R_Encodings
+# words_to_remove   <- c(words_to_remove,emoticons$R_Encoding)
+
 content.df$content <- lapply(content.df$content,
   function(i) {
     i %>%
     tokens() %>%
     tokens_wordstem() %>%
-    tokens_remove(stopwords("english")) %>%
+    tokens_remove(words_to_remove) %>%
     paste(collapse = " ")
   }
 )
 end_time1 <- Sys.time()
 print(paste("2nd preprocessing:  ",round(end_time1 - start_time1,5)," secs",sep=""))
 
-# # Test structure for Printing out 100 randomly selected tweets after preprocessing
-# set.seed(1)
-# sub_sample <- sample(1:nrow(content.df),100,replace=FALSE)
-#
-# for(i in sub_sample) {
-#   cat("\n")
-#   cat(paste("Printing tweet ",i,"\n",sep=""))
-#   cat(paste(as.character(content.df$content[i],"\n",sep="")))
-#   cat("\n")
-#   cat("\n")
-# }
-
 end_time <- Sys.time()
 
 print(paste("Execution time:     ",round(end_time - start_time,5)," secs",sep=""))
+cat("\n\n")
+
+# # Running test to compare the oirignal and preprocessed texts
+# # of a randomly selected set of records
+n.test.records = 100
+test_text_preprocessing(data.df,content.df,n.test.records)
 
 ###

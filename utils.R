@@ -2,6 +2,7 @@
 
 library(readxl)          # library to read xlsx files (excel)
 
+#================================================================
 load_list_of_xlsx_files = function(filenames,verbose=FALSE)
 {
 
@@ -47,3 +48,39 @@ load_list_of_xlsx_files = function(filenames,verbose=FALSE)
   return(df)
 
 }
+#================================================================
+test_text_preprocessing = function(original.data,preprocessed.data,n.test.records)
+{
+
+  # Compares the original and preprocessed text for a random sampling of n.test.records
+
+  n.test = n.test.records
+
+  # The number of test records cannot be higher than the number of records
+  nrecords = nrow(preprocessed.data)
+  if(n.test > nrecords) n.test = nrecords
+
+  # Set seed for test reproductivility
+  set.seed(1)
+  sub_sample <- sample(1:nrecords,n.test,replace=FALSE)
+
+  for(i in sub_sample) {
+    cat("\n")
+    cat(paste("Printing tweet ",i,"\n",sep=""))
+    cat(paste("Original     record:     ",as.character(original.data$content[i],    "\n",sep="")))
+    cat("\n")
+    cat("\n")
+    cat(paste("Preprocessed record:     ",as.character(preprocessed.data$content[i],"\n",sep="")))
+    cat("\n")
+    cat("\n")
+    cat("\n")
+  }
+
+}
+#================================================================
+
+
+
+
+
+#
