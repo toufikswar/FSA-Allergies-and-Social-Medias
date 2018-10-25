@@ -2,11 +2,10 @@
 
 ## Dependencies:
 
-*  [readxl](https://github.com/tidyverse/readxl)
+* [readxl](https://github.com/tidyverse/readxl)
 * [quanteda](https://github.com/quanteda/quanteda)
 * [stringi](https://github.com/gagolews/stringi)
+* [qdap](http://trinker.github.io/qdap/)
 
-
-
-Prior to Running script run:
-`install.packages(c("readxl","stringi","quanteda"))`
+*Prior to Running script run:*
+`install.packages(c("readxl","stringi","quanteda","qdap"))`
