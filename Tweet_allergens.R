@@ -74,8 +74,11 @@ start_time1 <- Sys.time()
 #Convert to lowercase
 content.df$content <- stri_trans_tolower(content.df$content)
 
+# Convert tweets text to ascii format
+content.df$content <- iconv(content.df$content, from = "latin1", to = "ascii", sub = "byte")
+
 #Remove Usernames starting with @, & rt
-content.df$content <- gsub("@\\w+|^rt ","", content.df$content)
+content.df$content <- gsub("@\\w+|^rt |<\\w+>","", content.df$content)
 
 #Replace ~ by whitespace
 content.df$content <- stri_replace_all_fixed(content.df$content, "~", " ")
@@ -98,12 +101,11 @@ print(paste("1st preprocessing:  ",round(end_time1 - start_time1,5)," secs",sep=
 
 start_time1 <- Sys.time()
 # stemming & stopword + emojis removing
-# Convert tweets text to ascii format
-#content.df$content <- iconv(content.df$content, from = "latin1", to = "ascii", sub = "byte")
+
 # list of engish stop words
 words_to_remove   <- stopwords("english")
 # Emojis emoji_dictionary from (https://raw.githubusercontent.com/lyons7/emojidictionary/master/emoji_dictionary.csv)
-emoticons         <- read.csv("resources/emoji_dictionary.csv", header = TRUE) # emojis emoji_dictionary
+#emoticons         <- read.csv("resources/emoji_dictionary.csv", header = TRUE) # emojis emoji_dictionary
 # combining english stops words and emojis R_Encodings
 # words_to_remove   <- c(words_to_remove,emoticons$R_Encoding)
 
