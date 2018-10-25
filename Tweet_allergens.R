@@ -73,7 +73,7 @@ content.df$content <- gsub("@\\w+|#\\w+|^rt ","", content.df$content)
 content.df$content <- stri_replace_all_fixed(content.df$content, "~", " ")
 
 # expand acronyms
-acronym_key        <- read.csv("acronyms.csv", header=FALSE,col.names = c("abv","repl"))  # acronyms map
+acronym_key        <- read.csv("resources/acronyms.csv", header=FALSE,col.names = c("abv","repl"))  # acronyms map
 content.df$content <- replace_abbreviation(content.df$content, acronym_key)
 
 #Remove all punctuation
@@ -95,7 +95,7 @@ start_time1 <- Sys.time()
 # list of engish stop words
 words_to_remove   <- stopwords("english")
 # Emojis emoji_dictionary from (https://raw.githubusercontent.com/lyons7/emojidictionary/master/emoji_dictionary.csv)
-emoticons         <- read.csv("emoji_dictionary.csv", header = TRUE) # emojis emoji_dictionary
+emoticons         <- read.csv("resources/emoji_dictionary.csv", header = TRUE) # emojis emoji_dictionary
 # combining english stops words and emojis R_Encodings
 # words_to_remove   <- c(words_to_remove,emoticons$R_Encoding)
 
