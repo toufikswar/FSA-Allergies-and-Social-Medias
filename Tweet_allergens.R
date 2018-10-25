@@ -1,20 +1,26 @@
+## Parent Script for Finding Public Mentions of Allergens in Tweet Data
+
+## Set working directory to current folder
+#setwd(dirname(sys.frame(1)$ofile))
+# (set you workdir)
+
+
+### Initialization
+
+## Load libraries for preprocessing
 library(stringi)
 library(qdap)
 library(quanteda)
 library(magrittr)
 
-# Set working directory to current folder
-#setwd(dirname(sys.frame(1)$ofile))
-
-# setwd("~/Google Drive/S2DS/FSA-Virtual-Oct18/")
-
+## for testing
 start_time  <- Sys.time()
-
 start_time1 <- Sys.time()
 
+# Read in Functions stored in utils.R
 source("utils.R")
 
-# path where the data is located
+# Path where the data is located
 dataDir   = "Data/"
 # list for file names
 filenames = c("20161029-20171127.xlsx",
@@ -28,7 +34,9 @@ verbose = TRUE
 data.df <- load_list_of_xlsx_files(filenames,verbose)
 cat(paste("N records = ",nrow(data.df),"\n",sep=""))
 
-# Now some preprocessing
+
+
+### Now some preprocessing
 
 # Lets drop some spureous columns
 columns_to_drop <- c("search",
@@ -66,8 +74,8 @@ start_time1 <- Sys.time()
 #Convert to lowercase
 content.df$content <- stri_trans_tolower(content.df$content)
 
-#Remove Usernames starting with @, rt, #
-content.df$content <- gsub("@\\w+|#\\w+|^rt ","", content.df$content)
+#Remove Usernames starting with @, & rt
+content.df$content <- gsub("@\\w+|^rt ","", content.df$content)
 
 #Replace ~ by whitespace
 content.df$content <- stri_replace_all_fixed(content.df$content, "~", " ")
@@ -122,3 +130,6 @@ n.test.records = 100
 test_text_preprocessing(data.df,content.df,n.test.records)
 
 ###
+
+
+
