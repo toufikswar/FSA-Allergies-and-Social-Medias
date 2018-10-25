@@ -1,7 +1,12 @@
-# Set working directory to current folder
-#setwd(dirname(sys.frame(1)$ofile)) 
+library(stringi)
+library(qdap)
+library(quanteda)
+library(magrittr)
 
-setwd("~/Google Drive/S2DS/FSA-Virtual-Oct18/")
+# Set working directory to current folder
+#setwd(dirname(sys.frame(1)$ofile))
+
+# setwd("~/Google Drive/S2DS/FSA-Virtual-Oct18/")
 
 source("utils.R")
 
@@ -42,44 +47,56 @@ print(names(data.df))
 
 # Subset dataframe with only 'id' and 'content' columns : content.df
 content.df <- subset(data.df, select=c("id", "content"))
-content.df2 <- content.df
+#content.df <- content.df[1:1000,]
+
 # Subset dataframe containing metadata only
 metadata.df <- data.df[ , ! colnames(data.df) %in% c("content") ]
 
-
-library(stringi)
-
+# Start text pre-preprocessing
 #Convert to lowercase
-content.df$content <- stri_trans_tolower(test.df$content) 
+content.df$content <- stri_trans_tolower(content.df$content)
 
-library(qdap)
 #Expand acronyms
-acronym_key <- read.csv("acronyms.csv", header=FALSE,col.names = c("abv","repl"))
+acronym_key        <- read.csv("acronyms.csv", header=FALSE,col.names = c("abv","repl"))  # acronyms map
 content.df$content <- replace_abbreviation(content.df$content, acronym_key)
 
-#Remove Usernames starting with @ & rt
-content.df$content <- gsub("@\\w+ *","", content.df$content)
-content.df$content <- gsub("^rt ", "", content.df$content)
+#Remove Usernames starting with @, rt, #
+content.df$content <- gsub("@\\w+|#\\w+|^rt ","", content.df$content)
+
+#Replace ~ by whitespace
+content.df$content <- stri_replace_all_fixed(content.df$content, "~", " ")
 
 #Remove all punctuation
 content.df$content <- stri_replace_all(content.df$content, "", regex = "[[:punct:]]")
 
-#Remove http links that have been collapsed into words
-content.df$content <- gsub("http\\w+","", content.df$content)
+#Remove http, url links that have been collapsed into words
+content.df$content <- stri_replace_all_fixed(content.df$content, "=", "")
+content.df$content <- gsub("url\\w+|http\\w+", "", content.df$content)
 
+# string surroundings whitespace
+content.df$content <- stri_trim(content.df$content)
 
+# stemming & stopword removing
+content.df$content <- lapply(content.df$content,
+  function(i) {
+    i %>%
+    tokens() %>%
+    tokens_wordstem() %>%
+    tokens_remove(stopwords("english")) %>%
+    paste(collapse = " ")
+  }
+)
 
+# # Test structure for Printing out 100 randomly selected tweets after preprocessing
+# set.seed(1)
+# sub_sample <- sample(1:nrow(content.df),100,replace=FALSE)
+#
+# for(i in sub_sample) {
+#   cat("\n")
+#   cat(paste("Printing tweet ",i,"\n",sep=""))
+#   cat(paste(as.character(content.df$content[i],"\n",sep="")))
+#   cat("\n")
+#   cat("\n")
+# }
 
-
-
-
-
-library(quanteda)
-
-
-
-
-
-
-
-
+###
