@@ -43,6 +43,10 @@ print(names(data.df))
 # Subset dataframe with only 'id' and 'content' columns : content.df
 content.df <- subset(data.df, select=c("id", "content"))
 
+# Subset dataframe containing metadata only
+metadata.df <- data.df[ , ! colnames(data.df) %in% c("content") ]
+
+
 library(stringi)
 
 #small test dataset
@@ -61,18 +65,6 @@ test.df$content <- stri_replace_all(test.df$content, "", regex = "[[:punct:]]")
 #Remove http links that have been collapsed into words
 test.df$content <- gsub("http\\w+","", test.df$content)
 
-
-
-
-
-
-
-
-
-
-
-
-                      
 library(quanteda)
 
 
