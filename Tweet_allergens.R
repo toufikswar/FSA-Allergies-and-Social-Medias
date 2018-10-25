@@ -8,6 +8,10 @@ library(magrittr)
 
 # setwd("~/Google Drive/S2DS/FSA-Virtual-Oct18/")
 
+start_time  <- Sys.time()
+
+start_time1 <- Sys.time()
+
 source("utils.R")
 
 # path where the data is located
@@ -47,16 +51,21 @@ print(names(data.df))
 
 # Subset dataframe with only 'id' and 'content' columns : content.df
 content.df <- subset(data.df, select=c("id", "content"))
-#content.df <- content.df[1:1000,]
+content.df <- content.df[1:1000,]
 
 # Subset dataframe containing metadata only
 metadata.df <- data.df[ , ! colnames(data.df) %in% c("content") ]
 
+end_time1 <- Sys.time()
+print(paste("Loading time:       ",round(end_time1 - start_time1,5)," secs",sep=""))
+
 # Start text pre-preprocessing
 #Convert to lowercase
+start_time1 <- Sys.time()
 content.df$content <- stri_trans_tolower(content.df$content)
 
 #Expand acronyms
+start_time1 <- Sys.time()
 acronym_key        <- read.csv("acronyms.csv", header=FALSE,col.names = c("abv","repl"))  # acronyms map
 content.df$content <- replace_abbreviation(content.df$content, acronym_key)
 
@@ -75,7 +84,10 @@ content.df$content <- gsub("url\\w+|http\\w+", "", content.df$content)
 
 # string surroundings whitespace
 content.df$content <- stri_trim(content.df$content)
+end_time1 <- Sys.time()
+print(paste("1st preprocessing:  ",round(end_time1 - start_time1,5)," secs",sep=""))
 
+start_time1 <- Sys.time()
 # stemming & stopword removing
 content.df$content <- lapply(content.df$content,
   function(i) {
@@ -86,6 +98,8 @@ content.df$content <- lapply(content.df$content,
     paste(collapse = " ")
   }
 )
+end_time1 <- Sys.time()
+print(paste("2nd preprocessing:  ",round(end_time1 - start_time1,5)," secs",sep=""))
 
 # # Test structure for Printing out 100 randomly selected tweets after preprocessing
 # set.seed(1)
@@ -98,5 +112,9 @@ content.df$content <- lapply(content.df$content,
 #   cat("\n")
 #   cat("\n")
 # }
+
+end_time <- Sys.time()
+
+print(paste("Execution time:     ",round(end_time - start_time,5)," secs",sep=""))
 
 ###
