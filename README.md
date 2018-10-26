@@ -4,7 +4,7 @@
 
 * [readxl](https://github.com/tidyverse/readxl)
 * [quanteda](https://github.com/quanteda/quanteda)
-~~* [stringi](https://github.com/gagolews/stringi)~~
+* ~~[stringi](https://github.com/gagolews/stringi)~~
 * [qdap](http://trinker.github.io/qdap/)
 * [magrittr](https://github.com/tidyverse/magrittr)
 
