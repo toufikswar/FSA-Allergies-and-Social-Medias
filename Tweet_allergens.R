@@ -96,6 +96,12 @@ content.df$content <- stri_replace_all_regex(content.df$content, abv, repl, vect
 #Remove all punctuation
 content.df$content <- stri_replace_all(content.df$content, "", regex = "[[:punct:]]")
 
+# Expand the english contractions
+english_contraction_key  <- read.csv("resources/english_contractions.csv", header=FALSE,col.names = c("contraction","expansion"))  # acronyms map
+contraction <- paste("\\b",english_contraction_key$contraction,"\\b",sep="")
+expansion   <- paste(" ",english_contraction_key$expansion," ",sep="")
+content.df$content <- stri_replace_all_regex(content.df$content, contraction, expansion, vectorize_all=FALSE)
+
 #Remove http, url links that have been collapsed into words
 content.df$content <- stri_replace_all_fixed(content.df$content, "=", "")
 content.df$content <- gsub("url\\w+|http\\w+", "", content.df$content)
