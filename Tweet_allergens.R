@@ -119,19 +119,18 @@ content.df$content <- lapply(content.df$content,
   }
 )
 end_time1 <- Sys.time()
-print(paste("2nd preprocessing:  ",round(end_time1 - start_time1,5)," secs",sep=""))
+print(paste("2nd preprocessing:  ",round(end_time1 - start_time1,5)," secs (stemming & stopwords removal)",sep=""))
 
 end_time <- Sys.time()
 
-print(paste("Execution time:     ",round(end_time - start_time,5)," secs",sep=""))
+print(paste("Execution time:     ",round(end_time - start_time,5)," secs (all processes)",sep=""))
+cat("\n\n")
+print(paste("Number of tweets processed: ",nrow(content.df),sep=""))
 cat("\n\n")
 
 # # Running test to compare the oirignal and preprocessed texts
 # # of a randomly selected set of records
-n.test.records = 100
+n.test.records = 500
 test_text_preprocessing(data.df,content.df,n.test.records)
 
 ###
-
-
-
