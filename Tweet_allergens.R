@@ -112,7 +112,14 @@ words_to_remove   <- stopwords("english")
 # combining english stops words and emojis R_Encodings
 # words_to_remove   <- c(words_to_remove,emoticons$R_Encoding)
 
-content.df$content <- lapply(content.df$content,
+library(parallel)
+instance <- makeCluster(detectCores()) # Start a local cluster with the cores available
+clusterEvalQ(instance, {
+  library(quanteda)
+  words_to_remove   <- stopwords("english")
+})
+
+content.df$content <- parLapply(instance, content.df$content,
   function(i) {
     i %>%
     tokens() %>%
@@ -121,6 +128,7 @@ content.df$content <- lapply(content.df$content,
     paste(collapse = " ")
   }
 )
+stopCluster(instance)
 end_time1 <- Sys.time()
 print(paste("2nd preprocessing:  ",round(end_time1 - start_time1,5)," secs (stemming & stopwords removal)",sep=""))
 
