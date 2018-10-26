@@ -77,6 +77,12 @@ content.df$content <- stri_trans_tolower(content.df$content)
 # Convert tweets text to ascii format
 content.df$content <- iconv(content.df$content, from = "latin1", to = "ascii", sub = "byte")
 
+# Extract usernames to new column
+content.df$users <- stri_extract_all_regex(content.df$content, "@\\w+")
+
+# Extract hashtags to new column
+content.df$hashtags <- stri_extract_all_regex(content.df$content, "#\\w+")
+
 #Remove Usernames starting with @, & rt
 content.df$content <- gsub("@\\w+|^rt |<\\w+>","", content.df$content)
 
