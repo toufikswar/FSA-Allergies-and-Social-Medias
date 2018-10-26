@@ -58,7 +58,7 @@ data.df <- data.df[,-match(columns_to_drop,names(data.df))]
 #print(names(data.df))
 
 # Subset dataframe with only 'id' and 'content' columns : content.df
-content.df <- subset(data.df, select=c("id", "content"))
+content.df <- subset(data.df, select=c("id", "content","source"))
 content.df <- content.df[1:1000,]
 
 # Subset dataframe containing metadata only
@@ -80,6 +80,8 @@ content.df$content <- iconv(content.df$content, from = "latin1", to = "ascii", s
 #Remove Usernames starting with @, & rt
 content.df$content <- gsub("@\\w+|^rt |<\\w+>","", content.df$content)
 
+# #Replace % by percent
+content.df$content <- stri_replace_all_fixed(content.df$content, "%", " percent ")
 #Replace ~ by whitespace
 content.df$content <- stri_replace_all_fixed(content.df$content, "~", " ")
 
@@ -93,9 +95,18 @@ content.df$content <- stri_replace_all_regex(content.df$content, abv, repl, vect
 #Remove all punctuation
 content.df$content <- stri_replace_all(content.df$content, "", regex = "[[:punct:]]")
 
-#Remove http, url links that have been collapsed into words
+# Expand the english contractions
+english_contraction_key  <- read.csv("resources/english_contractions.csv", header=FALSE,col.names = c("contraction","expansion"))  # acronyms map
+contraction <- paste("\\b",english_contraction_key$contraction,"\\b",sep="")
+expansion   <- paste(" ",english_contraction_key$expansion," ",sep="")
+content.df$content <- stri_replace_all_regex(content.df$content, contraction, expansion, vectorize_all=FALSE)
+
+# Remove http, url links that have been collapsed into words
 content.df$content <- stri_replace_all_fixed(content.df$content, "=", "")
 content.df$content <- gsub("url\\w+|http\\w+", "", content.df$content)
+
+#Replace ~ and . by whitespace
+content.df$content <- stri_replace_all_fixed(content.df$content, ".", " ")
 
 # string surroundings whitespace
 content.df$content <- stri_trim(content.df$content)
@@ -103,14 +114,13 @@ end_time1 <- Sys.time()
 print(paste("1st preprocessing:  ",round(end_time1 - start_time1,5)," secs",sep=""))
 
 start_time1 <- Sys.time()
+
 # stemming & stopword + emojis removing
 
 # list of engish stop words
 words_to_remove   <- stopwords("english")
 # Emojis emoji_dictionary from (https://raw.githubusercontent.com/lyons7/emojidictionary/master/emoji_dictionary.csv)
 #emoticons         <- read.csv("resources/emoji_dictionary.csv", header = TRUE) # emojis emoji_dictionary
-# combining english stops words and emojis R_Encodings
-# words_to_remove   <- c(words_to_remove,emoticons$R_Encoding)
 
 library(parallel)
 instance <- makeCluster(detectCores()) # Start a local cluster with the cores available
@@ -139,8 +149,8 @@ cat("\n\n")
 print(paste("Number of tweets processed: ",nrow(content.df),sep=""))
 cat("\n\n")
 
-# # Running test to compare the oirignal and preprocessed texts
-# # of a randomly selected set of records
+# Running test to compare the oirignal and preprocessed texts
+# of a randomly selected set of records
 n.test.records = 500
 test_text_preprocessing(data.df,content.df,n.test.records)
 

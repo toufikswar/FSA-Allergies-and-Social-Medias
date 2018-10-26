@@ -66,7 +66,7 @@ test_text_preprocessing = function(original.data,preprocessed.data,n.test.record
 
   for(i in sub_sample) {
     cat("\n")
-    cat(paste("Printing tweet ",i,"\n",sep=""))
+    cat(paste("Printing tweet ",i,", (source = ",original.data$source[i],")\n",sep=""))
     cat(paste("Original     record:     ",as.character(original.data$content[i],    "\n",sep="")))
     cat("\n")
     cat("\n")
