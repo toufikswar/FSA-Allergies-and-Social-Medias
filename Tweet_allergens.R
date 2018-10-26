@@ -9,7 +9,7 @@
 
 ## Load libraries for preprocessing
 library(stringi)
-library(qdap)
+# library(qdap)
 library(quanteda)
 library(magrittr)
 
@@ -85,7 +85,10 @@ content.df$content <- stri_replace_all_fixed(content.df$content, "~", " ")
 
 # expand acronyms
 acronym_key        <- read.csv("resources/acronyms.csv", header=FALSE,col.names = c("abv","repl"))  # acronyms map
-content.df$content <- replace_abbreviation(content.df$content, acronym_key)
+abv  <- paste("\\b",acronym_key$abv,"\\b",sep="")
+repl <- paste(acronym_key$repl,sep="")
+# content.df$content <- replace_abbreviation(content.df$content, acronym_key)
+content.df$content <- stri_replace_all_regex(content.df$content, abv, repl, vectorize_all=FALSE)
 
 #Remove all punctuation
 content.df$content <- stri_replace_all(content.df$content, "", regex = "[[:punct:]]")
