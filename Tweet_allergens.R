@@ -80,11 +80,10 @@ content.df$content <- iconv(content.df$content, from = "latin1", to = "ascii", s
 #Remove Usernames starting with @, & rt
 content.df$content <- gsub("@\\w+|^rt |<\\w+>","", content.df$content)
 
-#Replace ~ and . by whitespace
-content.df$content <- stri_replace_all_fixed(content.df$content, "~", " ")
-content.df$content <- stri_replace_all_fixed(content.df$content, ".", " ")
-#Replace % by percent
+# #Replace % by percent
 content.df$content <- stri_replace_all_fixed(content.df$content, "%", " percent ")
+#Replace ~ by whitespace
+content.df$content <- stri_replace_all_fixed(content.df$content, "~", " ")
 
 # expand acronyms
 acronym_key        <- read.csv("resources/acronyms.csv", header=FALSE,col.names = c("abv","repl"))  # acronyms map
@@ -102,9 +101,12 @@ contraction <- paste("\\b",english_contraction_key$contraction,"\\b",sep="")
 expansion   <- paste(" ",english_contraction_key$expansion," ",sep="")
 content.df$content <- stri_replace_all_regex(content.df$content, contraction, expansion, vectorize_all=FALSE)
 
-#Remove http, url links that have been collapsed into words
+# Remove http, url links that have been collapsed into words
 content.df$content <- stri_replace_all_fixed(content.df$content, "=", "")
 content.df$content <- gsub("url\\w+|http\\w+", "", content.df$content)
+
+#Replace ~ and . by whitespace
+content.df$content <- stri_replace_all_fixed(content.df$content, ".", " ")
 
 # string surroundings whitespace
 content.df$content <- stri_trim(content.df$content)
@@ -147,8 +149,8 @@ cat("\n\n")
 print(paste("Number of tweets processed: ",nrow(content.df),sep=""))
 cat("\n\n")
 
-# # Running test to compare the oirignal and preprocessed texts
-# # of a randomly selected set of records
+# Running test to compare the oirignal and preprocessed texts
+# of a randomly selected set of records
 n.test.records = 500
 test_text_preprocessing(data.df,content.df,n.test.records)
 
