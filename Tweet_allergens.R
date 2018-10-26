@@ -58,7 +58,7 @@ data.df <- data.df[,-match(columns_to_drop,names(data.df))]
 #print(names(data.df))
 
 # Subset dataframe with only 'id' and 'content' columns : content.df
-content.df <- subset(data.df, select=c("id", "content"))
+content.df <- subset(data.df, select=c("id", "content","source"))
 content.df <- content.df[1:1000,]
 
 # Subset dataframe containing metadata only
@@ -80,8 +80,11 @@ content.df$content <- iconv(content.df$content, from = "latin1", to = "ascii", s
 #Remove Usernames starting with @, & rt
 content.df$content <- gsub("@\\w+|^rt |<\\w+>","", content.df$content)
 
-#Replace ~ by whitespace
+#Replace ~ and . by whitespace
 content.df$content <- stri_replace_all_fixed(content.df$content, "~", " ")
+content.df$content <- stri_replace_all_fixed(content.df$content, ".", " ")
+#Replace % by percent
+content.df$content <- stri_replace_all_fixed(content.df$content, "%", " percent ")
 
 # expand acronyms
 acronym_key        <- read.csv("resources/acronyms.csv", header=FALSE,col.names = c("abv","repl"))  # acronyms map
@@ -103,14 +106,13 @@ end_time1 <- Sys.time()
 print(paste("1st preprocessing:  ",round(end_time1 - start_time1,5)," secs",sep=""))
 
 start_time1 <- Sys.time()
+
 # stemming & stopword + emojis removing
 
 # list of engish stop words
 words_to_remove   <- stopwords("english")
 # Emojis emoji_dictionary from (https://raw.githubusercontent.com/lyons7/emojidictionary/master/emoji_dictionary.csv)
 #emoticons         <- read.csv("resources/emoji_dictionary.csv", header = TRUE) # emojis emoji_dictionary
-# combining english stops words and emojis R_Encodings
-# words_to_remove   <- c(words_to_remove,emoticons$R_Encoding)
 
 library(parallel)
 instance <- makeCluster(detectCores()) # Start a local cluster with the cores available
