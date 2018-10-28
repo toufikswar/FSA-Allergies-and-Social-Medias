@@ -139,8 +139,8 @@ content.df$content <- parLapply(instance, content.df$content,
   function(i) {
     i %>%
     tokens() %>%
-    tokens_wordstem() %>%
     tokens_remove(words_to_remove) %>%
+    tokens_wordstem() %>%
     paste(collapse = " ")
   }
 )
