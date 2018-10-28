@@ -83,8 +83,8 @@ content.df$users <- stri_extract_all_regex(content.df$content, "@\\w+")
 # Extract hashtags to new column
 content.df$hashtags <- stri_extract_all_regex(content.df$content, "#\\w+")
 
-#Remove Usernames starting with @, & rt
-content.df$content <- gsub("@\\w+|^rt |<\\w+>","", content.df$content)
+#Remove Usernames starting with @, rt, Emoticons (<xx> tags) and HTML entities (e.g. &amp;)
+content.df$content <- gsub("@\\w+|^rt |<\\w+>|&.*;","", content.df$content)
 
 # #Replace % by percent
 content.df$content <- stri_replace_all_fixed(content.df$content, "%", " percent ")
