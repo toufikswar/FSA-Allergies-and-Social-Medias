@@ -74,6 +74,12 @@ start_time1 <- Sys.time()
 #Convert to lowercase
 content.df$content <- stri_trans_tolower(content.df$content)
 
+# Remove Retweets
+content.df <- content.df[-grep("^rt", content.df$content),]
+
+# Remove duplicate original tweets
+content.df <- content.df[!duplicated(content.df$content),]
+
 # Convert tweets text to ascii format
 content.df$content <- iconv(content.df$content, from = "latin1", to = "ascii", sub = "byte")
 
@@ -83,8 +89,8 @@ content.df$users <- stri_extract_all_regex(content.df$content, "@\\w+")
 # Extract hashtags to new column
 content.df$hashtags <- stri_extract_all_regex(content.df$content, "#\\w+")
 
-#Remove Usernames starting with @, rt, Emoticons (<xx> tags) and HTML entities (e.g. &amp;)
-content.df$content <- gsub("@\\w+|^rt |<\\w+>|&.*;","", content.df$content)
+#Remove Usernames starting with @, Emoticons (<xx> tags) and HTML entities (e.g. &amp;)
+content.df$content <- gsub("@\\w+|<\\w+>|&.*;","", content.df$content)
 
 # #Replace % by percent
 content.df$content <- stri_replace_all_fixed(content.df$content, "%", " percent ")
@@ -160,4 +166,8 @@ cat("\n\n")
 n.test.records = 500
 test_text_preprocessing(data.df,content.df,n.test.records)
 
-###
+
+
+
+
+
