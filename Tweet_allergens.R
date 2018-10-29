@@ -167,6 +167,11 @@ n.test.records = 500
 test_text_preprocessing(data.df,content.df,n.test.records)
 
 
+#Stream 2 - Allergy Labels
+
+allergy = read.csv(file = 'resources/allergen_list.csv')
+allergy[,1] #gives a list for 14 allergens with their keywords
+allergy[,2] #gives a list for other allergens with their keywords
 
 
 
