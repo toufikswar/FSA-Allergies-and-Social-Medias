@@ -1,21 +1,20 @@
-## Parent Script for Finding Public Mentions of Allergens in Tweet Data
+### Parent Script for Finding Public Mentions of Allergens in Tweet Data
 
-## Set working directory to current folder
-#setwd(dirname(sys.frame(1)$ofile))
-# (set you workdir)
+# Set working directory to current folder
+# setwd(dirname(sys.frame(1)$ofile))
 
-
-### Initialization
-
-## Load libraries for preprocessing
-library(stringi)
-# library(qdap)
-library(quanteda)
-library(magrittr)
+### ======================INITIALIZATION========================== ###
+# Load libraries and source utils.R.
+# quanteda library must loaded before 'utils.R' is
+# sourced to ensure allergen dictionaries are created properly
 
 ## for testing
 start_time  <- Sys.time()
 start_time1 <- Sys.time()
+
+library(stringi)
+library(quanteda) 
+library(magrittr)
 
 # Read in Functions stored in utils.R
 source("utils.R")
@@ -34,11 +33,9 @@ verbose = TRUE
 data.df <- load_list_of_xlsx_files(filenames,verbose)
 cat(paste("N records = ",nrow(data.df),"\n",sep=""))
 
+### =============PREPROCESSING & TEXT CLEANING================= ###
 
-
-### Now some preprocessing
-
-# Lets drop some spureous columns
+# Lets drop some spurious columns
 columns_to_drop <- c("search",
                      "language",
                      "main emotion",
@@ -59,7 +56,7 @@ data.df <- data.df[,-match(columns_to_drop,names(data.df))]
 
 # Subset dataframe with only 'id' and 'content' columns : content.df
 content.df <- subset(data.df, select=c("id", "content","source"))
-content.df <- content.df[1:1000,]
+#content.df <- content.df[1:1000,]
 
 # Subset dataframe containing metadata only
 metadata.df <- data.df[ , ! colnames(data.df) %in% c("content") ]
@@ -127,10 +124,12 @@ print(paste("1st preprocessing:  ",round(end_time1 - start_time1,5)," secs",sep=
 
 start_time1 <- Sys.time()
 
-# stemming & stopword + emojis removing
+# Stemming & Stopword Removal
+print("Stemming & Stopword Removal")
+print("Depending on the size of the Data this step can take 5-10 minutes")
+print("Be Patient")
+words_to_remove   <- stopwords("english") # list of engish stop words
 
-# list of engish stop words
-words_to_remove   <- stopwords("english")
 # Emojis emoji_dictionary from (https://raw.githubusercontent.com/lyons7/emojidictionary/master/emoji_dictionary.csv)
 #emoticons         <- read.csv("resources/emoji_dictionary.csv", header = TRUE) # emojis emoji_dictionary
 
@@ -166,13 +165,62 @@ cat("\n\n")
 n.test.records = 500
 test_text_preprocessing(data.df,content.df,n.test.records)
 
+##### ------ TO BE MOVED ------------########
 
-#Stream 2 - Allergy Labels
+### COUNT OF 14 ALLERGENS AND OTHER ALLERGENS
 
-allergy = read.csv(file = 'resources/allergen_list.csv')
-allergy[,1] #gives a list for 14 allergens with their keywords
-allergy[,2] #gives a list for other allergens with their keywords
+# Collapse tokenized words to character vectors
+content.df$content <- as.character(content.df$content)  ## This may interfere with tokenization for stream 1 - be aware
+# Create a corpus including id for identifier
+content.corpus <- corpus(content.df, docid_field = "id", text_field = "content")
+# Create a document term matrix 'content.dtm'
+content.dtm <- dfm(content.corpus, tolower = FALSE, verbose = TRUE)
+content.by.source.dtm <- dfm(content.corpus, tolower = FALSE, verbose = TRUE, group = "source")
+
+# 14 allergens by source:
+fourteen_allergen_source_dict.dtm <- dfm_lookup(content.by.source.dtm, fourteen_allergens.dict, nomatch = "_unmatched")
+# Lookup 14 allergens in content.dtm 
+fourteen_allergen_dict.dtm <- dfm_lookup(content.dtm, fourteen_allergens.dict, nomatch = "_unmatched")
+
+# other Allergens by source
+other_allergens_source_dict.dtm <- dfm_lookup(content.by.source.dtm, other_allergens.dict, nomatch = "_unmatched")
+# Lookup other allergens in content.dtm
+other_allergens_dict.dtm <- dfm_lookup(content.dtm, other_allergens.dict, nomatch = "_unmatched")
 
 
+library(tidyr)
+library(forcats)
+fourteen_allergen_by_source.long <- data.frame(fourteen_allergen_source_dict.dtm)
+fourteen_allergen_by_source.long <- gather(fourteen_allergen_by_source.long, Allergen, "Mentions", 2:15, factor_key = TRUE)
+fourteen_allergen_by_source.long$class <- "Fourteen_Allergens"
+other_allergen_by_source.long <- data.frame(other_allergens_source_dict.dtm)
+other_allergen_by_source.long <- gather(other_allergen_by_source.long, Allergen, "Mentions", 2:25, factor_key = TRUE)
+other_allergen_by_source.long$class <- "Other_Allergens"
 
+Allergen.by.source.df <- rbind(fourteen_allergen_by_source.long, other_allergen_by_source.long)
+
+library(ggplot2)
+fourteen.bysource <- ggplot(fourteen_allergen_by_source.long, 
+                            aes(x = fct_reorder(Allergen, Mentions) y = Mentions, fill = document))+
+  geom_col(position = "identity" ) +
+  theme_minimal()+
+  scale_fill_brewer(palette="Spectral")+
+  coord_flip()
+fourteen.bysource
+  
+otherallergen.bysource <- ggplot(other_allergen_by_source.long, 
+                                 aes(x = fct_reorder(Allergen, Mentions), y = Mentions, fill = document))+
+  geom_col(position = "identity" ) +
+  theme_minimal()+
+  scale_fill_brewer(palette="Spectral")+
+  coord_flip()
+otherallergen.bysource
+
+Allergen.by.source <- ggplot(Allergen.by.source.df, 
+                             aes(x = fct_reorder(Allergen, Mentions), y = Mentions, fill = document, colour = class))+
+  geom_col(position = "identity") +
+  theme_minimal()+
+  scale_fill_brewer(palette="Spectral")+
+  coord_flip() 
+Allergen.by.source
 
