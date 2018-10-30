@@ -201,7 +201,7 @@ Allergen.by.source.df <- rbind(fourteen_allergen_by_source.long, other_allergen_
 
 library(ggplot2)
 fourteen.bysource <- ggplot(fourteen_allergen_by_source.long, 
-                            aes(x = fct_reorder(Allergen, Mentions) y = Mentions, fill = document))+
+                            aes(x = fct_reorder(Allergen, Mentions), y = Mentions, fill = document))+
   geom_col(position = "identity" ) +
   theme_minimal()+
   scale_fill_brewer(palette="Spectral")+
