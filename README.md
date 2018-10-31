@@ -7,6 +7,8 @@
 * [magrittr](https://github.com/tidyverse/magrittr)
 * [tidyr](https://cran.r-project.org/web/packages/tidyr/index.html)
 * [forcats](https://forcats.tidyverse.org/)
+* [ggplot2](https://ggplot2.tidyverse.org/)
+* [ggpubr](http://www.sthda.com/english/rpkgs/ggpubr/)
 
 *Prior to Running script run:*
-`install.packages(c("readxl","stringi","quanteda","magrittr", "tidyr", "forcats"))`
+`install.packages(c("readxl","stringi","quanteda","magrittr", "tidyr", "forcats","ggplot2","ggpubr"))`
