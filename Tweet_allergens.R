@@ -150,6 +150,7 @@ content.df$content <- parLapply(instance, content.df$content,
   }
 )
 stopCluster(instance)
+rm(instance)
 end_time1 <- Sys.time()
 print(paste("2nd preprocessing:  ",round(end_time1 - start_time1,5)," secs (stemming & stopwords removal)",sep=""))
 
@@ -165,62 +166,13 @@ cat("\n\n")
 n.test.records = 500
 test_text_preprocessing(data.df,content.df,n.test.records)
 
-##### ------ TO BE MOVED ------------########
-
-### COUNT OF 14 ALLERGENS AND OTHER ALLERGENS
-
 # Collapse tokenized words to character vectors
-content.df$content <- as.character(content.df$content)  ## This may interfere with tokenization for stream 1 - be aware
+content.df$content <- as.character(content.df$content)  # This may interfere with tokenization for stream 1 - be aware
 # Create a corpus including id for identifier
-content.corpus <- corpus(content.df, docid_field = "id", text_field = "content")
-# Create a document term matrix 'content.dtm'
-content.dtm <- dfm(content.corpus, tolower = FALSE, verbose = TRUE)
-content.by.source.dtm <- dfm(content.corpus, tolower = FALSE, verbose = TRUE, group = "source")
+content.corpus <- corpus(content.df, docid_field = "id", text_field = "content") # Username and Hashtag metadata is retained
+# Create a document frequency matrix 'content.dfm'
+content.dfm <- dfm(content.corpus, tolower = FALSE, verbose = TRUE)
+content.by.source.dfm <- dfm(content.corpus, tolower = FALSE, verbose = TRUE, group = "source")
+save.image(file = "Tweet_allergens.RData")
 
-# 14 allergens by source:
-fourteen_allergen_source_dict.dtm <- dfm_lookup(content.by.source.dtm, fourteen_allergens.dict, nomatch = "_unmatched")
-# Lookup 14 allergens in content.dtm 
-fourteen_allergen_dict.dtm <- dfm_lookup(content.dtm, fourteen_allergens.dict, nomatch = "_unmatched")
-
-# other Allergens by source
-other_allergens_source_dict.dtm <- dfm_lookup(content.by.source.dtm, other_allergens.dict, nomatch = "_unmatched")
-# Lookup other allergens in content.dtm
-other_allergens_dict.dtm <- dfm_lookup(content.dtm, other_allergens.dict, nomatch = "_unmatched")
-
-
-library(tidyr)
-library(forcats)
-fourteen_allergen_by_source.long <- data.frame(fourteen_allergen_source_dict.dtm)
-fourteen_allergen_by_source.long <- gather(fourteen_allergen_by_source.long, Allergen, "Mentions", 2:15, factor_key = TRUE)
-fourteen_allergen_by_source.long$class <- "Fourteen_Allergens"
-other_allergen_by_source.long <- data.frame(other_allergens_source_dict.dtm)
-other_allergen_by_source.long <- gather(other_allergen_by_source.long, Allergen, "Mentions", 2:25, factor_key = TRUE)
-other_allergen_by_source.long$class <- "Other_Allergens"
-
-Allergen.by.source.df <- rbind(fourteen_allergen_by_source.long, other_allergen_by_source.long)
-
-library(ggplot2)
-fourteen.bysource <- ggplot(fourteen_allergen_by_source.long, 
-                            aes(x = fct_reorder(Allergen, Mentions), y = Mentions, fill = document))+
-  geom_col(position = "identity" ) +
-  theme_minimal()+
-  scale_fill_brewer(palette="Spectral")+
-  coord_flip()
-fourteen.bysource
-  
-otherallergen.bysource <- ggplot(other_allergen_by_source.long, 
-                                 aes(x = fct_reorder(Allergen, Mentions), y = Mentions, fill = document))+
-  geom_col(position = "identity" ) +
-  theme_minimal()+
-  scale_fill_brewer(palette="Spectral")+
-  coord_flip()
-otherallergen.bysource
-
-Allergen.by.source <- ggplot(Allergen.by.source.df, 
-                             aes(x = fct_reorder(Allergen, Mentions), y = Mentions, fill = document, colour = class))+
-  geom_col(position = "identity") +
-  theme_minimal()+
-  scale_fill_brewer(palette="Spectral")+
-  coord_flip() 
-Allergen.by.source
-
+# source("Stream2.R") # Runs Stream2.R script
