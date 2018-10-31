@@ -103,14 +103,14 @@ fourteen_allergens.dict <- dictionary(list(celery = c("celery*"),
                                            mustard = c("mustard*"),
                                            tree_nuts = c("nut*" ,"almond*", "hazelnut*", "walnut*", "brazil nut*", "brazilnut*", "cashew*", "pecan*", "pistachio*", "macadamia nut*", "macadamianut*", "queensland nut*", "queenslandnut*", "tree nut*", "treenut*"),
                                            peanuts = c("peanut*", "pea nut*"),
-                                           sesame_seeds = c("sesame seed*", "sesameseed*"),
+                                           sesame_seeds = c("sesame*","sesame seed*", "sesameseed*"),
                                            soybeans = c("soya*", "soybean*", "soy bean*", "soy*"),
                                            sulphur_dioxide_and_sulphites = c("sulphur dioxide*", "sulphurdioxide*", "sulphit*", "sulphite*"))
 )
 
 
 other_allergens.dict <- dictionary(list(corn = c("corn*", "maize*",  "sweetcorn*"),
-                                        meat = c("meet*", "pork*", "beef*", "lamb*"),
+                                        meat = c("meat*", "pork*", "beef*", "lamb*"),
                                         gelatine = c("gelatine*"), 
                                         seed = c("seed*", "sunflower*", "poppy*", "seed oil*"),
                                         spice = c("spice*", "coriander*", "garlic*", "cinnamon*", "chilli*"),
