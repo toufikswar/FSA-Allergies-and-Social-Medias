@@ -60,6 +60,7 @@ content.df <- subset(data.df, select=c("id", "content","source"))
 
 # Subset dataframe containing metadata only
 metadata.df <- data.df[ , ! colnames(data.df) %in% c("content") ]
+metadata.df$id <- as.character(metadata.df$id) # to fix downstream coercion
 
 end_time1 <- Sys.time()
 cat("\n\n")
