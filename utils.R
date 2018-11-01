@@ -92,13 +92,13 @@ test_text_preprocessing = function(original.data,preprocessed.data,n.test.record
 
 ## DICTIONARIES (will only create if library(quanteda) is loaded correctly)
 
-fourteen_allergens.dict <- dictionary(list(celery = c("celery*"),
-                                           cereals_contain_gluten = c("gluten*", "wheat*", "rye*", "barley*", "oat*"),
-                                           crustaceans = c("crab*", "prawn*", "lobster*",  "scampi*",  "shrimp*", "shrimp paste", "shrimppaste", "crayfish*", "cray fish*", "crustacean*"),
+fourteen_allergens.dict <- dictionary(list(celery = c("celery*", "celeri"),
+                                           cereals_contain_gluten = c("gluten*", "wheat*", "rye*", "barley*", "barli*","oat*"),
+                                           crustaceans = c("crab*", "prawn*", "lobster*", "lobstr*",  "scampi*",  "shrimp*", "shrimp paste", "shrimppaste", "crayfish*", "cray fish*", "crustacean*"),
                                            eggs = c("egg*"),
                                            fish = c("fish*", "salmon*", "tuna*"),
                                            lupin = c("lupin*"),
-                                           milk = c("milk*"),
+                                           milk = c("milk*", "cream*"),
                                            molluscs = c("mollusc*", "mussel*", "oyster*", "clams*", "scallop*", "snail*", "squid*"),
                                            mustard = c("mustard*"),
                                            tree_nuts = c("nut*" ,"almond*", "hazelnut*", "walnut*", "brazil nut*", "brazilnut*", "cashew*", "pecan*", "pistachio*", "macadamia nut*", "macadamianut*", "queensland nut*", "queenslandnut*", "tree nut*", "treenut*"),
@@ -132,5 +132,6 @@ other_allergens.dict <- dictionary(list(corn = c("corn*", "maize*",  "sweetcorn*
                                         garlic = c("garlic*"),
                                         banana = c("banana*"),
                                         lentils = c("lentil*"),
+                                        buckwheat = c("buckwheat*"),
                                         edible_insects = c("edible instect*", "edible bug*", "cricket*", "grasshopper*", "mealworm*",  "buffalo worm*", "buffaloworm*"))
 )
