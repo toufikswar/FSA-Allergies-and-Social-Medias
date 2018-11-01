@@ -4,44 +4,46 @@ library(quanteda)
 library(tidyr)
 
 # Lookup 14 allergens in content.dfm 
-fourteen_allergens_dict.dfm <- dfm_lookup(content.dfm, fourteen_allergens.dict, nomatch = "_unmatched")
+fourteen_allergens_dict.dfm <- dfm_lookup(content.dfm, fourteen_allergens.dict)
 fourteen_allergens.df <- convert(fourteen_allergens_dict.dfm, "data.frame")
 colnames(fourteen_allergens.df)[1] <- "id"
+fourteen.allergen.names <- colnames(fourteen_allergens.df)[-1]
 # Normalized to one mention per document
-fourteen_allergens.df.norm <- data.frame(id = fourteen_allergens.df$id, ifelse(fourteen_allergens.df[,2:15] > 0, 1, 0))
+fourteen_allergens.df.norm <- data.frame(id = fourteen_allergens.df$id, ifelse(fourteen_allergens.df[,fourteen.allergen.names] > 0, 1, 0))
 
 # Lookup other allergens in content.dfm
-other_allergens_dict.dfm <- dfm_lookup(content.dfm, other_allergens.dict, nomatch = "_unmatched")
+other_allergens_dict.dfm <- dfm_lookup(content.dfm, other_allergens.dict)
 other_allergens.df <- convert(other_allergens_dict.dfm, "data.frame")
 colnames(other_allergens.df)[1] <- "id"
+other.allergen.names <- colnames(other_allergens.df)[-1]
 # Normalized to one mention per document
-other_allergens.df.norm <- data.frame(id = other_allergens.df$id, ifelse(other_allergens.df[,2:25] > 0, 1, 0))
+other_allergens.df.norm <- data.frame(id = other_allergens.df$id, ifelse(other_allergens.df[,other.allergen.names] > 0, 1, 0))
 
 # Merge labelled tweets with metadata.df
 library(dplyr)
-fourteen_allergens.df <- left_join(fourteen_allergens.df, metadata.df[, c("id", "source", "latitude", "longitude","date")], "id")
-fourteen_allergens.df.norm <- left_join(fourteen_allergens.df.norm, metadata.df[, c("id", "source", "latitude", "longitude","date")], "id")
-other_allergens.df <- left_join(other_allergens.df, metadata.df[, c("id", "source", "latitude", "longitude","date")], "id")
-other_allergens.df.norm <- left_join(other_allergens.df.norm, metadata.df[, c("id", "source", "latitude", "longitude","date")], "id")
+fourteen_allergens.df <- left_join(fourteen_allergens.df, metadata.df[, c("id", "source", "latitude", "longitude","date","users","hashtags")], "id")
+fourteen_allergens.df.norm <- left_join(fourteen_allergens.df.norm, metadata.df[, c("id", "source", "latitude", "longitude","date","users","hashtags")], "id")
+other_allergens.df <- left_join(other_allergens.df, metadata.df[, c("id", "source", "latitude", "longitude","date","users","hashtags")], "id")
+other_allergens.df.norm <- left_join(other_allergens.df.norm, metadata.df[, c("id", "source", "latitude", "longitude","date","users","hashtags")], "id")
 
 
 library(tidyr)
 library(forcats)
-fourteen.df.long <- fourteen_allergens.df[,-match("_unmatched", colnames(fourteen_allergens.df))]
-fourteen.df.long <- gather(fourteen.df.long, Allergen, "Mentions", 2:15, factor_key = TRUE)
+fourteen.df.long <- fourteen_allergens.df
+fourteen.df.long <- gather(fourteen.df.long, Allergen, "Mentions", fourteen.allergen.names, factor_key = TRUE)
 fourteen.df.long$category <- "Fourteen_Allergens"
 fourteen.df.long$class <- "raw_counts"
 fourteen.df.norm.long <- fourteen_allergens.df.norm
-fourteen.df.norm.long <- gather(fourteen.df.norm.long, Allergen, "Mentions", 2:15, factor_key = TRUE)
+fourteen.df.norm.long <- gather(fourteen.df.norm.long, Allergen, "Mentions", fourteen.allergen.names, factor_key = TRUE)
 fourteen.df.norm.long$category <- "Fourteen_Allergens"
 fourteen.df.norm.long$class <- "per_document"
 
-other_allergens.df.long <- other_allergens.df[,-match("_unmatched", colnames(other_allergens.df))]
-other_allergens.df.long <- gather(other_allergens.df.long, Allergen, "Mentions", 2:25, factor_key = TRUE)
+other_allergens.df.long <- other_allergens.df
+other_allergens.df.long <- gather(other_allergens.df.long, Allergen, "Mentions", other.allergen.names, factor_key = TRUE)
 other_allergens.df.long$category <- "Other_Allergens"
 other_allergens.df.long$class <- "raw_counts"
 other_allergens.df.norm.long <- other_allergens.df.norm
-other_allergens.df.norm.long <- gather(other_allergens.df.norm.long, Allergen, "Mentions", 2:25, factor_key = TRUE)
+other_allergens.df.norm.long <- gather(other_allergens.df.norm.long, Allergen, "Mentions", other.allergen.names, factor_key = TRUE)
 other_allergens.df.norm.long$category <- "Other_Allergens"
 other_allergens.df.norm.long$class <- "per_document"
 
@@ -108,8 +110,15 @@ other.bysource.norm <- ggplot(other.bysource.norm.df,
 other.bysource.norm
 
 library(ggpubr)
+bysource.14panel <- ggarrange(fourteen.bysource, fourteen.bysource.norm, 
+
+                           ncol = 2, nrow = 1)
+
+bysource.otherpanel <- ggarrange(
+                              other.bysource, other.bysource.norm,
+                              ncol = 2, nrow = 1)
+
 bysource.panel <- ggarrange(fourteen.bysource, fourteen.bysource.norm, 
                             other.bysource, other.bysource.norm,
-                           ncol = 2, nrow = 2)
+                            ncol = 2, nrow = 2)
 bysource.panel
-
