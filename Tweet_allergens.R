@@ -83,9 +83,13 @@ content.df$content <- iconv(content.df$content, from = "latin1", to = "ascii", s
 
 # Extract usernames to new column
 content.df$users <- stri_extract_all_regex(content.df$content, "@\\w+")
+# Merge usernames to metadata
+metadata.df <- left_join(metadata.df, content.df[,c("id","users")], "id")
 
 # Extract hashtags to new column
 content.df$hashtags <- stri_extract_all_regex(content.df$content, "#\\w+")
+# Merge hashtags to metadata
+metadata.df <- left_join(metadata.df, content.df[,c("id","hashtags")], "id")
 
 #Remove Usernames starting with @, Emoticons (<xx> tags) and HTML entities (e.g. &amp;)
 content.df$content <- gsub("@\\w+|<\\w+>|&.*;","", content.df$content)
