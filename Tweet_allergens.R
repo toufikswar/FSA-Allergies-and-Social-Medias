@@ -33,7 +33,14 @@ verbose = TRUE
 data.df <- load_list_of_xlsx_files(filenames,verbose)
 cat(paste("N records = ",nrow(data.df),"\n",sep=""))
 
+end_time1 <- Sys.time()
+cat("\n\n")
+print(paste("Loading time:       ",round(end_time1 - start_time1,5)," secs",sep=""))
+
 ### =============PREPROCESSING & TEXT CLEANING================= ###
+
+# Set time for beginning of text pre-preprocessing
+start_time1 <- Sys.time()
 
 # Lets drop some spurious columns
 columns_to_drop <- c("search",
@@ -58,17 +65,6 @@ data.df <- data.df[,-match(columns_to_drop,names(data.df))]
 content.df <- subset(data.df, select=c("id", "content","source"))
 #content.df <- content.df[1:1000,]
 
-# Subset dataframe containing metadata only
-metadata.df <- data.df[ , ! colnames(data.df) %in% c("content") ]
-metadata.df$id <- as.character(metadata.df$id) # to fix downstream coercion
-
-end_time1 <- Sys.time()
-cat("\n\n")
-print(paste("Loading time:       ",round(end_time1 - start_time1,5)," secs",sep=""))
-
-# Start text pre-preprocessing
-
-start_time1 <- Sys.time()
 #Convert to lowercase
 content.df$content <- stri_trans_tolower(content.df$content)
 
@@ -83,13 +79,13 @@ content.df$content <- iconv(content.df$content, from = "latin1", to = "ascii", s
 
 # Extract usernames to new column
 content.df$users <- stri_extract_all_regex(content.df$content, "@\\w+")
-# Merge usernames to metadata
-metadata.df <- left_join(metadata.df, content.df[,c("id","users")], "id")
+# Merge usernames to data.df
+data.df <- left_join(data.df, content.df[,c("id","users")], "id")
 
 # Extract hashtags to new column
 content.df$hashtags <- stri_extract_all_regex(content.df$content, "#\\w+")
-# Merge hashtags to metadata
-metadata.df <- left_join(metadata.df, content.df[,c("id","hashtags")], "id")
+# Merge hashtags to data.df
+data.df <- left_join(data.df, content.df[,c("id","hashtags")], "id")
 
 #Remove Usernames starting with @, Emoticons (<xx> tags) and HTML entities (e.g. &amp;)
 content.df$content <- gsub("@\\w+|<\\w+>|&.*;","", content.df$content)
