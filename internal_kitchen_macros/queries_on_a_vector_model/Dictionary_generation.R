@@ -23,6 +23,9 @@ produce_line_out_of_vec = function(name,file)
 
   word_list <- c(name,as.vector(read.table(file,sep = ",")$V1))
 
+  # replace _ by a white-space
+  word_list <- stri_replace_all_fixed(word_list,"_"," ")
+
   line <- paste(word_list,collapse=",")
   line <- paste(line,",",sep="")
 
@@ -57,18 +60,24 @@ produce_dictionary_file = function(input_dir,myList,output_dir,output_file)
 }
 # =========================================================
 
-# path where input files are
-input_directory  <- "test/test_preprocessed/"
-# path where output file are going to be written
-output_directory <- "test/test_dictionary/"
-output_file      <- "test_dictionary.csv"
-# file queries dictionary
-test_file_list = list(
-                      hero   = c("hero_preprocessed_truncatedAt50.txt"),
-                      vilain = c("info_preprocessed_truncatedAt50.txt")
-                     )
+# set to true if want to run the test
+run_test <- FALSE
+# run_test <- TRUE
 
-produce_dictionary_file(input_directory,test_file_list,
-                        output_directory,output_file)
+if(run_test) {
+  # path where input files are
+  input_directory  <- "test/test_preprocessed/"
+  # path where output file are going to be written
+  output_directory <- "test/test_dictionary/"
+  output_file      <- "test_dictionary.csv"
+  # file queries dictionary
+  test_file_list = list(
+                        hero   = c("hero_preprocessed_truncatedAt50.txt"),
+                        vilain = c("info_preprocessed_truncatedAt50.txt")
+                       )
+
+  produce_dictionary_file(input_directory,test_file_list,
+                          output_directory,output_file)
+}
 
 #
