@@ -167,7 +167,6 @@ other_allergens.dict <- get_dictionary_from_file(other_allergens_dict_filename)
 from_corpus_to_lookup_dataframe <- function(data.corpus, dict)
 {
   data.dfm <- dfm(data.corpus, tolower = FALSE, verbose = TRUE, dictionary=dict)
-  data.dfm <- dfm_lookup(data.dfm, dict)
   processed.df <- convert(data.dfm, "data.frame")
   colnames(processed.df)[1] <- "id"
   processed.df.names <- colnames(processed.df)[-1]
