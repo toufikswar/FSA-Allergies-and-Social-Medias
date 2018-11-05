@@ -3,6 +3,7 @@
 # Set working directory to current folder
 # setwd(dirname(sys.frame(1)$ofile))
 
+
 ### ======================INITIALIZATION========================== ###
 # Load libraries and source utils.R.
 # quanteda library must loaded before 'utils.R' is
@@ -178,4 +179,4 @@ content.dfm <- dfm(content.corpus, tolower = FALSE, verbose = TRUE)
 content.by.source.dfm <- dfm(content.corpus, tolower = FALSE, verbose = TRUE, group = "source")
 save.image(file = "Tweet_allergens.RData")
 
-# source("Stream2.R") # Runs Stream2.R script
+#source("Stream2.R") # Runs Stream2.R script

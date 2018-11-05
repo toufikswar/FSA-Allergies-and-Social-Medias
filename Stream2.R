@@ -1,23 +1,18 @@
 ### COUNT OF 14 ALLERGENS AND OTHER ALLERGENS
 load("Tweet_allergens.RData")
+
+source("utils.R")
+
 library(quanteda)
 library(tidyr)
 
-# Lookup 14 allergens in content.dfm 
-fourteen_allergens_dict.dfm <- dfm_lookup(content.dfm, fourteen_allergens.dict)
-fourteen_allergens.df <- convert(fourteen_allergens_dict.dfm, "data.frame")
-colnames(fourteen_allergens.df)[1] <- "id"
-fourteen.allergen.names <- colnames(fourteen_allergens.df)[-1]
-# Normalized to one mention per document
-fourteen_allergens.df.norm <- data.frame(id = fourteen_allergens.df$id, ifelse(fourteen_allergens.df[,fourteen.allergen.names] > 0, 1, 0))
+
+
+# Lookup 14 allergens in content.dfm
+fourteen_allergens.df.norm <- from_corpus_to_lookup_dataframe(content.corpus, fourteen_allergens.dict)
 
 # Lookup other allergens in content.dfm
-other_allergens_dict.dfm <- dfm_lookup(content.dfm, other_allergens.dict)
-other_allergens.df <- convert(other_allergens_dict.dfm, "data.frame")
-colnames(other_allergens.df)[1] <- "id"
-other.allergen.names <- colnames(other_allergens.df)[-1]
-# Normalized to one mention per document
-other_allergens.df.norm <- data.frame(id = other_allergens.df$id, ifelse(other_allergens.df[,other.allergen.names] > 0, 1, 0))
+other_allergens.df.norm <- from_corpus_to_lookup_dataframe(content.corpus, other_allergens.dict)
 
 # Merge labelled tweets with other features from data.df
 library(dplyr)

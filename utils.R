@@ -158,4 +158,20 @@ other_allergens.dict <- get_dictionary_from_file(other_allergens_dict_filename)
 
 
 
-#
+#==================================================================
+
+## Function that takes a <corpus> and a <dictonary> 
+## Looks up the content their content to a DFM 
+## Returns a normalized Data Frame (on one mention per document)
+
+from_corpus_to_lookup_dataframe <- function(data.corpus, dict)
+{
+  data.dfm <- dfm(data.corpus, tolower = FALSE, verbose = TRUE, dictionary=dict)
+  data.dfm <- dfm_lookup(data.dfm, dict)
+  processed.df <- convert(data.dfm, "data.frame")
+  colnames(processed.df)[1] <- "id"
+  processed.df.names <- colnames(processed.df)[-1]
+  #Normalization to one mention per document
+  norm.df <- data.frame(id = processed.df$id, ifelse(processed.df[,processed.df.names] > 0, 1, 0))
+  return (norm.df)
+}
