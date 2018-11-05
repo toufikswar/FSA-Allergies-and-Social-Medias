@@ -13,7 +13,7 @@ start_time  <- Sys.time()
 start_time1 <- Sys.time()
 
 library(stringi)
-library(quanteda) 
+library(quanteda)
 library(magrittr)
 
 # Read in Functions stored in utils.R
@@ -76,6 +76,8 @@ content.df <- content.df[!duplicated(content.df$content),]
 
 # Convert tweets text to ascii format
 content.df$content <- iconv(content.df$content, from = "latin1", to = "ascii", sub = "byte")
+
+library(dplyr)
 
 # Extract usernames to new column
 content.df$users <- stri_extract_all_regex(content.df$content, "@\\w+")

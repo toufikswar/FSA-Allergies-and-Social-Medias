@@ -85,53 +85,77 @@ test_text_preprocessing = function(original.data,preprocessed.data,n.test.record
 
 }
 #================================================================
+get_dictionary_from_file = function(dict_filename)
+{
 
+  # build a dictionary from a cvs file
 
+  # Vector with the dictionary groupping names
+  the_names <- vector()
+  # The output dictionary
+  myList <- list()
 
+  # opening the file with the dictionary in csv format
+  con <- file(dict_filename,"r")
+  # file line counter
+  counter_line <- 0
+  # groupping line counter
+  counter_groupping <- 0
+  # read line by line
+  while(TRUE) {
+    # get the line
+    line <- readLines(con,n=1)
+    if(length(line) == 0) {
+      # Exit if end of file
+      break
+    }
+    # Counting the lines already read
+    counter_line <- counter_line + 1
+    # exclude empty lines
+    if(line == "") next
+    # exclude comment lines (starting with #)
+    if(startsWith(line,"#")) next
 
+    # counter the number of groupping in the file
+    counter_groupping <- counter_groupping + 1
+    # the elements in a line a comma separated
+    # get a vector with the different elements
+    vec_line <- unlist(strsplit(line,","))
+
+    # the 1st element is the groupping name
+    the_names <- c(the_names,vec_line[1])
+    # the rest of the elements are the dictionary
+    myList[[counter_groupping]] <- vec_line[-1]
+
+  }
+  close(con)
+
+  # Set the groupping names
+  names(myList) <- the_names
+
+  return(dictionary(myList))
+
+}
+#================================================================
 
 ## DICTIONARIES (will only create if library(quanteda) is loaded correctly)
 
-fourteen_allergens.dict <- dictionary(list(celery = c("celery*", "celeri"),
-                                           cereals_contain_gluten = c("gluten*", "wheat*", "rye*", "barley*", "barli*","oat*"),
-                                           crustaceans = c("crab*", "prawn*", "lobster*", "lobstr*",  "scampi*",  "shrimp*", "shrimp paste", "shrimppaste", "crayfish*", "cray fish*", "crustacean*"),
-                                           eggs = c("egg*"),
-                                           fish = c("fish*", "salmon*", "tuna*"),
-                                           lupin = c("lupin*"),
-                                           milk = c("milk*", "cream*"),
-                                           molluscs = c("mollusc*", "mussel*", "oyster*", "clams*", "scallop*", "snail*", "squid*"),
-                                           mustard = c("mustard*"),
-                                           tree_nuts = c("almond*", "hazelnut*", "walnut*", "brazil nut*", "brazilnut*", "cashew*", "pecan*", "pistachio*", "macadamia nut*", "macadamianut*", "queensland nut*", "queenslandnut*", "tree nut*", "treenut*"),
-                                           peanuts = c("peanut*"),
-                                           sesame_seeds = c("sesame*","sesame seed*", "sesameseed*"),
-                                           soybeans = c("soya*", "soybean*", "soy bean*", "soy*"),
-                                           sulphur_dioxide_and_sulphites = c("sulphur dioxide*", "sulphurdioxide*", "sulphit*", "sulphite*"))
-)
+# # Allergy enquiries dictionary:
+# allergy_enquiries_dict_filename <- "dictionaries/allergy_enquiries_dictionary.csv"
+# allergy_enquiries.dict <- get_dictionary_from_file(allergy_enquiries_dict_filename)
+# # Food labelling:
+#
+# # Reporting reactions:
+# reaction_report_dict_filename <- "dictionaries/reaction_report_dictionary.csv"
+# reaction_report.dict <- get_dictionary_from_file(reaction_report_dict_filename)
+
+fourteen_allergens_dict_filename <- "dictionaries/fourteen_allergens_dictionary.csv"
+fourteen_allergens.dict <- get_dictionary_from_file(fourteen_allergens_dict_filename)
+
+other_allergens_dict_filename <- "dictionaries/other_allergens_dictionary.csv"
+other_allergens.dict <- get_dictionary_from_file(other_allergens_dict_filename)
 
 
-other_allergens.dict <- dictionary(list(corn = c("corn*", "maize*",  "sweetcorn*"),
-                                        meat = c("meat*", "pork*", "beef*", "lamb*"),
-                                        gelatine = c("gelatine*"), 
-                                        seed = c("seed*", "sunflower*", "poppy*", "seed oil*"),
-                                        spice = c("spice*", "coriander*", "garlic*", "cinnamon*", "chilli*"),
-                                        fruit = c("fruit*", "apple*", "carrot*", "peach*", "plum*", "tomato*", "banana*", "strawberry*" ),
-                                        vegetable = c("vegetable*"),
-                                        latex = c("latex*"),
-                                        carrageenan = c("carrageenan*", "seaweed*", "sea weed*"),
-                                        coconut = c("coconut*"),
-                                        chestnut = c("chestnut*", "chest nut*"),
-                                        pinenut = c("pinenut*", "pine nut*"),
-                                        fungus = c("fungus*", "quorn*", "yeast*", "mushroom*"),
-                                        kiwi = c("kiwi*"),
-                                        peas = c("peas*"),
-                                        chickpeas = c("chickpeas*", "chick peas*"),
-                                        poppy_seeds = c("poppy seed*", "poppyseed*"),
-                                        pepper = c("pepper*", "bell pepper*"),
-                                        pumpkin = c("pumpkin*", "squash*", "punkin*"),
-                                        kidney_beans = c("kidney bean*", "kidneybean*"),
-                                        garlic = c("garlic*"),
-                                        banana = c("banana*"),
-                                        lentils = c("lentil*"),
-                                        buckwheat = c("buckwheat*"),
-                                        edible_insects = c("edible instect*", "edible bug*", "cricket*", "grasshopper*", "mealworm*",  "buffalo worm*", "buffaloworm*"))
-)
+
+
+#
