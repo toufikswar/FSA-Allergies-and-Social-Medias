@@ -1,65 +1,37 @@
 ### COUNT OF 14 ALLERGENS AND OTHER ALLERGENS
 load("Tweet_allergens.RData")
-
-source("utils.R")
-
 library(quanteda)
 library(tidyr)
-
-
+source("utils.R")
 
 # Lookup 14 allergens in content.dfm
 fourteen_allergens.df.norm <- from_corpus_to_lookup_dataframe(content.corpus, fourteen_allergens.dict)
-
+fourteen.allergen.names <- colnames(fourteen_allergens.df.norm)[-1]
 # Lookup other allergens in content.dfm
 other_allergens.df.norm <- from_corpus_to_lookup_dataframe(content.corpus, other_allergens.dict)
+other.allergen.names <- colnames(other_allergens.df.norm)[-1]
 
 # Merge labelled tweets with other features from data.df
 library(dplyr)
-fourteen_allergens.df <- left_join(fourteen_allergens.df, data.df[, c("id", "source", "latitude", "longitude","date","users","hashtags", "sentiment class", "content")], "id")
 fourteen_allergens.df.norm <- left_join(fourteen_allergens.df.norm, data.df[, c("id", "source", "latitude", "longitude","date","users","hashtags", "sentiment class","content")], "id")
-other_allergens.df <- left_join(other_allergens.df, data.df[, c("id", "source", "latitude", "longitude","date","users","hashtags","sentiment class","content")], "id")
 other_allergens.df.norm <- left_join(other_allergens.df.norm, data.df[, c("id", "source", "latitude", "longitude","date","users","hashtags","sentiment class","content")], "id")
 
-
-library(tidyr)
 library(forcats)
-fourteen.df.long <- fourteen_allergens.df
-fourteen.df.long <- gather(fourteen.df.long, Allergen, "Mentions", fourteen.allergen.names, factor_key = TRUE)
-fourteen.df.long$class <- "raw_counts"
 fourteen.df.norm.long <- fourteen_allergens.df.norm
 fourteen.df.norm.long <- gather(fourteen.df.norm.long, Allergen, "Mentions", fourteen.allergen.names, factor_key = TRUE)
-fourteen.df.norm.long$class <- "per_document"
 
-other_allergens.df.long <- other_allergens.df
-other_allergens.df.long <- gather(other_allergens.df.long, Allergen, "Mentions", other.allergen.names, factor_key = TRUE)
-other_allergens.df.long$class <- "raw_counts"
 other_allergens.df.norm.long <- other_allergens.df.norm
 other_allergens.df.norm.long <- gather(other_allergens.df.norm.long, Allergen, "Mentions", other.allergen.names, factor_key = TRUE)
-other_allergens.df.norm.long$class <- "per_document"
-
-all_allergens.df <- rbind(fourteen.df.long, other_allergens.df.long)
-#all_allergens.df <- all_allergens.df[all_allergens.df$Mentions!=0,] # remove rows with no mentions
-all_allergens.df$date <- as.Date(all_allergens.df$date, format= "%Y-%m-%d")
 
 all_allergens.norm.df <- rbind(fourteen.df.norm.long, other_allergens.df.norm.long)
 all_allergens.norm.df$date <- as.Date(all_allergens.norm.df$date, format= "%Y-%m-%d")
-#all_allergens.norm.df <- all_allergens.norm.df[all_allergens.norm.df$Mentions!=0,] # to remove zeros. When binning (ie. by month) dont perform this and keep zeros in.
+all_allergens.norm.df <- all_allergens.norm.df[all_allergens.norm.df$Mentions!=0,] # to remove zeros. When binning (ie. by month) dont perform this and keep zeros in.
 all_allergens.norm.df$Month <- as.Date(cut(all_allergens.norm.df$date, breaks = "month"))
 all_allergens.norm.df$Week <- as.Date(cut(all_allergens.norm.df$date, breaks = "week"))
 names(all_allergens.norm.df)[names(all_allergens.norm.df) == "sentiment class"] <- "sentiment_class" #rename sentiment class to a single string
 all_allergens.norm.df$sentiment_class[all_allergens.norm.df$sentiment_class %in% c("not_evaluable", "processing")] <- "neutral" # collapse not evaluable and procesing to neutral
 
-
-fourteen.bysource.df <- fourteen.df.long %>%
-  group_by(source, Allergen) %>%
-  summarise(count=sum(Mentions))
-
 fourteen.bysource.norm.df <- fourteen.df.norm.long %>%
-  group_by(source, Allergen) %>%
-  summarise(count=sum(Mentions))
-
-other.bysource.df <- other_allergens.df.long %>%
   group_by(source, Allergen) %>%
   summarise(count=sum(Mentions))
 
@@ -68,16 +40,6 @@ other.bysource.norm.df <- other_allergens.df.norm.long %>%
   summarise(count=sum(Mentions))
 
 library(ggplot2)
-fourteen.bysource <- ggplot(fourteen.bysource.df, 
-                            aes(x = fct_reorder(Allergen, count), y= count, fill = source)) +
-  geom_bar(stat = "identity") +
-  theme_minimal() +
-  scale_fill_brewer(palette="Spectral") +
-  xlab("Allergen")+
-  ylab("Mentions") +
-  ggtitle("Raw Mentions of the 14 Allergens")+
-  coord_flip() 
-fourteen.bysource
 
 fourteen.bysource.norm <- ggplot(fourteen.bysource.norm.df, 
                             aes(x = fct_reorder(Allergen, count), y= count, fill = source)) +
@@ -89,17 +51,6 @@ fourteen.bysource.norm <- ggplot(fourteen.bysource.norm.df,
   ggtitle("Mentions of the 14 Allergens Normalized by Document")+
   coord_flip() 
 fourteen.bysource.norm
-
-other.bysource <- ggplot(other.bysource.df, 
-                            aes(x = fct_reorder(Allergen, count), y= count, fill = source)) +
-  geom_bar(stat = "identity") +
-  theme_minimal() +
-  scale_fill_brewer(palette="Spectral") +
-  xlab("Allergen")+
-  ylab("Mentions") +
-  ggtitle("Raw Mentions of Other Allergens") +
-  coord_flip() 
-other.bysource
 
 other.bysource.norm <- ggplot(other.bysource.norm.df, 
                             aes(x = fct_reorder(Allergen, count), y= count, fill = source)) +
@@ -113,17 +64,9 @@ other.bysource.norm <- ggplot(other.bysource.norm.df,
 other.bysource.norm
 
 library(ggpubr)
-bysource.14panel <- ggarrange(fourteen.bysource, fourteen.bysource.norm, 
-
-                           ncol = 2, nrow = 1)
-
-bysource.otherpanel <- ggarrange(
-                              other.bysource, other.bysource.norm,
-                              ncol = 2, nrow = 1)
-
-bysource.panel <- ggarrange(fourteen.bysource, fourteen.bysource.norm, 
-                            other.bysource, other.bysource.norm,
-                            ncol = 2, nrow = 2)
+bysource.panel <- ggarrange(fourteen.bysource.norm, 
+                            other.bysource.norm,
+                            ncol = 1, nrow = 2)
 bysource.panel
 
 
@@ -141,14 +84,12 @@ by.date.twitter.14.month <- ggplot(all_allergens.norm.df.t14, aes(x = Month, y =
 by.date.twitter.14.month
 
 by.date.twitter.14.week <- ggplot(all_allergens.norm.df.t14, aes(x = Week, y = Mentions, colour = Allergen), group = Allergen)+
-  stat_summary(fun.y = sum, # adds up all observations for the month
+  stat_summary(fun.y = sum, # adds up all observations for the week
                geom = "line") +
   theme_minimal()+
   theme(legend.position="bottom")+
   facet_grid(sentiment_class~.)
 by.date.twitter.14.week
-
-all_allergens.norm.df.t14pos <- subset(all_allergens.norm.df.t14, Mentions > 0)
 
 all_allergens.norm.df.t.other <- subset(all_allergens.norm.df, source == "Twitter" & Allergen %in% other.allergen.names)
 
