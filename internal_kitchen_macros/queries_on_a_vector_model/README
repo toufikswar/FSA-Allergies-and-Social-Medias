@@ -58,6 +58,33 @@ clean them, lower-case them and remove duplicates.
 
 The output is a set of files with the lists of words for each query.
 
+========================
+IMPORTANT: hand cleaning
+------------------------
+This set of output files have to be cleaned by hand as the similar words
+queries give not only similar or synonyms words but also words which are
+used in a similar context but which don't have similar meaning.
+
+==========================
+Dictionary in a csv format
+--------------------------
+As a final step of this process, the list of words for each
+query have to be converted to a csv format to be later used
+by the main code. For this we can use the R-script
+Dictionary_generation.R
+
+The setup is performed between lines 60 and 70.
+
+The output of this script will be a file inside the
+test/test_dictionary/ folder and with the name
+test_dictionary.csv. The content of this output file
+should be like below
+
+hero,hero,stupid,
+vilain,vilain,trump,
+
+
+
 
 
 
