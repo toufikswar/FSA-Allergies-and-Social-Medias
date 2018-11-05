@@ -174,9 +174,6 @@ test_text_preprocessing(data.df,content.df,n.test.records)
 content.df$content <- as.character(content.df$content)  # This may interfere with tokenization for stream 1 - be aware
 # Create a corpus including id for identifier
 content.corpus <- corpus(content.df, docid_field = "id", text_field = "content") # Username and Hashtag metadata is retained
-# Create a document frequency matrix 'content.dfm'
-content.dfm <- dfm(content.corpus, tolower = FALSE, verbose = TRUE)
-content.by.source.dfm <- dfm(content.corpus, tolower = FALSE, verbose = TRUE, group = "source")
 save.image(file = "Tweet_allergens.RData")
 
 #source("Stream2.R") # Runs Stream2.R script
