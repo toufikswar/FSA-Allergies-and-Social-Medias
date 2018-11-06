@@ -178,7 +178,7 @@ other_allergens_dict_filename <- "dictionaries/other_allergens_dictionary.csv"
 other_allergens.dict <- get_dictionary_from_file(other_allergens_dict_filename)
 
 ## columns names from the original data to be merged with the streams labellings
-merging_names <- c("id", "source", "latitude", "longitude","date","users","hashtags", "sentiment class","content")
+retained_metadata <- c("id", "source", "latitude", "longitude","date","users","hashtags", "sentiment class","content")
 
 
 

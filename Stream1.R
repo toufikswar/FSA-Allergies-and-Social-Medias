@@ -7,15 +7,13 @@ source("utils.R")
 # Allergy enquiries:
 allergy_enquiries.df.norm <- from_corpus_to_lookup_dataframe(content.corpus,allergy_enquiries.dict)
 allergy_enquiries.names   <- colnames(allergy_enquiries.df.norm)[-1]
-# Convert from 0/1 to FALSE/TRUE
-allergy_enquiries.df.norm <- data.frame(id = allergy_enquiries.df.norm$id, ifelse(allergy_enquiries.df.norm[,allergy_enquiries.names] == 0, FALSE, TRUE))
 # Combine the queries
 allergy_enquiries.df.norm$allergy_enquiries <- ifelse(allergy_enquiries.df.norm[,"allergy"] &
                                                       allergy_enquiries.df.norm[,"info"]    &
                                                       (allergy_enquiries.df.norm[,"request"] | allergy_enquiries.df.norm[,"response"]) &
-                                                      allergy_enquiries.df.norm[,"restaurant"],TRUE,FALSE)
+                                                      allergy_enquiries.df.norm[,"restaurant"],1,0)
 allergy_enquiries.df.norm <- allergy_enquiries.df.norm[,-match(allergy_enquiries.names,names(allergy_enquiries.df.norm))]
-# print(head(allergy_enquiries.df.norm,10))
+print(head(allergy_enquiries.df.norm,10))
 
 
 # # Food labelling:
@@ -23,15 +21,13 @@ allergy_enquiries.df.norm <- allergy_enquiries.df.norm[,-match(allergy_enquiries
 # Reporting reactions:
 reaction_report.df.norm <- from_corpus_to_lookup_dataframe(content.corpus,reaction_report.dict)
 reaction_report.names   <- colnames(reaction_report.df.norm)[-1]
-# Convert from 0/1 to FALSE/TRUE
-reaction_report.df.norm <- data.frame(id = reaction_report.df.norm$id, ifelse(reaction_report.df.norm[,reaction_report.names] == 0, FALSE, TRUE))
 # Combine the queries
-reaction_report.df.norm$mild_reaction <- ifelse(reaction_report.df.norm[,"symptons"] & reaction_report.df.norm[,"ingestion"] &
-                                                !reaction_report.df.norm[,"severe"]
-                                                ,TRUE,FALSE)
+reaction_report.df.norm$mild_reaction   <- ifelse(reaction_report.df.norm[,"symptons"] & reaction_report.df.norm[,"ingestion"] &
+                                                  !reaction_report.df.norm[,"severe"]
+                                                  ,1,0)
 reaction_report.df.norm$severe_reaction <- ifelse(reaction_report.df.norm[,"symptons"] & reaction_report.df.norm[,"ingestion"] &
                                                   reaction_report.df.norm[,"severe"]
-                                                  ,TRUE,FALSE)
+                                                  ,1,0)
 reaction_report.df.norm <- reaction_report.df.norm[,-match(reaction_report.names,names(reaction_report.df.norm))]
 # print(head(reaction_report.df.norm,10))
 
@@ -39,14 +35,14 @@ support_local_authorities.df <- data.frame(id                = allergy_enquiries
                                            allergy_enquiries = allergy_enquiries.df.norm$allergy_enquiries,
                                            mild_reaction     = reaction_report.df.norm$mild_reaction,
                                            severe_reaction   = reaction_report.df.norm$severe_reaction)
-# print(head(support_local_authorities.df,10))
+print(head(support_local_authorities.df,10))
 
 # Merge labelled tweets with other features from data.df
 library(dplyr)
 
 support_local_authorities.df$id <- as.character(support_local_authorities.df$id)
-support_local_authorities.df    <- left_join(support_local_authorities.df, data.df[,merging_names], "id")
-# print(head(support_local_authorities.df,10))
+support_local_authorities.df    <- left_join(support_local_authorities.df, data.df[,retained_metadata], "id")
+print(head(support_local_authorities.df,10))
 
 # library(forcats)
 # fourteen.df.norm.long <- fourteen_allergens.df.norm

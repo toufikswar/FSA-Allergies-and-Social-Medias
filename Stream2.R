@@ -16,8 +16,8 @@ library(dplyr)
 fourteen_allergens.df.norm$id <- as.character(fourteen_allergens.df.norm$id)
 other_allergens.df.norm$id    <- as.character(other_allergens.df.norm$id)
 
-fourteen_allergens.df.norm <- left_join(fourteen_allergens.df.norm, data.df[, merging_names], "id")
-other_allergens.df.norm    <- left_join(other_allergens.df.norm,    data.df[, merging_names], "id")
+fourteen_allergens.df.norm <- left_join(fourteen_allergens.df.norm, data.df[, retained_metadata], "id")
+other_allergens.df.norm    <- left_join(other_allergens.df.norm,    data.df[, retained_metadata], "id")
 
 library(forcats)
 fourteen.df.norm.long <- fourteen_allergens.df.norm
