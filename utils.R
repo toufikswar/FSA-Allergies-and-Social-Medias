@@ -56,7 +56,7 @@ load_list_of_xlsx_files = function(filenames,verbose=FALSE)
 
 ### TESTING ORIGINAL TWEET VS PROCESSED TWEET
 
-test_text_preprocessing = function(original.data,preprocessed.data,n.test.records)
+test_text_preprocessing = function(df,n.test.records)
 {
 
   # Compares the original and preprocessed text for a random sampling of n.test.records
@@ -64,7 +64,7 @@ test_text_preprocessing = function(original.data,preprocessed.data,n.test.record
   n.test = n.test.records
 
   # The number of test records cannot be higher than the number of records
-  nrecords = nrow(preprocessed.data)
+  nrecords = nrow(df)
   if(n.test > nrecords) n.test = nrecords
 
   # Set seed for test reproductivility
@@ -73,11 +73,11 @@ test_text_preprocessing = function(original.data,preprocessed.data,n.test.record
 
   for(i in sub_sample) {
     cat("\n")
-    cat(paste("Printing tweet ",i,", (source = ",original.data$source[i],")\n",sep=""))
-    cat(paste("Original     record:     ",as.character(original.data$content[i],    "\n",sep="")))
+    cat(paste("Printing tweet id=",df$id[i],", (source = ",df$source[i],")\n",sep=""))
+    cat(paste("Original     record:     ",as.character(df$original_content[i],"\n",sep="")))
     cat("\n")
     cat("\n")
-    cat(paste("Preprocessed record:     ",as.character(preprocessed.data$content[i],"\n",sep="")))
+    cat(paste("Preprocessed record:     ",as.character(df$content[i],"\n",sep="")))
     cat("\n")
     cat("\n")
     cat("\n")
@@ -136,32 +136,10 @@ get_dictionary_from_file = function(dict_filename)
   return(dictionary(myList))
 
 }
-#================================================================
-
-## DICTIONARIES (will only create if library(quanteda) is loaded correctly)
-
-# # Allergy enquiries dictionary:
-# allergy_enquiries_dict_filename <- "dictionaries/allergy_enquiries_dictionary.csv"
-# allergy_enquiries.dict <- get_dictionary_from_file(allergy_enquiries_dict_filename)
-# # Food labelling:
-#
-# # Reporting reactions:
-# reaction_report_dict_filename <- "dictionaries/reaction_report_dictionary.csv"
-# reaction_report.dict <- get_dictionary_from_file(reaction_report_dict_filename)
-
-fourteen_allergens_dict_filename <- "dictionaries/fourteen_allergens_dictionary.csv"
-fourteen_allergens.dict <- get_dictionary_from_file(fourteen_allergens_dict_filename)
-
-other_allergens_dict_filename <- "dictionaries/other_allergens_dictionary.csv"
-other_allergens.dict <- get_dictionary_from_file(other_allergens_dict_filename)
-
-
-
-
 #==================================================================
 
-## Function that takes a <corpus> and a <dictonary> 
-## Looks up the content their content to a DFM 
+## Function that takes a <corpus> and a <dictonary>
+## Looks up the content their content to a DFM
 ## Returns a normalized Data Frame (on one mention per document)
 
 from_corpus_to_lookup_dataframe <- function(data.corpus, dict)
@@ -174,3 +152,34 @@ from_corpus_to_lookup_dataframe <- function(data.corpus, dict)
   norm.df <- data.frame(id = processed.df$id, ifelse(processed.df[,processed.df.names] > 0, 1, 0))
   return (norm.df)
 }
+#================================================================
+
+
+
+## DICTIONARIES (will only create if library(quanteda) is loaded correctly)
+
+# Stream 1: Supporting local authorities
+# Allergy enquiries dictionary:
+allergy_enquiries_dict_filename <- "dictionaries/allergy_enquiries_dictionary.csv"
+allergy_enquiries.dict <- get_dictionary_from_file(allergy_enquiries_dict_filename)
+# Food labelling dictionary:
+# food_labelling_dict_filename <- "dictionaries/food_labelling_dictionary.csv"
+# food_labelling.dict <- get_dictionary_from_file(allergy_enquiries_dict_filename)
+# Reporting reactions dictionary:
+reaction_report_dict_filename <- "dictionaries/reaction_report_dictionary.csv"
+reaction_report.dict <- get_dictionary_from_file(reaction_report_dict_filename)
+
+# Stream 2: 14 allergen list:
+# 14 allergen dictionary:
+fourteen_allergens_dict_filename <- "dictionaries/fourteen_allergens_dictionary.csv"
+fourteen_allergens.dict <- get_dictionary_from_file(fourteen_allergens_dict_filename)
+# Other allergen dictionary:
+other_allergens_dict_filename <- "dictionaries/other_allergens_dictionary.csv"
+other_allergens.dict <- get_dictionary_from_file(other_allergens_dict_filename)
+
+## columns names from the original data to be merged with the streams labellings
+merging_names <- c("id", "source", "latitude", "longitude","date","users","hashtags", "sentiment class","content")
+
+
+
+#

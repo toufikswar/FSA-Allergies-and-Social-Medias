@@ -64,6 +64,7 @@ data.df <- data.df[,-match(columns_to_drop,names(data.df))]
 
 # Subset dataframe with only 'id' and 'content' columns : content.df
 content.df <- subset(data.df, select=c("id", "content","source"))
+content.df$original_content <- content.df$content
 #content.df <- content.df[1:1000,]
 
 #Convert to lowercase
@@ -168,7 +169,7 @@ cat("\n\n")
 # Running test to compare the oirignal and preprocessed texts
 # of a randomly selected set of records
 n.test.records = 500
-test_text_preprocessing(data.df,content.df,n.test.records)
+test_text_preprocessing(content.df,n.test.records)
 
 # Collapse tokenized words to character vectors
 content.df$content <- as.character(content.df$content)  # This may interfere with tokenization for stream 1 - be aware

@@ -13,8 +13,11 @@ other.allergen.names <- colnames(other_allergens.df.norm)[-1]
 
 # Merge labelled tweets with other features from data.df
 library(dplyr)
-fourteen_allergens.df.norm <- left_join(fourteen_allergens.df.norm, data.df[, c("id", "source", "latitude", "longitude","date","users","hashtags", "sentiment class","content")], "id")
-other_allergens.df.norm <- left_join(other_allergens.df.norm, data.df[, c("id", "source", "latitude", "longitude","date","users","hashtags","sentiment class","content")], "id")
+fourteen_allergens.df.norm$id <- as.character(fourteen_allergens.df.norm$id)
+other_allergens.df.norm$id    <- as.character(other_allergens.df.norm$id)
+
+fourteen_allergens.df.norm <- left_join(fourteen_allergens.df.norm, data.df[, merging_names], "id")
+other_allergens.df.norm    <- left_join(other_allergens.df.norm,    data.df[, merging_names], "id")
 
 library(forcats)
 fourteen.df.norm.long <- fourteen_allergens.df.norm
@@ -41,7 +44,7 @@ other.bysource.norm.df <- other_allergens.df.norm.long %>%
 
 library(ggplot2)
 
-fourteen.bysource.norm <- ggplot(fourteen.bysource.norm.df, 
+fourteen.bysource.norm <- ggplot(fourteen.bysource.norm.df,
                             aes(x = fct_reorder(Allergen, count), y= count, fill = source)) +
   geom_bar(stat = "identity") +
   theme_minimal() +
@@ -49,10 +52,10 @@ fourteen.bysource.norm <- ggplot(fourteen.bysource.norm.df,
   xlab("Allergen")+
   ylab("Mentions") +
   ggtitle("Mentions of the 14 Allergens Normalized by Document")+
-  coord_flip() 
+  coord_flip()
 fourteen.bysource.norm
 
-other.bysource.norm <- ggplot(other.bysource.norm.df, 
+other.bysource.norm <- ggplot(other.bysource.norm.df,
                             aes(x = fct_reorder(Allergen, count), y= count, fill = source)) +
   geom_bar(stat = "identity") +
   theme_minimal() +
@@ -60,11 +63,11 @@ other.bysource.norm <- ggplot(other.bysource.norm.df,
   xlab("Allergen")+
   ylab("Mentions") +
   ggtitle("Mentions of Other Allergens Normalized by Document")+
-  coord_flip() 
+  coord_flip()
 other.bysource.norm
 
 library(ggpubr)
-bysource.panel <- ggarrange(fourteen.bysource.norm, 
+bysource.panel <- ggarrange(fourteen.bysource.norm,
                             other.bysource.norm,
                             ncol = 1, nrow = 2)
 bysource.panel
@@ -100,4 +103,3 @@ by.date.twitter.other <- ggplot(all_allergens.norm.df.t.other, aes(x = Month, y 
   theme(legend.position="bottom")+
   facet_grid(sentiment_class~.)
 by.date.twitter.other
-
