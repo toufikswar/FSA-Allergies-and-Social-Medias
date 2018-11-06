@@ -186,8 +186,8 @@ get_time_units = function(timediff)
 allergy_enquiries_dict_filename <- "dictionaries/allergy_enquiries_dictionary.csv"
 allergy_enquiries.dict <- get_dictionary_from_file(allergy_enquiries_dict_filename)
 # Food labelling dictionary:
-# food_labelling_dict_filename <- "dictionaries/food_labelling_dictionary.csv"
-# food_labelling.dict <- get_dictionary_from_file(allergy_enquiries_dict_filename)
+food_labelling_dict_filename <- "dictionaries/food_labelling_dictionary.csv"
+food_labelling.dict <- get_dictionary_from_file(food_labelling_dict_filename)
 # Reporting reactions dictionary:
 reaction_report_dict_filename <- "dictionaries/reaction_report_dictionary.csv"
 reaction_report.dict <- get_dictionary_from_file(reaction_report_dict_filename)

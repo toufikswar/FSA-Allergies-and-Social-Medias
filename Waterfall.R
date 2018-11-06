@@ -24,7 +24,24 @@ end_time1 <- Sys.time()
 allergy_enquiries_time <- as.difftime(end_time1 - start_time1, units = "secs")
 
 # Food labelling:
+start_time1 <- Sys.time()
+food_labelling.df.norm <- from_corpus_to_lookup_dataframe(content.corpus, food_labelling.dict)
+food_labelling.names <- colnames(food_labelling.df.norm)
+# Combine the queries
+labelled.df$food_labelling <- ifelse(food_labelling.df.norm[,"consumer"] & 
+                                       food_labelling.df.norm[,"issue"] &
+                                       food_labelling.df.norm[,"labelling"] 
+                                     |
+                                       food_labelling.df.norm[,"incorrect"] &
+                                       food_labelling.df.norm[,"allergy"] &
+                                       food_labelling.df.norm[,"labelling"] 
+                                     |
+                                       food_labelling.df.norm[,"consumer"] &
+                                       food_labelling.df.norm[,"allergy"] &
+                                       food_labelling.df.norm[,"labelling"] ,1,0)
 
+end_time1 <- Sys.time()
+food_labelling_time <- as.difftime(end_time1 - start_time1, units = "secs")
 
 
 # Reporting reactions:
@@ -83,6 +100,8 @@ cat("\n\n")
 cat("\n\n")
 the_time_unit <- get_time_units(allergy_enquiries_time)
 print(paste("Allergy enquiries labelling time:    ",round(as.numeric(allergy_enquiries_time,  units=the_time_unit),5), " ",the_time_unit,sep=""))
+the_time_unit <- get_time_units(food_labelling_time)
+print(paste("Food Labelling labelling time:    ",round(as.numeric(food_labelling_time,  units=the_time_unit),5), " ",the_time_unit,sep=""))
 the_time_unit <- get_time_units(reaction_report_time)
 print(paste("Reporting reactions labelling time:  ",round(as.numeric(reaction_report_time,    units=the_time_unit),5), " ",the_time_unit,sep=""))
 the_time_unit <- get_time_units(fourteen_allergens_time)
