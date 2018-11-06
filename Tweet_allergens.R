@@ -36,7 +36,9 @@ cat(paste("N records = ",nrow(data.df),"\n",sep=""))
 
 end_time1 <- Sys.time()
 cat("\n\n")
-print(paste("Loading time:       ",round(end_time1 - start_time1,5)," secs",sep=""))
+atimediff <- as.difftime(end_time1 - start_time1, units = "secs")
+the_time_unit <- get_time_units(atimediff)
+print(paste("Loading time:       ",round(as.numeric(atimediff,units=the_time_unit),5)," ",the_time_unit,sep=""))
 
 ### =============PREPROCESSING & TEXT CLEANING================= ###
 
@@ -125,7 +127,9 @@ content.df$content <- stri_replace_all_fixed(content.df$content, ".", " ")
 # string surroundings whitespace
 content.df$content <- stri_trim(content.df$content)
 end_time1 <- Sys.time()
-print(paste("1st preprocessing:  ",round(end_time1 - start_time1,5)," secs",sep=""))
+atimediff <- as.difftime(end_time1 - start_time1, units = "secs")
+the_time_unit <- get_time_units(atimediff)
+print(paste("1st preprocessing:  ",round(as.numeric(atimediff,units=the_time_unit),5)," ",the_time_unit,sep=""))
 
 start_time1 <- Sys.time()
 
@@ -157,11 +161,15 @@ content.df$content <- parLapply(instance, content.df$content,
 stopCluster(instance)
 rm(instance)
 end_time1 <- Sys.time()
-print(paste("2nd preprocessing:  ",round(end_time1 - start_time1,5)," secs (stemming & stopwords removal)",sep=""))
+atimediff <- as.difftime(end_time1 - start_time1, units = "secs")
+the_time_unit <- get_time_units(atimediff)
+print(paste("2nd preprocessing:  ",round(as.numeric(atimediff,units=the_time_unit),5)," ",the_time_unit,sep=""))
 
 end_time <- Sys.time()
 
-print(paste("Execution time:     ",round(end_time - start_time,5)," secs (all processes)",sep=""))
+atimediff <- as.difftime(end_time - start_time, units = "secs")
+the_time_unit <- get_time_units(atimediff)
+print(paste("Execution time:     ",round(as.numeric(atimediff,units=the_time_unit),5)," ",the_time_unit,sep=""))
 cat("\n\n")
 print(paste("Number of tweets processed: ",nrow(content.df),sep=""))
 cat("\n\n")

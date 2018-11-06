@@ -153,6 +153,29 @@ from_corpus_to_lookup_dataframe <- function(data.corpus, dict)
   return (norm.df)
 }
 #================================================================
+get_time_units = function(timediff)
+{
+
+  timediff <- as.numeric(timediff,units="secs")
+
+  amin  <- 60
+  ahour <- 60*amin
+  aday  <- 24*ahour
+
+  the_time_unit = "secs"
+
+  if(timediff/amin > 1) {
+    the_time_unit = "mins"
+  } else if(timediff/ahour > 1) {
+    the_time_unit = "hours"
+  } else if(timediff/aday > 1) {
+    the_time_unit = "days"
+  }
+
+  return(the_time_unit)
+
+}
+#================================================================
 
 
 
