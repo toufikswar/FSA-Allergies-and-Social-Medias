@@ -58,7 +58,7 @@ severe_reaction <- ifelse(reaction_report.df.norm[,"symptons"] & reaction_report
 labelled.df$reactions_report <- rep("No-report",nrow(labelled.df))
 labelled.df$reactions_report[mild_reaction == 1 & severe_reaction == 0] <- "Mild-reaction"
 labelled.df$reactions_report[mild_reaction == 0 & severe_reaction == 1] <- "Severe-reaction"
-
+labelled.df$reactions_report <- factor(labelled.df$reactions_report, levels = c("No-report","Mild-reaction", "Severe-reaction"))
 reaction.report.names <- c("reactions_report")
 
 end_time1 <- Sys.time()
@@ -85,6 +85,11 @@ other_allergens_time <- as.difftime(end_time1 - start_time1, units = "secs")
 library(dplyr)
 
 labelled.df <- left_join(labelled.df, data.df[,retained_metadata], "id")
+labelled.df$date <- as.Date(labelled.df$date, format= "%Y-%m-%d")
+labelled.df$Month <- as.Date(cut(labelled.df$date, breaks = "month"))
+labelled.df$Week <- as.Date(cut(labelled.df$date, breaks = "week"))
+names(labelled.df)[names(labelled.df) == "sentiment class"] <- "sentiment_class" #rename sentiment class to a single string
+labelled.df$sentiment_class[labelled.df$sentiment_class %in% c("not_evaluable", "processing")] <- "neutral" # collapse not evaluable and procesing to neutral
 
 save.image(file = "Waterfall.RData")
 
@@ -114,3 +119,6 @@ cat("\n\n")
 
 
 #
+
+
+
