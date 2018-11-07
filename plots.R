@@ -1,4 +1,4 @@
-source("Waterfall.RData")
+load("Waterfall.RData")
 
 # Static plots
 
@@ -21,16 +21,17 @@ fourteen.bysource <- ggplot(subset(allergen.bysource.df, Allergen %in% fourteen.
   ylab("Mentions") +
   ggtitle("Mentions of the 14 Allergens Normalized by Document")+
   coord_flip()
-fourteen.bysource.norm
+fourteen.bysource
 
-other.bysource <- ggplot(allergen.bysource.df, Allergen %in% other.allergen.names,
+other.bysource <- ggplot(subset(allergen.bysource.df, 
+                                Allergen %in% other.allergen.names),
                               aes(x = fct_reorder(Allergen, count), y= count, fill = source)) +
   geom_bar(stat = "identity") +
   theme_minimal() +
   scale_fill_brewer(palette="Spectral") +
-  xlab("Allergen")+
+  xlab("Allergen") +
   ylab("Mentions") +
-  ggtitle("Mentions of Other Allergens Normalized by Document")+
+  ggtitle("Mentions of Other Allergens Normalized by Document") +
   coord_flip()
 other.bysource
 
@@ -38,35 +39,47 @@ other.bysource
 library(scales)
 library(ggrepel)
 
-all_allergens.norm.df.t14 <- subset(labelled.df.long, source == "Twitter" & Allergen %in% fourteen.allergen.names)
+all_allergens.norm.df.t14 <- subset(labelled.df.long, 
+                                    source == "Twitter" & 
+                                      Allergen %in% fourteen.allergen.names)
 
-by.date.twitter.14.month <- ggplot(all_allergens.norm.df.t14, aes(x = Month, y = Mentions, colour = Allergen), group = Allergen) +
-  stat_summary(fun.y = sum, # adds up all observations for the month
-               geom = "line") +
-  geom_point(size = 0.1) 
-theme_minimal()+
-  theme(legend.position="bottom")+
-  facet_grid(sentiment_class~.)
-by.date.twitter.14.month
-
-by.date.twitter.14.week <- ggplot(all_allergens.norm.df.t14, aes(x = Week, y = Mentions, colour = Allergen), group = Allergen) +
-  stat_summary(fun.y = sum, # adds up all observations for the week
-               geom = "line") +
-  theme_minimal() +
-  theme(legend.position="bottom")+
-  facet_grid(sentiment_class~.)
-by.date.twitter.14.week
-
-all_allergens.norm.df.t.other <- subset(labelled.df.long, source == "Twitter" & Allergen %in% other.allergen.names)
-
-by.date.twitter.other <- ggplot(all_allergens.norm.df.t.other, aes(x = Month, y = Mentions, colour = Allergen), group = Allergen)+
+by.month.twitter.14 <- ggplot(all_allergens.norm.df.t14, 
+                                   aes(x = Month, y = Mentions, colour = Allergen), 
+                                   group = Allergen) +
   stat_summary(fun.y = sum, # adds up all observations for the month
                geom = "line") +
   theme_minimal()+
   theme(legend.position="bottom")+
   facet_grid(sentiment_class~.)
-by.date.twitter.other
+by.month.twitter.14
 
+by.week.twitter.14 <- ggplot(all_allergens.norm.df.t14, 
+                                  aes(x = Week, y = Mentions, colour = Allergen), 
+                                  group = Allergen) +
+  stat_summary(fun.y = sum, # adds up all observations for the week
+               geom = "line") +
+  theme_minimal() +
+  theme(legend.position="bottom")+
+  facet_grid(sentiment_class~.)
+by.week.twitter.14 
+
+all_allergens.norm.df.t.other <- subset(labelled.df.long, source == "Twitter" & Allergen %in% other.allergen.names)
+
+by.month.twitter.other <- ggplot(all_allergens.norm.df.t.other, aes(x = Month, y = Mentions, colour = Allergen), group = Allergen)+
+  stat_summary(fun.y = sum, # adds up all observations for the month
+               geom = "line") +
+  theme_minimal()+
+  theme(legend.position="bottom")+
+  facet_grid(sentiment_class~.)
+by.month.twitter.other
+
+by.week.twitter.other <- ggplot(all_allergens.norm.df.t.other, aes(x = Week, y = Mentions, colour = Allergen), group = Allergen)+
+  stat_summary(fun.y = sum, # adds up all observations for the month
+               geom = "line") +
+  theme_minimal()+
+  theme(legend.position="bottom")+
+  facet_grid(sentiment_class~.)
+by.week.twitter.other
 
 ## Intersections
 
@@ -91,6 +104,23 @@ int_14allergen_react <- ggplot(subset(labelled.df.long, Mentions > 0 & Allergen 
   facet_grid(Allergen~.)+
   theme(strip.text.y = element_text(angle = 0))
 int_14allergen_react
+
+int_otherallergen_react <- ggplot(subset(labelled.df.long, Mentions > 0 & Allergen %in% other.allergen.names), 
+                               aes(x = Week, y = reactions_report, fill = reactions_report))+
+  stat_summary(fun.y = sum, # adds up all observations for the month
+               geom = "bar") +
+  theme_minimal() +
+  ylab("Mentions") +
+  xlab("Week")+
+  scale_fill_manual(values = c("grey90","yellow","red"))+
+  ggtitle("Reported Reactions Over Time")+
+  facet_grid(Allergen~.)+
+  theme(strip.text.y = element_text(angle = 0))
+int_otherallergen_react
+
+
+
+
 
 Int_enquiry_reaction <- ggplot(subset(labelled.df, allergy_enquiries > 0 ), aes(x = Week, y = allergy_enquiries, fill = reactions_report))+
   stat_summary(fun.y = sum, # adds up all observations for the month
