@@ -14,6 +14,7 @@ start_time1 <- Sys.time()
 allergy_enquiries.df.norm <- from_corpus_to_lookup_dataframe(content.corpus,allergy_enquiries.dict)
 allergy_enquiries.names   <- colnames(allergy_enquiries.df.norm)[-1]
 # Combine the queries
+# Looking for [allergy AND info AND (request OR response) AND restaurant]
 labelled.df$allergy_enquiries <- ifelse(allergy_enquiries.df.norm[,"allergy"] &
                                         allergy_enquiries.df.norm[,"info"]    &
                                         (allergy_enquiries.df.norm[,"request"] | allergy_enquiries.df.norm[,"response"]) &
@@ -28,17 +29,18 @@ start_time1 <- Sys.time()
 food_labelling.df.norm <- from_corpus_to_lookup_dataframe(content.corpus, food_labelling.dict)
 food_labelling.names <- colnames(food_labelling.df.norm)
 # Combine the queries
-labelled.df$food_labelling <- ifelse(food_labelling.df.norm[,"consumer"] & 
+# Looking for [(consurmer AND issue AND labelling) OR (incorrect AND allergy AND labelling) OR (consumer AND allergy AND labelling)]
+labelled.df$food_labelling <- ifelse((food_labelling.df.norm[,"consumer"] & 
                                        food_labelling.df.norm[,"issue"] &
-                                       food_labelling.df.norm[,"labelling"] 
+                                       food_labelling.df.norm[,"labelling"]) 
                                      |
-                                       food_labelling.df.norm[,"incorrect"] &
+                                       (food_labelling.df.norm[,"incorrect"] &
                                        food_labelling.df.norm[,"allergy"] &
-                                       food_labelling.df.norm[,"labelling"] 
+                                       food_labelling.df.norm[,"labelling"]) 
                                      |
-                                       food_labelling.df.norm[,"consumer"] &
+                                       (food_labelling.df.norm[,"consumer"] &
                                        food_labelling.df.norm[,"allergy"] &
-                                       food_labelling.df.norm[,"labelling"] ,1,0)
+                                       food_labelling.df.norm[,"labelling"]) ,1,0)
 
 end_time1 <- Sys.time()
 food_labelling_time <- as.difftime(end_time1 - start_time1, units = "secs")
@@ -48,10 +50,12 @@ food_labelling_time <- as.difftime(end_time1 - start_time1, units = "secs")
 start_time1 <- Sys.time()
 reaction_report.df.norm <- from_corpus_to_lookup_dataframe(content.corpus,reaction_report.dict)
 reaction_report.names   <- colnames(reaction_report.df.norm)[-1]
-# Combine the queries
+# Combine the queries 
+# Looking for [symptons & ingestion AND NOT severe]
 mild_reaction   <- ifelse(reaction_report.df.norm[,"symptons"] & reaction_report.df.norm[,"ingestion"] &
                           !reaction_report.df.norm[,"severe"]
                           ,1,0)
+# Looking for [symptons & ingestion AND severe]
 severe_reaction <- ifelse(reaction_report.df.norm[,"symptons"] & reaction_report.df.norm[,"ingestion"] &
                           reaction_report.df.norm[,"severe"]
                           ,1,0)
