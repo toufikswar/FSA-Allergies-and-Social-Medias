@@ -29,37 +29,79 @@ filenames = c("20161029-20171127.xlsx",
 # paste the data path with filename
 filenames = paste(dataDir,filenames,sep="")
 
+cat("\n\n")
+cat(paste("Start loading the data","\n",sep=""))
 # verbose variable
 verbose = TRUE
 data.df <- load_list_of_xlsx_files(filenames,verbose)
 cat(paste("N records = ",nrow(data.df),"\n",sep=""))
 
+# flag to run preprocessing test
+do_test_preprocessing <- FALSE
+
 end_time1 <- Sys.time()
 cat("\n\n")
 atimediff <- as.difftime(end_time1 - start_time1, units = "secs")
 the_time_unit <- get_time_units(atimediff)
-print(paste("Loading time:       ",round(as.numeric(atimediff,units=the_time_unit),5)," ",the_time_unit,sep=""))
+cat(paste("Loading data time:  ",round(as.numeric(atimediff,units=the_time_unit),5)," ",the_time_unit,"\n",sep=""))
+cat(paste("Finished loading the data","\n",sep=""))
+cat("\n\n")
 
-## DICTIONARIES (will only create if library(quanteda) is loaded correctly)
+### =============LOAD DICTIONARIES================= ###
+# (will only create if library(quanteda) is loaded correctly)
 
+cat("\n\n")
+cat(paste("Start loading dictionaries","\n",sep=""))
+
+start_time1 <- Sys.time()
 # Stream 1: Supporting local authorities
 # Allergy enquiries dictionary:
 allergy_enquiries_dict_filename <- "dictionaries/allergy_enquiries_dictionary.csv"
 allergy_enquiries.dict <- get_dictionary_from_file(allergy_enquiries_dict_filename)
+cat("\n\n")
+cat(paste("Allergy enquiries dictionary","\n",sep=""))
+print(allergy_enquiries.dict)
+cat("\n\n")
+
 # Food labelling dictionary:
 food_labelling_dict_filename <- "dictionaries/food_labelling_dictionary.csv"
 food_labelling.dict <- get_dictionary_from_file(food_labelling_dict_filename)
+cat("\n\n")
+cat(paste("Food labeling dictionary","\n",sep=""))
+print(food_labelling.dict)
+cat("\n\n")
+
 # Reporting reactions dictionary:
 reaction_report_dict_filename <- "dictionaries/reaction_report_dictionary.csv"
 reaction_report.dict <- get_dictionary_from_file(reaction_report_dict_filename)
+cat("\n\n")
+cat(paste("Reporing reactions dictionary","\n",sep=""))
+print(reaction_report.dict)
+cat("\n\n")
 
 # Stream 2: 14 allergen list:
 # 14 allergen dictionary:
 fourteen_allergens_dict_filename <- "dictionaries/fourteen_allergens_dictionary.csv"
 fourteen_allergens.dict <- get_dictionary_from_file(fourteen_allergens_dict_filename)
+cat("\n\n")
+cat(paste("14 allergens dictionary","\n",sep=""))
+print(fourteen_allergens.dict)
+cat("\n\n")
+
 # Other allergen dictionary:
 other_allergens_dict_filename <- "dictionaries/other_allergens_dictionary.csv"
 other_allergens.dict <- get_dictionary_from_file(other_allergens_dict_filename)
+cat("\n\n")
+cat(paste("other allergens dictionary","\n",sep=""))
+print(other_allergens.dict)
+cat("\n\n")
+
+end_time1 <- Sys.time()
+atimediff <- as.difftime(end_time1 - start_time1, units = "secs")
+the_time_unit <- get_time_units(atimediff)
+cat(paste("Loading dictionary time:  ",round(as.numeric(atimediff,units=the_time_unit),5)," ",the_time_unit,"\n",sep=""))
+cat(paste("Finished loading dictionaries","\n",sep=""))
+cat("\n\n")
 
 ## columns names from the original data to be merged with the streams labellings
 retained_metadata <- c("id", "latitude", "longitude","date","sentiment class")
@@ -67,6 +109,10 @@ retained_metadata <- c("id", "latitude", "longitude","date","sentiment class")
 ### =============PREPROCESSING & TEXT CLEANING================= ###
 
 # Set time for beginning of text pre-preprocessing
+
+cat("\n\n")
+cat(paste("Start 1st data preprocessing","\n",sep=""))
+
 start_time1 <- Sys.time()
 
 # Lets drop some spurious columns
@@ -87,6 +133,9 @@ columns_to_drop <- c("search",
 
 data.df <- data.df[,-match(columns_to_drop,names(data.df))]
 #print(names(data.df))
+
+# Sorting data by date in increasing order
+data.df <- data.df[order(as.Date(data.df$date, format=c("%Y/%m/%d","h:m:s"))),]
 
 # Subset dataframe with only 'id' and 'content' columns : content.df
 content.df <- subset(data.df, select=c("id", "content","source"))
@@ -153,16 +202,18 @@ content.df$content <- stri_trim(content.df$content)
 end_time1 <- Sys.time()
 atimediff <- as.difftime(end_time1 - start_time1, units = "secs")
 the_time_unit <- get_time_units(atimediff)
-print(paste("1st preprocessing:  ",round(as.numeric(atimediff,units=the_time_unit),5)," ",the_time_unit,sep=""))
+cat(paste("1st preprocessing time:  ",round(as.numeric(atimediff,units=the_time_unit),5)," ",the_time_unit,"\n",sep=""))
+cat(paste("Finished 1st data preprocessing","\n",sep=""))
+cat("\n\n")
 
 start_time1 <- Sys.time()
 
 # Stemming & Stopword Removal
-print("Stemming & Stopword Removal")
-print("Depending on the size of the Data this step can take 5-10 minutes")
-print("Be Patient")
-words_to_remove   <- stopwords("english") # list of engish stop words
+cat("\n\n")
+cat(paste("Start Stemming & Stopword Removal","\n",sep=""))
+cat("Depending on the size of the Data this step can take 5-10 minutes. Be patient please.\n")
 
+# words_to_remove   <- stopwords("english") # list of engish stop words
 # Emojis emoji_dictionary from (https://raw.githubusercontent.com/lyons7/emojidictionary/master/emoji_dictionary.csv)
 #emoticons         <- read.csv("resources/emoji_dictionary.csv", header = TRUE) # emojis emoji_dictionary
 
@@ -184,30 +235,50 @@ content.df$content <- parLapply(instance, content.df$content,
 )
 stopCluster(instance)
 rm(instance)
+
 end_time1 <- Sys.time()
 atimediff <- as.difftime(end_time1 - start_time1, units = "secs")
 the_time_unit <- get_time_units(atimediff)
-print(paste("2nd preprocessing:  ",round(as.numeric(atimediff,units=the_time_unit),5)," ",the_time_unit,sep=""))
+cat(paste("Stemming & Stopword Removal time:  ",round(as.numeric(atimediff,units=the_time_unit),5)," ",the_time_unit,"\n",sep=""))
+cat(paste("Finished Stemming & Stopword Removal","\n",sep=""))
+cat("\n\n")
+
+# Removing duplicates
+content.df <- content.df[!duplicated(content.df$content),]
+
+# Running test to compare the oirignal and preprocessed texts
+# of a randomly selected set of records
+if(do_test_preprocessing) {
+  n.test.records = 500
+  test_text_preprocessing(content.df,n.test.records)
+}
+
+file_out <- "Tweet_allergens.RData"
+cat("\n\n")
+cat(paste("Start saving image ",file_out,"\n",sep=""))
+start_time1 <- Sys.time()
+# Collapse tokenized words to character vectors
+content.df$content <- as.character(content.df$content)  # This may interfere with tokenization for stream 1 - be aware
+# Create a corpus including id for identifier
+content.corpus <- corpus(content.df, docid_field = "id", text_field = "content") # Username and Hashtag metadata is retained
+save.image(file = file_out)
+
+end_time1 <- Sys.time()
+atimediff <- as.difftime(end_time1 - start_time1, units = "secs")
+the_time_unit <- get_time_units(atimediff)
+cat(paste("Save image time:  ",round(as.numeric(atimediff,units=the_time_unit),5)," ",the_time_unit,"\n",sep=""))
+cat(paste("Finised saving image ",file_out,"\n",sep=""))
+cat("\n\n")
 
 end_time <- Sys.time()
 
 atimediff <- as.difftime(end_time - start_time, units = "secs")
 the_time_unit <- get_time_units(atimediff)
-print(paste("Execution time:     ",round(as.numeric(atimediff,units=the_time_unit),5)," ",the_time_unit,sep=""))
 cat("\n\n")
-print(paste("Number of tweets processed: ",nrow(content.df),sep=""))
+cat(paste("Execution time:     ",round(as.numeric(atimediff,units=the_time_unit),5)," ",the_time_unit,"\n",sep=""))
 cat("\n\n")
-
-# Running test to compare the oirignal and preprocessed texts
-# of a randomly selected set of records
-n.test.records = 500
-test_text_preprocessing(content.df,n.test.records)
-
-# Collapse tokenized words to character vectors
-content.df$content <- as.character(content.df$content)  # This may interfere with tokenization for stream 1 - be aware
-# Create a corpus including id for identifier
-content.corpus <- corpus(content.df, docid_field = "id", text_field = "content") # Username and Hashtag metadata is retained
-save.image(file = "Tweet_allergens.RData")
+cat(paste("Number of tweets processed: ",nrow(content.df),"\n",sep=""))
+cat("\n\n")
 
 
 #

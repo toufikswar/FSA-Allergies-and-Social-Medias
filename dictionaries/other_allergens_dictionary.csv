@@ -1,25 +1,74 @@
-corn,corn*,maize*,sweetcorn*,
-meat,meat*,pork*,beef*,lamb*,
-gelatine,gelatine*,
-seed,seed*,sunflower*,poppy*,seed oil*,
-spice,spice*,coriander*,garlic*,cinnamon*,chilli*,
-fruit,fruit*,apple*,carrot*,peach*,plum*,tomato*,banana*,strawberry*,
-vegetable,vegetable*,
-latex,latex*,
-carrageenan,carrageenan*,seaweed*,sea weed*,
-coconut,coconut*,
-chestnut,chestnut*,chest nut*,
-pinenut,pinenut*,pine nut*,
-fungus,fungus*,quorn*,yeast*,mushroom*,
-kiwi,kiwi*,
-peas,peas*,
-chickpeas,chickpeas*,chick peas*,
-poppy_seeds,poppy seed*,poppyseed*,
-pepper,pepper*,bell pepper*,
-pumpkin,pumpkin*,squash*,punkin*,
-kidney_beans,kidney bean*,kidneybean*,
-garlic,garlic*,
-banana,banana*,
-lentils,lentil*,
-buckwheat,buckwheat*,
-edible_insects,edible instect*,edible bug*,cricket*,grasshopper*,mealworm*,buffalo worm*,buffaloworm*,
+# corn
+corn,corn,maize,sweetcorn,
+
+# meat
+meat,meat,pork,beef,lamb,
+
+# gelatine
+gelatine,gelatine,
+
+# seeds
+seed,seed,sunflower,poppy,seed oil,
+
+# spices
+spice,spice,coriander,garlic,cinnamon,chilli,
+
+# fruits
+fruit,fruit,apple,carrot,peach,plum,tomato,banana,strawberry,
+
+# vegetables
+vegetable,vegetable,
+
+# latex
+latex,latex,
+
+# carrageenan
+carrageenan,carrageenan,seaweed,sea weed,
+
+# coconut
+coconut,coconut,
+
+# chest nut
+chestnut,chestnut,chest nut,
+
+# pinenut
+pinenut,pinenut,pine nut,
+
+# fungus
+fungus,fungus,quorn,yeast,mushroom,
+
+# kiwi
+kiwi,kiwi,
+
+# peas
+peas,peas,
+
+# chickpeas
+chickpeas,chickpeas,chick peas,
+
+# poppy seeds
+poppy_seeds,poppy seed,poppyseed,
+
+# pepper
+pepper,pepper,bell pepper,
+
+# pumpkin
+pumpkin,pumpkin,squash,punkin,
+
+# kidney beans
+kidney_beans,kidney bean,kidneybean,
+
+# garlic
+garlic,garlic,
+
+# banana
+banana,banana,
+
+# lentils
+lentils,lentil,
+
+# buckwheat
+buckwheat,buckwheat,
+
+# edible insects
+edible_insects,edible insect,edible bug,cricket,grasshopper,mealworm,buffalo worm,buffaloworm,
