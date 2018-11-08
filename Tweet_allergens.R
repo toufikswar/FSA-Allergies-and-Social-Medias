@@ -185,4 +185,5 @@ content.df$content <- as.character(content.df$content)  # This may interfere wit
 content.corpus <- corpus(content.df, docid_field = "id", text_field = "content") # Username and Hashtag metadata is retained
 save.image(file = "Tweet_allergens.RData")
 
-#source("Stream2.R") # Runs Stream2.R script
+
+#

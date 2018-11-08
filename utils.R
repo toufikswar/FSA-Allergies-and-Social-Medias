@@ -7,7 +7,7 @@
 library(readxl)          # library to read xlsx files (excel)
 
 #================================================================
-load_list_of_xlsx_files = function(filenames,verbose=FALSE)
+load_list_of_xlsx_files <- function(filenames,verbose=FALSE)
 {
 
   # reads the data from a list of files into a single data.frame
@@ -56,7 +56,7 @@ load_list_of_xlsx_files = function(filenames,verbose=FALSE)
 
 ### TESTING ORIGINAL TWEET VS PROCESSED TWEET
 
-test_text_preprocessing = function(df,n.test.records)
+test_text_preprocessing <- function(df,n.test.records)
 {
 
   # Compares the original and preprocessed text for a random sampling of n.test.records
@@ -85,7 +85,7 @@ test_text_preprocessing = function(df,n.test.records)
 
 }
 #================================================================
-get_dictionary_from_file = function(dict_filename)
+get_dictionary_from_file <- function(dict_filename)
 {
 
   # build a dictionary from a cvs file
@@ -133,7 +133,55 @@ get_dictionary_from_file = function(dict_filename)
   # Set the groupping names
   names(myList) <- the_names
 
+  # Stemming the dictionary
+  myList <- stem_dictionary(myList)
+
   return(dictionary(myList))
+
+}
+#==================================================================
+
+## This function takes a dictionary in list format and
+## perform stemming on its terms
+## Returns the stemmed dictionary
+
+stem_dictionary <- function(myList)
+{
+
+  library(quanteda)
+
+  # loop over the dictionary lists
+  for(i in 1:length(myList)) {
+    # loop over the list elements
+    for(j in 1:length(myList[[i]])) {
+      term <- myList[[i]][j]
+      # separate the string into words
+      words <- unlist(strsplit(term," "))
+      words <- term_tokens[term_tokens != ""]
+
+      # loop over the words
+      for(k in 1:length(words)) {
+        # check if word ends with *
+        endsWithStart <- endsWith(words[k],"*")
+        # remove the * at the end of the word
+        if(endsWithStart) words[k] <- substr(words[k],1,nchar(words[k])-1)
+
+        # stem the word
+        words[k] <- paste(tokens_wordstem(tokens(words[k])),collapse="")
+        # reattach the * and the end of the word
+        if(endsWithStart) words[k] <- paste(c(words[k],"*"),collapse="")
+      }
+      # combine all the words into a single string
+      term <- paste(words,collapse=" ")
+      myList[[i]][j] <- term
+    }
+    # remove duplicates
+    myList[[i]] <- unique(myList[[i]])
+    # order alphabetically
+    myList[[i]] <- sort(myList[[i]],decreasing=FALSE)
+  }
+
+  return(myList)
 
 }
 #==================================================================
