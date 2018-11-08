@@ -21,7 +21,7 @@ other_allergens.df.norm    <- left_join(other_allergens.df.norm,    data.df[, re
 
 # to create a Dictance Matrix Computation for 14 allergens and other allergens
 fourteen_allergens.df.norm.subset <- fourteen_allergens.df.norm[2:15]
-fourteen_allergens.df.norm.subset.transpose <- t(fourteen_allergens.df.norm.subset) #if the vector memory exhausted use fourteen_allergens.df.norm.subset[1:1000,] to see the graph
+fourteen_allergens.df.norm.subset.transpose <- t(fourteen_allergens.df.norm.subset) 
 dist(fourteen_allergens.df.norm.subset.transpose)
 
 other_allergens.df.norm.subset <- other_allergens.df.norm[2:26]
@@ -35,67 +35,105 @@ plot(hc_fourteen_allergens)
 hc_other_allergens <- hclust(dist(other_allergens.df.norm.subset.transpose))
 plot(hc_other_allergens)
 
-# Heatmap from the correlation matrix
-cormat <- round(cor(t(fourteen_allergens.df.norm.subset.transpose)),2)
-head(cormat)
+# creating percentage matrix for heatmap 1 for fourteen allergens
 
-cormat_other <- round(cor(t(other_allergens.df.norm.subset.transpose)),2)
-head(cormat_other)
+column_names = colnames(fourteen_allergens.df.norm.subset)
+number_of_rows = nrow(fourteen_allergens.df.norm.subset)
+number_of_cols = ncol(fourteen_allergens.df.norm.subset)
+mat = matrix(list(), nrow=number_of_cols, ncol=number_of_cols)
 
-library(reshape2)
-melted_cormat <- melt(cormat)
-head(melted_cormat)
 
-melted_cormat_other <- melt(cormat_other)
-head(melted_cormat_other)
-
-library(ggplot2)
-ggplot(data = melted_cormat, aes(x=Var1, y=Var2, fill=value)) + geom_tile()
-
-ggplot(data = melted_cormat_other, aes(x=Var1, y=Var2, fill=value)) + geom_tile()
-
-# Get upper triangle of the correlation matrix
-get_upper_tri <- function(cormat){
-  cormat[lower.tri(cormat)]<- NA
-  return(cormat)
+for (i in 1:(number_of_cols)){
+  for (j in i:number_of_cols){
+    temp = table(fourteen_allergens.df.norm.subset[,i] + fourteen_allergens.df.norm.subset[,j])
+    count_one = table(fourteen_allergens.df.norm.subset[,j])
+    number_of_positive = as.vector(count_one[names(count_one) ==1])
+    count_of_both_present = as.vector(temp[names(temp) ==2]) # 1,1 - are cases where both are present
+    percentage_of_2 = 100*count_of_both_present/number_of_positive
+    print(c(column_names[j],column_names[i], percentage_of_2))
+    mat[i, j] = percentage_of_2
+    mat[j, i] = percentage_of_2
+  }
 }
 
-upper_tri <- get_upper_tri(cormat)
-upper_tri
+percentage_mat = data.frame(mat)
+colnames(percentage_mat) = column_names
+rownames(percentage_mat) = column_names
+percentage_mat <- data.matrix(percentage_mat, rownames.force = NA)
 
-get_upper_tri <- function(cormat_other){
-  cormat_other[lower.tri(cormat_other)]<- NA
-  return(cormat_other)
-}
-
-upper_tri <- get_upper_tri(cormat_other)
-upper_tri
-
-
-# Melt the correlation matrix
 library(reshape2)
-melted_cormat <- melt(upper_tri, na.rm = TRUE)
+melted_cormat_per_14 <- melt(percentage_mat) 
+head(melted_cormat_per_14)
 
-melted_cormat_other <- melt(upper_tri, na.rm = TRUE)
+# plot heatmap 1 for 14 allergens
 
-# Heatmap for 14 Allergens
 library(ggplot2)
-ggplot(data = melted_cormat, aes(Var2, Var1, fill = value))+
+ggplot(data = melted_cormat_per_14, aes(x=Var1, y=Var2, fill=value)) + geom_tile()
+
+
+get_upper_tri <- function(percentage_mat){   # to get lower triangle part of the heatmap
+  percentage_mat[lower.tri(percentage_mat)]<- NA
+  return(percentage_mat)
+}
+upper_tri <- get_upper_tri(percentage_mat)
+
+melted_cormat_per_14 <- melt(upper_tri, na.rm = TRUE)  # Melt the correlation matrix
+
+ggplot(data = melted_cormat_per_14, aes(Var1, Var2, fill = value))+  # Heatmap 1 for 14 Allergens
   geom_tile(color = "white")+
-  scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
-                       midpoint = 0, limit = c(-1,1), space = "Lab", 
-                       name="Pearson\nCorrelation") +
+  scale_fill_gradient2(low = "white", high = "red", mid = "white", 
+                       midpoint = 0, limit = c(0,60), space = "Lab", 
+                       name="Percentage") +
   theme_minimal()+ 
   theme(axis.text.x = element_text(angle = 45, vjust = 1, 
                                    size = 12, hjust = 1))+
   coord_fixed()
 
-#Heatmap for Other Allergens
-ggplot(data = melted_cormat_other, aes(Var2, Var1, fill = value))+
+
+# creating 14x14 matrix for heatmap 2 for fourteen allergens
+
+for (i in 1:(number_of_cols)){
+  for (j in i:number_of_cols){
+    temp = table(fourteen_allergens.df.norm.subset[,i] + fourteen_allergens.df.norm.subset[,j])
+    count_one = table(fourteen_allergens.df.norm.subset[,i])
+    number_of_positive = as.vector(count_one[names(count_one) ==1])
+    count_of_both_present = as.vector(temp[names(temp) ==2]) # 1,1 - are cases where both are present
+    percentage_of_2 = 100*count_of_both_present/number_of_positive
+    print(c(column_names[i],column_names[j], percentage_of_2))
+    mat[i, j] = percentage_of_2
+    mat[j, i] = percentage_of_2
+  }
+}
+
+percentage_mat = data.frame(mat)
+colnames(percentage_mat) = column_names
+rownames(percentage_mat) = column_names
+percentage_mat <- data.matrix(percentage_mat, rownames.force = NA)
+
+library(reshape2)
+melted_cormat_per_14 <- melt(percentage_mat) 
+head(melted_cormat_per_14)
+
+#plot heatmap 2 for 14 allergens
+
+library(ggplot2)
+ggplot(data = melted_cormat_per_14, aes(x=Var1, y=Var2, fill=value)) + geom_tile()
+
+
+get_upper_tri <- function(percentage_mat){   # to get upper triangle part of the heatmap
+  percentage_mat[upper.tri(percentage_mat)]<- NA
+  return(percentage_mat)
+}
+
+upper_tri <- get_upper_tri(percentage_mat)
+
+melted_cormat_per_14 <- melt(upper_tri, na.rm = TRUE)  # Melt the correlation matrix
+
+ggplot(data = melted_cormat_per_14, aes(Var1, Var2, fill = value))+  # plot heatmap 2 for 14 Allergens
   geom_tile(color = "white")+
-  scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
-                       midpoint = 0, limit = c(-1,1), space = "Lab", 
-                       name="Pearson\nCorrelation") +
+  scale_fill_gradient2(low = "white", high = "red", mid = "white", 
+                       midpoint = 0, limit = c(0,60), space = "Lab", 
+                       name="Percentage") +
   theme_minimal()+ 
   theme(axis.text.x = element_text(angle = 45, vjust = 1, 
                                    size = 12, hjust = 1))+
