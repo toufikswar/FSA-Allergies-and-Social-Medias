@@ -125,7 +125,7 @@ int_14allergen_react <- ggplot(subset(labelled.df.long, Mentions > 0 & Allergen 
 int_14allergen_react
 
 allergen.react.df <- subset(labelled.df.long, Allergen %in% fourteen.allergen.names) %>%
-  group_by(Allergen, Month, reactions_report) %>%
+  group_by(Allergen, Month, sentiment_class, reactions_report) %>%
   summarise(Count= sum(Mentions))
 
 allergen.react.bubble <- ggplot(allergen.react.df, aes(x = Month, y = fct_reorder(Allergen, Count), 
@@ -141,7 +141,9 @@ allergen.react.bubble <- ggplot(allergen.react.df, aes(x = Month, y = fct_reorde
   theme_minimal()+
   theme(axis.text.x = element_text(angle = 45, vjust = 1, 
                                    size = 12, hjust = 1))+
-  theme(panel.grid.minor = element_blank())
+  theme(panel.grid.minor = element_blank())+
+  theme(strip.text.y = element_text(angle = 0))+
+  facet_grid(sentiment_class~.)
 allergen.react.bubble
 
 allergen.react.labelling.df <- subset(labelled.df.long, Allergen %in% fourteen.allergen.names & food_labelling > 0) %>%
@@ -167,7 +169,7 @@ allergen.react.labelling.bubble <- ggplot(allergen.react.labelling.df, aes(x = M
 allergen.react.labelling.bubble
 
 allergen.react.inquiries.df <- subset(labelled.df.long, Allergen %in% fourteen.allergen.names & allergy_enquiries > 0) %>%
-  group_by(Allergen, Month, reactions_report) %>%
+  group_by(Allergen, Month, sentiment_class, reactions_report) %>%
   summarise(Count= sum(Mentions))
 
 allergen.react.inquiries.bubble <- ggplot(allergen.react.labelling.df, aes(x = Month, y = fct_reorder(Allergen, Count), 
@@ -183,7 +185,9 @@ allergen.react.inquiries.bubble <- ggplot(allergen.react.labelling.df, aes(x = M
   theme_minimal()+
   theme(axis.text.x = element_text(angle = 45, vjust = 1, 
                                    size = 12, hjust = 1))+
-  theme(panel.grid.minor = element_blank())
+  theme(strip.text.y = element_text(angle = 0))+
+  theme(panel.grid.minor = element_blank())+
+  facet_grid(sentiment_class~.)
 allergen.react.inquiries.bubble
 
 
