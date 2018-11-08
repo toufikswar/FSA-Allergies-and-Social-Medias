@@ -211,8 +211,8 @@ start_time1 <- Sys.time()
 # Stemming & Stopword Removal
 cat("\n\n")
 cat(paste("Start Stemming & Stopword Removal","\n",sep=""))
-cat("Depending on the size of the Data this step can take 5-10 minutes. Be patient please.\n")
-
+cat("Depending on the size of the Data this step can take 5-10 minutes. Be patient please.")
+cat("Distributing jobs to available CPU cores...\n")
 # words_to_remove   <- stopwords("english") # list of engish stop words
 # Emojis emoji_dictionary from (https://raw.githubusercontent.com/lyons7/emojidictionary/master/emoji_dictionary.csv)
 #emoticons         <- read.csv("resources/emoji_dictionary.csv", header = TRUE) # emojis emoji_dictionary
@@ -221,14 +221,13 @@ library(parallel)
 instance <- makeCluster(detectCores()) # Start a local cluster with the cores available
 clusterEvalQ(instance, {
   library(quanteda)
-  words_to_remove   <- stopwords("english")
 })
 
 content.df$content <- parLapply(instance, content.df$content,
   function(i) {
     i %>%
     tokens() %>%
-    tokens_remove(words_to_remove) %>%
+    tokens_remove(stopwords("english")) %>%
     tokens_wordstem() %>%
     paste(collapse = " ")
   }
@@ -255,7 +254,7 @@ if(do_test_preprocessing) {
 
 file_out <- "Tweet_allergens.RData"
 cat("\n\n")
-cat(paste("Start saving image ",file_out,"\n",sep=""))
+cat(paste("Saving image of RData to ", file_out,"...", "\n",sep=""))
 start_time1 <- Sys.time()
 # Collapse tokenized words to character vectors
 content.df$content <- as.character(content.df$content)  # This may interfere with tokenization for stream 1 - be aware
@@ -266,8 +265,8 @@ save.image(file = file_out)
 end_time1 <- Sys.time()
 atimediff <- as.difftime(end_time1 - start_time1, units = "secs")
 the_time_unit <- get_time_units(atimediff)
-cat(paste("Save image time:  ",round(as.numeric(atimediff,units=the_time_unit),5)," ",the_time_unit,"\n",sep=""))
-cat(paste("Finised saving image ",file_out,"\n",sep=""))
+cat(paste("Image save time:  ",round(as.numeric(atimediff,units=the_time_unit),5)," ",the_time_unit,"\n",sep=""))
+cat(paste("Finished! ","\n",sep=""))
 cat("\n\n")
 
 end_time <- Sys.time()
@@ -275,9 +274,9 @@ end_time <- Sys.time()
 atimediff <- as.difftime(end_time - start_time, units = "secs")
 the_time_unit <- get_time_units(atimediff)
 cat("\n\n")
-cat(paste("Execution time:     ",round(as.numeric(atimediff,units=the_time_unit),5)," ",the_time_unit,"\n",sep=""))
+cat(paste("Total execution time:     ",round(as.numeric(atimediff,units=the_time_unit),5)," ",the_time_unit,"\n",sep=""))
 cat("\n\n")
-cat(paste("Number of tweets processed: ",nrow(content.df),"\n",sep=""))
+cat(paste("Number of unique entires cleaned: ",nrow(content.df),"\n",sep=""))
 cat("\n\n")
 
 
