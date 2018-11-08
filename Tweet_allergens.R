@@ -40,6 +40,30 @@ atimediff <- as.difftime(end_time1 - start_time1, units = "secs")
 the_time_unit <- get_time_units(atimediff)
 print(paste("Loading time:       ",round(as.numeric(atimediff,units=the_time_unit),5)," ",the_time_unit,sep=""))
 
+## DICTIONARIES (will only create if library(quanteda) is loaded correctly)
+
+# Stream 1: Supporting local authorities
+# Allergy enquiries dictionary:
+allergy_enquiries_dict_filename <- "dictionaries/allergy_enquiries_dictionary.csv"
+allergy_enquiries.dict <- get_dictionary_from_file(allergy_enquiries_dict_filename)
+# Food labelling dictionary:
+food_labelling_dict_filename <- "dictionaries/food_labelling_dictionary.csv"
+food_labelling.dict <- get_dictionary_from_file(food_labelling_dict_filename)
+# Reporting reactions dictionary:
+reaction_report_dict_filename <- "dictionaries/reaction_report_dictionary.csv"
+reaction_report.dict <- get_dictionary_from_file(reaction_report_dict_filename)
+
+# Stream 2: 14 allergen list:
+# 14 allergen dictionary:
+fourteen_allergens_dict_filename <- "dictionaries/fourteen_allergens_dictionary.csv"
+fourteen_allergens.dict <- get_dictionary_from_file(fourteen_allergens_dict_filename)
+# Other allergen dictionary:
+other_allergens_dict_filename <- "dictionaries/other_allergens_dictionary.csv"
+other_allergens.dict <- get_dictionary_from_file(other_allergens_dict_filename)
+
+## columns names from the original data to be merged with the streams labellings
+retained_metadata <- c("id", "latitude", "longitude","date","sentiment class")
+
 ### =============PREPROCESSING & TEXT CLEANING================= ###
 
 # Set time for beginning of text pre-preprocessing

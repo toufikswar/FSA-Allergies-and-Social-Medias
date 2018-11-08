@@ -1,7 +1,6 @@
 load("Tweet_allergens.RData")
 library(quanteda)
 library(tidyr)
-source("utils.R")
 
 labelled.df <- content.df
 
@@ -30,13 +29,13 @@ food_labelling.df.norm <- from_corpus_to_lookup_dataframe(content.corpus, food_l
 food_labelling.names <- colnames(food_labelling.df.norm)
 # Combine the queries
 # Looking for [(consurmer AND issue AND labelling) OR (incorrect AND allergy AND labelling) OR (consumer AND allergy AND labelling)]
-labelled.df$food_labelling <- ifelse((food_labelling.df.norm[,"consumer"] & 
+labelled.df$food_labelling <- ifelse((food_labelling.df.norm[,"consumer"] &
                                        food_labelling.df.norm[,"issue"] &
-                                       food_labelling.df.norm[,"labelling"]) 
+                                       food_labelling.df.norm[,"labelling"])
                                      |
                                        (food_labelling.df.norm[,"incorrect"] &
                                        food_labelling.df.norm[,"allergy"] &
-                                       food_labelling.df.norm[,"labelling"]) 
+                                       food_labelling.df.norm[,"labelling"])
                                      |
                                        (food_labelling.df.norm[,"consumer"] &
                                        food_labelling.df.norm[,"allergy"] &
@@ -50,7 +49,7 @@ food_labelling_time <- as.difftime(end_time1 - start_time1, units = "secs")
 start_time1 <- Sys.time()
 reaction_report.df.norm <- from_corpus_to_lookup_dataframe(content.corpus,reaction_report.dict)
 reaction_report.names   <- colnames(reaction_report.df.norm)[-1]
-# Combine the queries 
+# Combine the queries
 # Looking for [symptons & ingestion AND NOT severe]
 mild_reaction   <- ifelse(reaction_report.df.norm[,"symptons"] & reaction_report.df.norm[,"ingestion"] &
                           !reaction_report.df.norm[,"severe"]
@@ -123,6 +122,3 @@ cat("\n\n")
 
 
 #
-
-
-
