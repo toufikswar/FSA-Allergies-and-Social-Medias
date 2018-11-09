@@ -55,28 +55,11 @@ cat(paste("Start loading dictionaries","\n",sep=""))
 
 start_time1 <- Sys.time()
 # Stream 1: Supporting local authorities
-# Allergy enquiries dictionary:
-allergy_enquiries_dict_filename <- "dictionaries/allergy_enquiries_dictionary.csv"
-allergy_enquiries.dict <- get_dictionary_from_file(allergy_enquiries_dict_filename)
+supporting_local_authorities_dict_filename <- "dictionaries/supporting_local_authorities_dictionary.csv"
+supporting_local_authorities.dict <- get_dictionary_from_file(supporting_local_authorities_dict_filename)
 cat("\n\n")
-cat(paste("Allergy enquiries dictionary","\n",sep=""))
-print(allergy_enquiries.dict)
-cat("\n\n")
-
-# Food labelling dictionary:
-food_labelling_dict_filename <- "dictionaries/food_labelling_dictionary.csv"
-food_labelling.dict <- get_dictionary_from_file(food_labelling_dict_filename)
-cat("\n\n")
-cat(paste("Food labeling dictionary","\n",sep=""))
-print(food_labelling.dict)
-cat("\n\n")
-
-# Reporting reactions dictionary:
-reaction_report_dict_filename <- "dictionaries/reaction_report_dictionary.csv"
-reaction_report.dict <- get_dictionary_from_file(reaction_report_dict_filename)
-cat("\n\n")
-cat(paste("Reporing reactions dictionary","\n",sep=""))
-print(reaction_report.dict)
+cat(paste("Supporting local authorities dictionary","\n",sep=""))
+print(supporting_local_authorities.dict)
 cat("\n\n")
 
 # Stream 2: 14 allergen list:
@@ -104,7 +87,7 @@ cat(paste("Finished loading dictionaries","\n",sep=""))
 cat("\n\n")
 
 ## columns names from the original data to be merged with the streams labellings
-retained_metadata <- c("id", "latitude", "longitude","date","sentiment class")
+retained_metadata <- c("id", "latitude", "longitude","date","sentiment","sentiment class","topics")
 
 ### =============PREPROCESSING & TEXT CLEANING================= ###
 

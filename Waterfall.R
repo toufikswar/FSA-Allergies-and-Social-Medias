@@ -9,54 +9,41 @@ start_time  <- Sys.time()
 
 ### Stream 1: Supporting Local Authorities
 start_time1 <- Sys.time()
-# Allergy enquiries:
-allergy_enquiries.df.norm <- from_corpus_to_lookup_dataframe(content.corpus,allergy_enquiries.dict)
-allergy_enquiries.names   <- colnames(allergy_enquiries.df.norm)[-1]
-# Combine the queries
+supporting_local_authorities.df.norm <- from_corpus_to_lookup_dataframe(content.corpus,supporting_local_authorities.dict)
+supporting_local_authorities.names   <- colnames(supporting_local_authorities.df.norm)[-1]
+labelled.df                          <- cbind(labelled.df,supporting_local_authorities.df.norm[,supporting_local_authorities.names])
+
+# Allergy enquiries query combination:
 # Looking for [allergy AND info AND (request OR response) AND restaurant]
-labelled.df$allergy_enquiries <- ifelse(allergy_enquiries.df.norm[,"allergy"] &
-                                        allergy_enquiries.df.norm[,"info"]    &
-                                        (allergy_enquiries.df.norm[,"request"] | allergy_enquiries.df.norm[,"response"]) &
-                                        allergy_enquiries.df.norm[,"restaurant"],1,0)
+labelled.df$allergy_enquiries <- ifelse(labelled.df[,"allergy"] &
+                                        labelled.df[,"info"]    &
+                                        (labelled.df[,"request"] | labelled.df[,"response"]) &
+                                        labelled.df[,"restaurant"],1,0)
 allergy.enquiries.names       <- c("allergy_enquiries")
 
-end_time1 <- Sys.time()
-allergy_enquiries_time <- as.difftime(end_time1 - start_time1, units = "secs")
-
-# Food labelling:
-start_time1 <- Sys.time()
-food_labelling.df.norm <- from_corpus_to_lookup_dataframe(content.corpus, food_labelling.dict)
-food_labelling.names <- colnames(food_labelling.df.norm)
-# Combine the queries
+# Food labelling query combination:
 # Looking for [(consurmer AND issue AND labelling) OR (incorrect AND allergy AND labelling) OR (consumer AND allergy AND labelling)]
-labelled.df$food_labelling <- ifelse((food_labelling.df.norm[,"consumer"] &
-                                       food_labelling.df.norm[,"issue"] &
-                                       food_labelling.df.norm[,"labelling"])
-                                     |
-                                       (food_labelling.df.norm[,"incorrect"] &
-                                       food_labelling.df.norm[,"allergy"] &
-                                       food_labelling.df.norm[,"labelling"])
-                                     |
-                                       (food_labelling.df.norm[,"consumer"] &
-                                       food_labelling.df.norm[,"allergy"] &
-                                       food_labelling.df.norm[,"labelling"]) ,1,0)
-
-end_time1 <- Sys.time()
-food_labelling_time <- as.difftime(end_time1 - start_time1, units = "secs")
+labelled.df$food_labelling <- ifelse((labelled.df[,"consumer"] &
+                                      labelled.df[,"issue"] &
+                                      labelled.df[,"labelling"])
+                                      |
+                                     (labelled.df[,"incorrect"] &
+                                      labelled.df[,"allergy"] &
+                                      labelled.df[,"labelling"])
+                                      |
+                                     (labelled.df[,"consumer"] &
+                                      labelled.df[,"allergy"] &
+                                      labelled.df[,"labelling"]) ,1,0)
 
 
-# Reporting reactions:
-start_time1 <- Sys.time()
-reaction_report.df.norm <- from_corpus_to_lookup_dataframe(content.corpus,reaction_report.dict)
-reaction_report.names   <- colnames(reaction_report.df.norm)[-1]
-# Combine the queries
-# Looking for [symptons & ingestion AND NOT severe]
-mild_reaction   <- ifelse(reaction_report.df.norm[,"allergy"] & reaction_report.df.norm[,"symptons"] & reaction_report.df.norm[,"ingestion"] &
-                          !reaction_report.df.norm[,"severe"]
+# Reporting reactions query combination:
+# Looking for [allergy & symptons & ingestion AND NOT severe]
+mild_reaction   <- ifelse(labelled.df[,"allergy"] & labelled.df[,"symptons"] & labelled.df[,"ingestion"] &
+                          !labelled.df[,"severe"]
                           ,1,0)
-# Looking for [symptons & ingestion AND severe]
-severe_reaction <- ifelse(reaction_report.df.norm[,"allergy"] & reaction_report.df.norm[,"symptons"] & reaction_report.df.norm[,"ingestion"] &
-                          reaction_report.df.norm[,"severe"]
+# Looking for [allergy & symptons & ingestion AND severe]
+severe_reaction <- ifelse(labelled.df[,"allergy"] & labelled.df[,"symptons"] & labelled.df[,"ingestion"] &
+                          labelled.df[,"severe"]
                           ,1,0)
 labelled.df$reactions_report <- rep("No-report",nrow(labelled.df))
 labelled.df$reactions_report[mild_reaction == 1 & severe_reaction == 0] <- "Mild-reaction"
@@ -65,7 +52,7 @@ labelled.df$reactions_report <- factor(labelled.df$reactions_report, levels = c(
 reaction.report.names <- c("reactions_report")
 
 end_time1 <- Sys.time()
-reaction_report_time <- as.difftime(end_time1 - start_time1, units = "secs")
+supporting_local_authorities_time <- as.difftime(end_time1 - start_time1, units = "secs")
 
 ### Stream 2: 14 allergens
 # 14 allergens
@@ -106,18 +93,14 @@ print(colnames(labelled.df))
 cat("\n\n")
 
 cat("\n\n")
-the_time_unit <- get_time_units(allergy_enquiries_time)
-print(paste("Allergy enquiries labelling time:    ",round(as.numeric(allergy_enquiries_time,  units=the_time_unit),5), " ",the_time_unit,sep=""))
-the_time_unit <- get_time_units(food_labelling_time)
-print(paste("Food Labelling labelling time:       ",round(as.numeric(food_labelling_time,  units=the_time_unit),5), " ",the_time_unit,sep=""))
-the_time_unit <- get_time_units(reaction_report_time)
-print(paste("Reporting reactions labelling time:  ",round(as.numeric(reaction_report_time,    units=the_time_unit),5), " ",the_time_unit,sep=""))
+the_time_unit <- get_time_units(supporting_local_authorities_time)
+print(paste("Supporting local authorities labelling time:  ",round(as.numeric(supporting_local_authorities_time,  units=the_time_unit),5), " ",the_time_unit,sep=""))
 the_time_unit <- get_time_units(fourteen_allergens_time)
-print(paste("14 allergens labelling time:         ",round(as.numeric(fourteen_allergens_time, units=the_time_unit),5), " ",the_time_unit,sep=""))
+print(paste("14 allergens labelling time:                  ",round(as.numeric(fourteen_allergens_time, units=the_time_unit),5), " ",the_time_unit,sep=""))
 the_time_unit <- get_time_units(other_allergens_time)
-print(paste("Other allergens labelling time:      ",round(as.numeric(other_allergens_time,    units=the_time_unit),5), " ",the_time_unit,sep=""))
+print(paste("Other allergens labelling time:               ",round(as.numeric(other_allergens_time,    units=the_time_unit),5), " ",the_time_unit,sep=""))
 the_time_unit <- get_time_units(global_time)
-print(paste("Total labelling time:                ",round(as.numeric(global_time,             units=the_time_unit),5), " ",the_time_unit,sep=""))
+print(paste("Total labelling time:                         ",round(as.numeric(global_time,             units=the_time_unit),5), " ",the_time_unit,sep=""))
 cat("\n\n")
 
 
