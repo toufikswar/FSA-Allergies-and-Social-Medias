@@ -25,6 +25,7 @@ dataDir   = "Data/"
 # list for file names
 filenames = c("20161029-20171127.xlsx",
               "20171128-20180926.xlsx")
+sheet_name = "Sheet1"
 
 # paste the data path with filename
 filenames = paste(dataDir,filenames,sep="")
@@ -33,7 +34,7 @@ cat("\n\n")
 cat(paste("Start loading the data","\n",sep=""))
 # verbose variable
 verbose = TRUE
-data.df <- load_list_of_xlsx_files(filenames,verbose)
+data.df <- load_list_of_xlsx_files(filenames,sheet_name,verbose)
 cat(paste("N records = ",nrow(data.df),"\n",sep=""))
 
 # flag to run preprocessing test
