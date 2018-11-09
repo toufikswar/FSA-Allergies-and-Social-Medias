@@ -48,48 +48,6 @@ cat(paste("Loading data time:  ",round(as.numeric(atimediff,units=the_time_unit)
 cat(paste("Finished loading the data","\n",sep=""))
 cat("\n\n")
 
-### =============LOAD DICTIONARIES================= ###
-# (will only create if library(quanteda) is loaded correctly)
-
-cat("\n\n")
-cat(paste("Start loading dictionaries","\n",sep=""))
-
-start_time1 <- Sys.time()
-# Stream 1: Supporting local authorities
-supporting_local_authorities_dict_filename <- "dictionaries/supporting_local_authorities_dictionary.csv"
-supporting_local_authorities.dict <- get_dictionary_from_file(supporting_local_authorities_dict_filename)
-cat("\n\n")
-cat(paste("Supporting local authorities dictionary","\n",sep=""))
-print(supporting_local_authorities.dict)
-cat("\n\n")
-
-# Stream 2: 14 allergen list:
-# 14 allergen dictionary:
-fourteen_allergens_dict_filename <- "dictionaries/fourteen_allergens_dictionary.csv"
-fourteen_allergens.dict <- get_dictionary_from_file(fourteen_allergens_dict_filename)
-cat("\n\n")
-cat(paste("14 allergens dictionary","\n",sep=""))
-print(fourteen_allergens.dict)
-cat("\n\n")
-
-# Other allergen dictionary:
-other_allergens_dict_filename <- "dictionaries/other_allergens_dictionary.csv"
-other_allergens.dict <- get_dictionary_from_file(other_allergens_dict_filename)
-cat("\n\n")
-cat(paste("other allergens dictionary","\n",sep=""))
-print(other_allergens.dict)
-cat("\n\n")
-
-end_time1 <- Sys.time()
-atimediff <- as.difftime(end_time1 - start_time1, units = "secs")
-the_time_unit <- get_time_units(atimediff)
-cat(paste("Loading dictionary time:  ",round(as.numeric(atimediff,units=the_time_unit),5)," ",the_time_unit,"\n",sep=""))
-cat(paste("Finished loading dictionaries","\n",sep=""))
-cat("\n\n")
-
-## columns names from the original data to be merged with the streams labellings
-retained_metadata <- c("id", "latitude", "longitude","date","sentiment","sentiment class","topics")
-
 ### =============PREPROCESSING & TEXT CLEANING================= ###
 
 # Set time for beginning of text pre-preprocessing
