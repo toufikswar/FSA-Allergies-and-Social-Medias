@@ -51,11 +51,11 @@ reaction_report.df.norm <- from_corpus_to_lookup_dataframe(content.corpus,reacti
 reaction_report.names   <- colnames(reaction_report.df.norm)[-1]
 # Combine the queries
 # Looking for [symptons & ingestion AND NOT severe]
-mild_reaction   <- ifelse(reaction_report.df.norm[,"symptons"] & reaction_report.df.norm[,"ingestion"] &
+mild_reaction   <- ifelse(reaction_report.df.norm[,"allergy"] & reaction_report.df.norm[,"symptons"] & reaction_report.df.norm[,"ingestion"] &
                           !reaction_report.df.norm[,"severe"]
                           ,1,0)
 # Looking for [symptons & ingestion AND severe]
-severe_reaction <- ifelse(reaction_report.df.norm[,"symptons"] & reaction_report.df.norm[,"ingestion"] &
+severe_reaction <- ifelse(reaction_report.df.norm[,"allergy"] & reaction_report.df.norm[,"symptons"] & reaction_report.df.norm[,"ingestion"] &
                           reaction_report.df.norm[,"severe"]
                           ,1,0)
 labelled.df$reactions_report <- rep("No-report",nrow(labelled.df))

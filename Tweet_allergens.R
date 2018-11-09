@@ -212,7 +212,7 @@ start_time1 <- Sys.time()
 cat("\n\n")
 cat(paste("Start Stemming & Stopword Removal","\n",sep=""))
 cat("Depending on the size of the Data this step can take 5-10 minutes. Be patient please.")
-cat("Distributing jobs to available CPU cores...\n")
+cat(" Distributing jobs to available CPU cores...\n")
 # words_to_remove   <- stopwords("english") # list of engish stop words
 # Emojis emoji_dictionary from (https://raw.githubusercontent.com/lyons7/emojidictionary/master/emoji_dictionary.csv)
 #emoticons         <- read.csv("resources/emoji_dictionary.csv", header = TRUE) # emojis emoji_dictionary
