@@ -1,0 +1,48 @@
+---
+title: "FSA - Allergies and Social Media"
+author: "The four Seasons"
+site: bookdown::bookdown_site
+documentclass: book
+output:
+  bookdown::gitbook: default
+  #bookdown::pdf_book: default
+---
+
+
+# Project Presentation
+
+## Context
+
+Using social media data, FSA wants to be able to track endorcement of allergen based legislations in the UK.
+There are two streams of analysis involved in this project :
+
+### Stream 1
+Using social media data, we would like to determine whether some Local Authorities face more allergy-relate issues than others by tracking:
+- Allergy enquiries: Do consumers experience negative or positive reactions from staff when enquiring about allergen information in restaurants/ food outlets?
+- Food labelling: Do consumers face issues with incorrect or incomplete food labelling?
+- Reporting reactions: Do consumers report allergic reactions to food or near-misses?
+
+### Stream 2
+Based on a list of 14 common allergens provided in the EU legislation, we will focus on these 2 areas:
+- How much are each of the 14 allergens being talked about, and are they usually mentioned in isolation or in combination with others? What insight can we gain by analysis of posts relating to these 14 allergens?
+- Are other allergens outside of this list of 14 being talked about? We will explore this by: (a) using a list of other likely allergenic foods provided by subject matter experts, and (b) for posts that do not contain any of the main 14, are there any common food themes. Are any of these mentioned more than any of the 14 allergens?
+
+## Team
+
+The team is composed of Alejandro, Andrew, Ozgue and Toufik.
+
+# Data Cleaning and Preprocessing
+
+```{r chunk-label, echo = FALSE, fig.cap = 'A figure caption.'}
+1 + 1
+rnorm(10)  # 10 random numbers
+plot(dist ~ speed, cars)  # a scatterplot
+```
+
+# Data Visualization
+
+Hi.
+
+Bye.
+
+<!-- If you need PDF output, uncomment bookdown::pdf_book above in YAML. You will need a LaTeX installation, e.g., https://yihui.name/tinytex/ -->
