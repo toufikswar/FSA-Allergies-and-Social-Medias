@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>FSA - Allergies and Social Media</title>
+  <meta name="description" content="FSA - Allergies and Social Media">
+  <meta name="generator" content="bookdown 0.7 and GitBook 2.6.7">
+
+  <meta property="og:title" content="FSA - Allergies and Social Media" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="FSA - Allergies and Social Media" />
+  
+  
+  
+
+<meta name="author" content="The four Seasons">
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+<link rel="prev" href="data-cleaning-and-preprocessing.html">
+
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Project Presentation</a><ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#context"><i class="fa fa-check"></i><b>1.1</b> Context</a><ul>
+<li class="chapter" data-level="1.1.1" data-path="index.html"><a href="index.html#stream-1"><i class="fa fa-check"></i><b>1.1.1</b> Stream 1</a></li>
+<li class="chapter" data-level="1.1.2" data-path="index.html"><a href="index.html#stream-2"><i class="fa fa-check"></i><b>1.1.2</b> Stream 2</a></li>
+</ul></li>
+<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#team"><i class="fa fa-check"></i><b>1.2</b> Team</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="data-cleaning-and-preprocessing.html"><a href="data-cleaning-and-preprocessing.html"><i class="fa fa-check"></i><b>2</b> Data Cleaning and Preprocessing</a><ul>
+<li class="chapter" data-level="2.1" data-path="data-cleaning-and-preprocessing.html"><a href="data-cleaning-and-preprocessing.html#cleaning"><i class="fa fa-check"></i><b>2.1</b> Cleaning</a></li>
+<li class="chapter" data-level="2.2" data-path="data-cleaning-and-preprocessing.html"><a href="data-cleaning-and-preprocessing.html#normalization"><i class="fa fa-check"></i><b>2.2</b> Normalization</a></li>
+<li class="chapter" data-level="2.3" data-path="data-cleaning-and-preprocessing.html"><a href="data-cleaning-and-preprocessing.html#data-term-matrix"><i class="fa fa-check"></i><b>2.3</b> Data Term Matrix</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="stream-1-1.html"><a href="stream-1-1.html"><i class="fa fa-check"></i><b>3</b> Stream 1</a><ul>
+<li class="chapter" data-level="3.1" data-path="stream-1-1.html"><a href="stream-1-1.html#approach"><i class="fa fa-check"></i><b>3.1</b> Approach</a></li>
+<li class="chapter" data-level="3.2" data-path="stream-1-1.html"><a href="stream-1-1.html#labelling"><i class="fa fa-check"></i><b>3.2</b> Labelling</a></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">FSA - Allergies and Social Media</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="stream-1-1" class="section level1">
+<h1><span class="header-section-number">3</span> Stream 1</h1>
+<div id="approach" class="section level2">
+<h2><span class="header-section-number">3.1</span> Approach</h2>
+<p>The idea is to use provided data in order to find out information about: 1. Allergy enquiries 2. Food labelling 3. Reporting reactions</p>
+<p>Our approach was to use each of these elements and to find words related to the subject.</p>
+<p>Let’s take Food labelling as an example. The idea is to find cases where consumers face issues due to incorrect food labelling.</p>
+<p>We divided it into the following list:</p>
+<p><code>c(&quot;consumer&quot;, &quot;issue&quot;, &quot;labelling&quot;, &quot;allergy&quot;)</code></p>
+<p>We used a Google library called Word2Vec an efficient implementation of the continuous bag-of-words and skip-gram architectures for computing vector representations of words.</p>
+<p>For each of the words consumer, issue, labelling and allergen, we used word2vec to generate dictionaries of words with a strong semantic proximity.</p>
+<p>If we talk the word allergy, applying word2vec functions to it provided us with a list of words related to the allergen subject. With some data cleaning and manual rework, we obtain a dictionary with <key> and values.</p>
+<p>Example for allergy : <code>allergy allergy,allergen,allergenic,allergens,allergic,allergies,allergy,</code></p>
+<p>This processed is applied to all the words that we will use to identify issues with food labelling.</p>
+<p>We will generate a DFM composed of the list of all the entries (tweets, news, forum) by line, the column will be the key of our dictionary (in that case “allergy”) Because some of these may be repeted several times in a same document tweet or forum posts, the DFM is <strong>normalized</strong> containing 1 for any occurence of the word &gt;= 1. The matrix is composed of 0 and 1, corresponding to the occurrences of the context words.</p>
+</div>
+<div id="labelling" class="section level2">
+<h2><span class="header-section-number">3.2</span> Labelling</h2>
+<p>Using the previous generated matrix, we will apply the following logic to filter and label the tweets as per their corresponding context.</p>
+<p>Staying in the example of food labelling, we apply the following logical expression :</p>
+<p>[(consurmer AND issue AND labelling) OR (incorrect AND allergy AND labelling) OR (consumer AND allergy AND labelling)]</p>
+<p>When one of the above conditions is verified, we flag the corresponding document (tweet, or post forum) with the food_labelling value to 1</p>
+<p>The same process is applyied for the allergies inqueries and reactions reports.</p>
+<!-- If you need PDF output, uncomment bookdown::pdf_book above in YAML. You will need a LaTeX installation, e.g., https://yihui.name/tinytex/ -->
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="data-cleaning-and-preprocessing.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"linkedin": false,
+"weibo": false,
+"instapper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"download": null,
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+</body>
+
+</html>

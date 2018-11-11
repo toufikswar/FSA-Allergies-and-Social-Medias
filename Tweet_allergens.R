@@ -25,6 +25,7 @@ dataDir   = "Data/"
 # list for file names
 filenames = c("20161029-20171127.xlsx",
               "20171128-20180926.xlsx")
+sheet_name = "Sheet1"
 
 # paste the data path with filename
 filenames = paste(dataDir,filenames,sep="")
@@ -33,7 +34,7 @@ cat("\n\n")
 cat(paste("Start loading the data","\n",sep=""))
 # verbose variable
 verbose = TRUE
-data.df <- load_list_of_xlsx_files(filenames,verbose)
+data.df <- load_list_of_xlsx_files(filenames,sheet_name,verbose)
 cat(paste("N records = ",nrow(data.df),"\n",sep=""))
 
 # flag to run preprocessing test
@@ -46,65 +47,6 @@ the_time_unit <- get_time_units(atimediff)
 cat(paste("Loading data time:  ",round(as.numeric(atimediff,units=the_time_unit),5)," ",the_time_unit,"\n",sep=""))
 cat(paste("Finished loading the data","\n",sep=""))
 cat("\n\n")
-
-### =============LOAD DICTIONARIES================= ###
-# (will only create if library(quanteda) is loaded correctly)
-
-cat("\n\n")
-cat(paste("Start loading dictionaries","\n",sep=""))
-
-start_time1 <- Sys.time()
-# Stream 1: Supporting local authorities
-# Allergy enquiries dictionary:
-allergy_enquiries_dict_filename <- "dictionaries/allergy_enquiries_dictionary.csv"
-allergy_enquiries.dict <- get_dictionary_from_file(allergy_enquiries_dict_filename)
-cat("\n\n")
-cat(paste("Allergy enquiries dictionary","\n",sep=""))
-print(allergy_enquiries.dict)
-cat("\n\n")
-
-# Food labelling dictionary:
-food_labelling_dict_filename <- "dictionaries/food_labelling_dictionary.csv"
-food_labelling.dict <- get_dictionary_from_file(food_labelling_dict_filename)
-cat("\n\n")
-cat(paste("Food labeling dictionary","\n",sep=""))
-print(food_labelling.dict)
-cat("\n\n")
-
-# Reporting reactions dictionary:
-reaction_report_dict_filename <- "dictionaries/reaction_report_dictionary.csv"
-reaction_report.dict <- get_dictionary_from_file(reaction_report_dict_filename)
-cat("\n\n")
-cat(paste("Reporing reactions dictionary","\n",sep=""))
-print(reaction_report.dict)
-cat("\n\n")
-
-# Stream 2: 14 allergen list:
-# 14 allergen dictionary:
-fourteen_allergens_dict_filename <- "dictionaries/fourteen_allergens_dictionary.csv"
-fourteen_allergens.dict <- get_dictionary_from_file(fourteen_allergens_dict_filename)
-cat("\n\n")
-cat(paste("14 allergens dictionary","\n",sep=""))
-print(fourteen_allergens.dict)
-cat("\n\n")
-
-# Other allergen dictionary:
-other_allergens_dict_filename <- "dictionaries/other_allergens_dictionary.csv"
-other_allergens.dict <- get_dictionary_from_file(other_allergens_dict_filename)
-cat("\n\n")
-cat(paste("other allergens dictionary","\n",sep=""))
-print(other_allergens.dict)
-cat("\n\n")
-
-end_time1 <- Sys.time()
-atimediff <- as.difftime(end_time1 - start_time1, units = "secs")
-the_time_unit <- get_time_units(atimediff)
-cat(paste("Loading dictionary time:  ",round(as.numeric(atimediff,units=the_time_unit),5)," ",the_time_unit,"\n",sep=""))
-cat(paste("Finished loading dictionaries","\n",sep=""))
-cat("\n\n")
-
-## columns names from the original data to be merged with the streams labellings
-retained_metadata <- c("id", "latitude", "longitude","date","sentiment class")
 
 ### =============PREPROCESSING & TEXT CLEANING================= ###
 

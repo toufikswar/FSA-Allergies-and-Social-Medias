@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>FSA - Allergies and Social Media</title>
+  <meta name="description" content="FSA - Allergies and Social Media">
+  <meta name="generator" content="bookdown 0.7 and GitBook 2.6.7">
+
+  <meta property="og:title" content="FSA - Allergies and Social Media" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="FSA - Allergies and Social Media" />
+  
+  
+  
+
+<meta name="author" content="The four Seasons">
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+<link rel="prev" href="index.html">
+<link rel="next" href="stream-1-1.html">
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Project Presentation</a><ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#context"><i class="fa fa-check"></i><b>1.1</b> Context</a><ul>
+<li class="chapter" data-level="1.1.1" data-path="index.html"><a href="index.html#stream-1"><i class="fa fa-check"></i><b>1.1.1</b> Stream 1</a></li>
+<li class="chapter" data-level="1.1.2" data-path="index.html"><a href="index.html#stream-2"><i class="fa fa-check"></i><b>1.1.2</b> Stream 2</a></li>
+</ul></li>
+<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#team"><i class="fa fa-check"></i><b>1.2</b> Team</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="data-cleaning-and-preprocessing.html"><a href="data-cleaning-and-preprocessing.html"><i class="fa fa-check"></i><b>2</b> Data Cleaning and Preprocessing</a><ul>
+<li class="chapter" data-level="2.1" data-path="data-cleaning-and-preprocessing.html"><a href="data-cleaning-and-preprocessing.html#cleaning"><i class="fa fa-check"></i><b>2.1</b> Cleaning</a></li>
+<li class="chapter" data-level="2.2" data-path="data-cleaning-and-preprocessing.html"><a href="data-cleaning-and-preprocessing.html#normalization"><i class="fa fa-check"></i><b>2.2</b> Normalization</a></li>
+<li class="chapter" data-level="2.3" data-path="data-cleaning-and-preprocessing.html"><a href="data-cleaning-and-preprocessing.html#data-term-matrix"><i class="fa fa-check"></i><b>2.3</b> Data Term Matrix</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="stream-1-1.html"><a href="stream-1-1.html"><i class="fa fa-check"></i><b>3</b> Stream 1</a><ul>
+<li class="chapter" data-level="3.1" data-path="stream-1-1.html"><a href="stream-1-1.html#approach"><i class="fa fa-check"></i><b>3.1</b> Approach</a></li>
+<li class="chapter" data-level="3.2" data-path="stream-1-1.html"><a href="stream-1-1.html#labelling"><i class="fa fa-check"></i><b>3.2</b> Labelling</a></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">FSA - Allergies and Social Media</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="data-cleaning-and-preprocessing" class="section level1">
+<h1><span class="header-section-number">2</span> Data Cleaning and Preprocessing</h1>
+<div id="cleaning" class="section level2">
+<h2><span class="header-section-number">2.1</span> Cleaning</h2>
+<p>First step of our code is too import the data provided by FSA in Excel Format and to load it in a DataFrame. This will allow us to perform the data cleaning, which is composed of the following steps:</p>
+<ul>
+<li>Remove of undesiered columns</li>
+<li>Ordering of data per dates</li>
+<li>Lowercasing of content</li>
+<li>Removal of undesired characters from including Emoticons, Hashtags, URLs, HTML tags and symbols and punctuation</li>
+<li>Removal of duplicates</li>
+<li>Removal of spaces around conten (Trimming)</li>
+</ul>
+<p>For further future analysis, some information like Username and Hashtags are extracted in inserted in a new column.</p>
+<p>Lots of content is composed of abbraviations. In order to be the more relevant possible in the future analysis, we convert those to there expander meaning for e.g. “asap” becomes “as soon as possible”</p>
+</div>
+<div id="normalization" class="section level2">
+<h2><span class="header-section-number">2.2</span> Normalization</h2>
+<p>The normalization refers to the transformation of words into a more uniform form.</p>
+<p>We perform stop words removals where words like “the” “an” and other articles are removed from the content. This allows compuation to be more efficiant, reducing content size.</p>
+<p>We apply the stemming process, an algorithm that converts inflected forms of words into their base forms (stems). This allows us to discard variations of words (like singular, plural).</p>
+<p>The words are treated like normalized elements that we call tokens.</p>
+<p>We need to convert this set of tokens to a corpus in order to perform matricial analysis.</p>
+</div>
+<div id="data-term-matrix" class="section level2">
+<h2><span class="header-section-number">2.3</span> Data Term Matrix</h2>
+<p>After all our data is cleaned and preprocessed, our corpus is converted into a Data Term Matrix. A DTM is a matrix in which rows are documents, columns are terms, and cells indicate how often each term occurred in each document. In our case each line represents a tweet, forum entry or news.</p>
+<p>This is the base element that we will use for Stream 1 and Stream 2 analyis.</p>
+<!-- If you need PDF output, uncomment bookdown::pdf_book above in YAML. You will need a LaTeX installation, e.g., https://yihui.name/tinytex/ -->
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="index.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="stream-1-1.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"linkedin": false,
+"weibo": false,
+"instapper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"download": null,
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+</body>
+
+</html>

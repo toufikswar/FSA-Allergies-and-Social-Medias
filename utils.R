@@ -7,7 +7,9 @@
 library(readxl)          # library to read xlsx files (excel)
 
 #================================================================
-load_list_of_xlsx_files <- function(filenames,verbose=FALSE)
+load_list_of_xlsx_files <- function(filenames,
+                                    sheet_name="Sheet1",
+                                    verbose=FALSE)
 {
 
   # reads the data from a list of files into a single data.frame
@@ -19,7 +21,7 @@ load_list_of_xlsx_files <- function(filenames,verbose=FALSE)
 
     if(i == 1) {
       # only the 1st file has the columns names
-      all_data[[i]] = read_excel(filenames[i],sheet="Sheet1",col_names=TRUE)
+      all_data[[i]] = read_excel(filenames[i],sheet=sheet_name,col_names=TRUE)
       # save column names
       col_names     = names(all_data[[i]])
 
@@ -33,7 +35,7 @@ load_list_of_xlsx_files <- function(filenames,verbose=FALSE)
     }
     else {
       # extract the rest of the files without column names
-      all_data[[i]] = read_excel(filenames[i],sheet="Sheet1",col_names=FALSE)
+      all_data[[i]] = read_excel(filenames[i],sheet=sheet_name,col_names=FALSE)
       # set the same column names as the 1st file
       colnames(all_data[[i]]) <- col_names
     }

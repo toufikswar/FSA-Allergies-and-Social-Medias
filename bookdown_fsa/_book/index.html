@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>FSA - Allergies and Social Media</title>
+  <meta name="description" content="FSA - Allergies and Social Media">
+  <meta name="generator" content="bookdown 0.7 and GitBook 2.6.7">
+
+  <meta property="og:title" content="FSA - Allergies and Social Media" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="FSA - Allergies and Social Media" />
+  
+  
+  
+
+<meta name="author" content="The four Seasons">
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+
+<link rel="next" href="data-cleaning-and-preprocessing.html">
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Project Presentation</a><ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#context"><i class="fa fa-check"></i><b>1.1</b> Context</a><ul>
+<li class="chapter" data-level="1.1.1" data-path="index.html"><a href="index.html#stream-1"><i class="fa fa-check"></i><b>1.1.1</b> Stream 1</a></li>
+<li class="chapter" data-level="1.1.2" data-path="index.html"><a href="index.html#stream-2"><i class="fa fa-check"></i><b>1.1.2</b> Stream 2</a></li>
+</ul></li>
+<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#team"><i class="fa fa-check"></i><b>1.2</b> Team</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="data-cleaning-and-preprocessing.html"><a href="data-cleaning-and-preprocessing.html"><i class="fa fa-check"></i><b>2</b> Data Cleaning and Preprocessing</a><ul>
+<li class="chapter" data-level="2.1" data-path="data-cleaning-and-preprocessing.html"><a href="data-cleaning-and-preprocessing.html#cleaning"><i class="fa fa-check"></i><b>2.1</b> Cleaning</a></li>
+<li class="chapter" data-level="2.2" data-path="data-cleaning-and-preprocessing.html"><a href="data-cleaning-and-preprocessing.html#normalization"><i class="fa fa-check"></i><b>2.2</b> Normalization</a></li>
+<li class="chapter" data-level="2.3" data-path="data-cleaning-and-preprocessing.html"><a href="data-cleaning-and-preprocessing.html#data-term-matrix"><i class="fa fa-check"></i><b>2.3</b> Data Term Matrix</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="stream-1-1.html"><a href="stream-1-1.html"><i class="fa fa-check"></i><b>3</b> Stream 1</a><ul>
+<li class="chapter" data-level="3.1" data-path="stream-1-1.html"><a href="stream-1-1.html#approach"><i class="fa fa-check"></i><b>3.1</b> Approach</a></li>
+<li class="chapter" data-level="3.2" data-path="stream-1-1.html"><a href="stream-1-1.html#labelling"><i class="fa fa-check"></i><b>3.2</b> Labelling</a></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">FSA - Allergies and Social Media</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="header">
+<h1 class="title">FSA - Allergies and Social Media</h1>
+<h4 class="author"><em>The four Seasons</em></h4>
+</div>
+<div id="project-presentation" class="section level1">
+<h1><span class="header-section-number">1</span> Project Presentation</h1>
+<div id="context" class="section level2">
+<h2><span class="header-section-number">1.1</span> Context</h2>
+<p>Using social media data, FSA wants to be able to track endorcement of allergen based legislations in the UK. There are two streams of analysis involved in this project :</p>
+<div id="stream-1" class="section level3">
+<h3><span class="header-section-number">1.1.1</span> Stream 1</h3>
+<p>Using social media data, we would like to determine whether some Local Authorities face more allergy-relate issues than others by tracking: - Allergy enquiries: Do consumers experience negative or positive reactions from staff when enquiring about allergen information in restaurants/ food outlets? - Food labelling: Do consumers face issues with incorrect or incomplete food labelling? - Reporting reactions: Do consumers report allergic reactions to food or near-misses?</p>
+</div>
+<div id="stream-2" class="section level3">
+<h3><span class="header-section-number">1.1.2</span> Stream 2</h3>
+<p>Based on a list of 14 common allergens provided in the EU legislation, we will focus on these 2 areas: * How much are each of the 14 allergens being talked about, and are they usually mentioned in isolation or in combination with others? What insight can we gain by analysis of posts relating to these 14 allergens? * Are other allergens outside of this list of 14 being talked about? We will explore this by: (a) using a list of other likely allergenic foods provided by subject matter experts, and (b) for posts that do not contain any of the main 14, are there any common food themes. Are any of these mentioned more than any of the 14 allergens?</p>
+</div>
+</div>
+<div id="team" class="section level2">
+<h2><span class="header-section-number">1.2</span> Team</h2>
+<p>The team is composed of Alejandro, Andrew, Ozge and Toufik.</p>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+
+<a href="data-cleaning-and-preprocessing.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"linkedin": false,
+"weibo": false,
+"instapper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"download": null,
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+</body>
+
+</html>
