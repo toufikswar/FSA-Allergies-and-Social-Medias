@@ -79,12 +79,12 @@ labelled.df$food_labelling <- ifelse((labelled.df[,"consumer"] &
 
 
 # Reporting reactions query combination:
-# Looking for [allergy & symptons & ingestion AND NOT severe]
-mild_reaction   <- ifelse(labelled.df[,"allergy"] & labelled.df[,"symptons"] & labelled.df[,"ingestion"] &
+# Looking for [allergy & symptoms & ingestion AND NOT severe]
+mild_reaction   <- ifelse(labelled.df[,"allergy"] & labelled.df[,"symptoms"] & labelled.df[,"ingestion"] &
                           !labelled.df[,"severe"]
                           ,1,0)
 # Looking for [allergy & symptons & ingestion AND severe]
-severe_reaction <- ifelse(labelled.df[,"allergy"] & labelled.df[,"symptons"] & labelled.df[,"ingestion"] &
+severe_reaction <- ifelse(labelled.df[,"allergy"] & labelled.df[,"symptoms"] & labelled.df[,"ingestion"] &
                           labelled.df[,"severe"]
                           ,1,0)
 labelled.df$reactions_report <- rep("No-report",nrow(labelled.df))
