@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
+<link rel="prev" href="data-cleaning-and-preprocessing.html">
 
-<link rel="next" href="data-cleaning-and-preprocessing.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -48,6 +48,43 @@
 
 
 
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
 
 </head>
 
@@ -72,10 +109,11 @@
 <li class="chapter" data-level="2.1" data-path="data-cleaning-and-preprocessing.html"><a href="data-cleaning-and-preprocessing.html#cleaning"><i class="fa fa-check"></i><b>2.1</b> Cleaning</a></li>
 <li class="chapter" data-level="2.2" data-path="data-cleaning-and-preprocessing.html"><a href="data-cleaning-and-preprocessing.html#normalization"><i class="fa fa-check"></i><b>2.2</b> Normalization</a></li>
 <li class="chapter" data-level="2.3" data-path="data-cleaning-and-preprocessing.html"><a href="data-cleaning-and-preprocessing.html#data-term-matrix"><i class="fa fa-check"></i><b>2.3</b> Data Term Matrix</a></li>
+<li class="chapter" data-level="2.4" data-path="data-cleaning-and-preprocessing.html"><a href="data-cleaning-and-preprocessing.html#approach"><i class="fa fa-check"></i><b>2.4</b> Approach</a></li>
+<li class="chapter" data-level="2.5" data-path="data-cleaning-and-preprocessing.html"><a href="data-cleaning-and-preprocessing.html#labelling"><i class="fa fa-check"></i><b>2.5</b> Labelling</a></li>
 </ul></li>
-<li class="chapter" data-level="3" data-path="stream-1-1.html"><a href="stream-1-1.html"><i class="fa fa-check"></i><b>3</b> Stream 1</a><ul>
-<li class="chapter" data-level="3.1" data-path="stream-1-1.html"><a href="stream-1-1.html#approach"><i class="fa fa-check"></i><b>3.1</b> Approach</a></li>
-<li class="chapter" data-level="3.2" data-path="stream-1-1.html"><a href="stream-1-1.html#labelling"><i class="fa fa-check"></i><b>3.2</b> Labelling</a></li>
+<li class="chapter" data-level="3" data-path="r-markdown.html"><a href="r-markdown.html"><i class="fa fa-check"></i><b>3</b> R Markdown</a><ul>
+<li class="chapter" data-level="3.1" data-path="r-markdown.html"><a href="r-markdown.html#including-plots"><i class="fa fa-check"></i><b>3.1</b> Including Plots</a></li>
 </ul></li>
 </ul>
 
@@ -94,27 +132,23 @@
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="header">
-<h1 class="title">FSA - Allergies and Social Media</h1>
-<h4 class="author"><em>The four Seasons</em></h4>
-</div>
-<div id="project-presentation" class="section level1">
-<h1><span class="header-section-number">1</span> Project Presentation</h1>
-<div id="context" class="section level2">
-<h2><span class="header-section-number">1.1</span> Context</h2>
-<p>Using social media data, FSA wants to be able to track endorcement of allergen based legislations in the UK. There are two streams of analysis involved in this project :</p>
-<div id="stream-1" class="section level3">
-<h3><span class="header-section-number">1.1.1</span> Stream 1</h3>
-<p>Using social media data, we would like to determine whether some Local Authorities face more allergy-relate issues than others by tracking: - Allergy enquiries: Do consumers experience negative or positive reactions from staff when enquiring about allergen information in restaurants/ food outlets? - Food labelling: Do consumers face issues with incorrect or incomplete food labelling? - Reporting reactions: Do consumers report allergic reactions to food or near-misses?</p>
-</div>
-<div id="stream-2" class="section level3">
-<h3><span class="header-section-number">1.1.2</span> Stream 2</h3>
-<p>Based on a list of 14 common allergens provided in the EU legislation, we will focus on these 2 areas: * How much are each of the 14 allergens being talked about, and are they usually mentioned in isolation or in combination with others? What insight can we gain by analysis of posts relating to these 14 allergens? * Are other allergens outside of this list of 14 being talked about? We will explore this by: (a) using a list of other likely allergenic foods provided by subject matter experts, and (b) for posts that do not contain any of the main 14, are there any common food themes. Are any of these mentioned more than any of the 14 allergens?</p>
-</div>
-</div>
-<div id="team" class="section level2">
-<h2><span class="header-section-number">1.2</span> Team</h2>
-<p>The team is composed of Alejandro, Andrew, Ozge and Toufik.</p>
+<div id="r-markdown" class="section level1">
+<h1><span class="header-section-number">3</span> R Markdown</h1>
+<p>This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <a href="http://rmarkdown.rstudio.com" class="uri">http://rmarkdown.rstudio.com</a>.</p>
+<p>When you click the <strong>Knit</strong> button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(cars)</code></pre></div>
+<pre><code>##      speed           dist       
+##  Min.   : 4.0   Min.   :  2.00  
+##  1st Qu.:12.0   1st Qu.: 26.00  
+##  Median :15.0   Median : 36.00  
+##  Mean   :15.4   Mean   : 42.98  
+##  3rd Qu.:19.0   3rd Qu.: 56.00  
+##  Max.   :25.0   Max.   :120.00</code></pre>
+<div id="including-plots" class="section level2">
+<h2><span class="header-section-number">3.1</span> Including Plots</h2>
+<p>You can also embed plots, for example:</p>
+<p><img src="_main_files/figure-html/pressure-1.png" width="672" /></p>
+<p>Note that the <code>echo = FALSE</code> parameter was added to the code chunk to prevent printing of the R code that generated the plot.</p>
 
 </div>
 </div>
@@ -123,8 +157,8 @@
           </div>
         </div>
       </div>
+<a href="data-cleaning-and-preprocessing.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
 
-<a href="data-cleaning-and-preprocessing.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

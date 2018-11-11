@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
+<link rel="prev" href="data-cleaning-and-preprocessing.html">
 
-<link rel="next" href="data-cleaning-and-preprocessing.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -94,27 +94,30 @@
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="header">
-<h1 class="title">FSA - Allergies and Social Media</h1>
-<h4 class="author"><em>The four Seasons</em></h4>
+<div id="stream-1-1" class="section level1">
+<h1><span class="header-section-number">3</span> Stream 1</h1>
+<div id="approach" class="section level2">
+<h2><span class="header-section-number">3.1</span> Approach</h2>
+<p>The idea is to use provided data in order to find out information about: 1. Allergy enquiries 2. Food labelling 3. Reporting reactions</p>
+<p>Our approach was to use each of these elements and to find words related to the subject.</p>
+<p>Let’s take Food labelling as an example. The idea is to find cases where consumers face issues due to incorrect food labelling.</p>
+<p>We divided it into the following list:</p>
+<p><code>c(&quot;consumer&quot;, &quot;issue&quot;, &quot;labelling&quot;, &quot;allergy&quot;)</code></p>
+<p>We used a Google library called Word2Vec an efficient implementation of the continuous bag-of-words and skip-gram architectures for computing vector representations of words.</p>
+<p>For each of the words consumer, issue, labelling and allergen, we used word2vec to generate dictionaries of words with a strong semantic proximity.</p>
+<p>If we talk the word allergy, applying word2vec functions to it provided us with a list of words related to the allergen subject. With some data cleaning and manual rework, we obtain a dictionary with <key> and values.</p>
+<p>Example for allergy : <code>allergy allergy,allergen,allergenic,allergens,allergic,allergies,allergy,</code></p>
+<p>This processed is applied to all the words that we will use to identify issues with food labelling.</p>
+<p>We will generate a DFM composed of the list of all the entries (tweets, news, forum) by line, the column will be the key of our dictionary (in that case “allergy”) Because some of these may be repeted several times in a same document tweet or forum posts, the DFM is <strong>normalized</strong> containing 1 for any occurence of the word &gt;= 1. The matrix is composed of 0 and 1, corresponding to the occurrences of the context words.</p>
 </div>
-<div id="project-presentation" class="section level1">
-<h1><span class="header-section-number">1</span> Project Presentation</h1>
-<div id="context" class="section level2">
-<h2><span class="header-section-number">1.1</span> Context</h2>
-<p>Using social media data, FSA wants to be able to track endorcement of allergen based legislations in the UK. There are two streams of analysis involved in this project :</p>
-<div id="stream-1" class="section level3">
-<h3><span class="header-section-number">1.1.1</span> Stream 1</h3>
-<p>Using social media data, we would like to determine whether some Local Authorities face more allergy-relate issues than others by tracking: - Allergy enquiries: Do consumers experience negative or positive reactions from staff when enquiring about allergen information in restaurants/ food outlets? - Food labelling: Do consumers face issues with incorrect or incomplete food labelling? - Reporting reactions: Do consumers report allergic reactions to food or near-misses?</p>
-</div>
-<div id="stream-2" class="section level3">
-<h3><span class="header-section-number">1.1.2</span> Stream 2</h3>
-<p>Based on a list of 14 common allergens provided in the EU legislation, we will focus on these 2 areas: * How much are each of the 14 allergens being talked about, and are they usually mentioned in isolation or in combination with others? What insight can we gain by analysis of posts relating to these 14 allergens? * Are other allergens outside of this list of 14 being talked about? We will explore this by: (a) using a list of other likely allergenic foods provided by subject matter experts, and (b) for posts that do not contain any of the main 14, are there any common food themes. Are any of these mentioned more than any of the 14 allergens?</p>
-</div>
-</div>
-<div id="team" class="section level2">
-<h2><span class="header-section-number">1.2</span> Team</h2>
-<p>The team is composed of Alejandro, Andrew, Ozge and Toufik.</p>
+<div id="labelling" class="section level2">
+<h2><span class="header-section-number">3.2</span> Labelling</h2>
+<p>Using the previous generated matrix, we will apply the following logic to filter and label the tweets as per their corresponding context.</p>
+<p>Staying in the example of food labelling, we apply the following logical expression :</p>
+<p>[(consurmer AND issue AND labelling) OR (incorrect AND allergy AND labelling) OR (consumer AND allergy AND labelling)]</p>
+<p>When one of the above conditions is verified, we flag the corresponding document (tweet, or post forum) with the food_labelling value to 1</p>
+<p>The same process is applyied for the allergies inqueries and reactions reports.</p>
+<!-- If you need PDF output, uncomment bookdown::pdf_book above in YAML. You will need a LaTeX installation, e.g., https://yihui.name/tinytex/ -->
 
 </div>
 </div>
@@ -123,8 +126,8 @@
           </div>
         </div>
       </div>
+<a href="data-cleaning-and-preprocessing.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
 
-<a href="data-cleaning-and-preprocessing.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
