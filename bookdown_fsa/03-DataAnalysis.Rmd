@@ -36,7 +36,6 @@ We will generate a DFM composed of the list of all the entries (tweets, news, fo
 Because some of these may be repeted several times in a same document tweet or forum posts, the DFM is **normalized** containing 1 for  any occurence of the word >= 1. The matrix is composed of 0 and 1, corresponding to the occurrences of the context words. 
 
 
-
 ### Labelling
 
 Using the previous generated matrix, we will apply the following logic to filter and label the tweets as per their corresponding context.
