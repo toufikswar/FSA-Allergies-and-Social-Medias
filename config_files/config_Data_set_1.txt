@@ -1,0 +1,36 @@
+# configuration file for data analysis
+
+######################
+## Loading the data ##
+######################
+
+# input file directory
+input_file_dir:  Data
+
+# list of inputs files
+input_file_list:  20161029-20171127.xlsx  20171128-20180926.xlsx
+
+# data_sheet
+sheet_name:  Sheet1
+
+# project name
+project_name: Data set 1
+
+######################################
+## Data pre-processing and labeling ##
+######################################
+
+rerun_data_processing: No
+
+########################
+## Data visualization ##
+########################
+
+do_static_plots: Yes
+
+output_report:   Yes
+
+launch_shiny_dash_board: No
+
+
+#

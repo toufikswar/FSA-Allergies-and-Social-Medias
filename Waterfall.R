@@ -1,4 +1,4 @@
-load("Preprocessing.RData")
+load(image_preprocessing)
 library(quanteda)
 library(tidyr)
 
@@ -136,7 +136,7 @@ names(labelled.df)[names(labelled.df) == "sentiment class"] <- "sentiment_class"
 labelled.df$sentiment_class[labelled.df$sentiment_class %in% c("not_evaluable", "processing")] <- "neutral" # collapse not evaluable and procesing into neutral
 
 # save image file for data-labelling
-save.image(file = "Waterfall.RData")
+save.image(file = image_analysis)
 
 end_time <- Sys.time()
 global_time <- as.difftime(end_time - start_time, units = "secs")

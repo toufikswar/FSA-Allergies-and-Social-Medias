@@ -17,20 +17,13 @@ library(magrittr)
 # Read in Functions stored in utils.R
 source("utils.R")
 
-# Path where the data is located
-dataDir   = "Data/"
-# list for file names
-filenames = c("20161029-20171127.xlsx",
-              "20171128-20180926.xlsx")
-sheet_name = "Sheet1"
-
-# paste the data path with filename
-filenames = paste(dataDir,filenames,sep="")
+sheet_name <- configuration$sheet_name
+filenames  <- paste(configuration$input_dir,"/",configuration$input_file_list,sep="")
 
 cat("\n\n")
 cat(paste("Start loading the data","\n",sep=""))
 # verbose variable
-verbose = TRUE
+verbose <- TRUE
 data.df <- load_list_of_xlsx_files(filenames,sheet_name,verbose)
 cat(paste("Total number of records in the data = ",nrow(data.df),"\n",sep=""))
 
@@ -80,7 +73,7 @@ data.df <- data.df[order(as.Date(data.df$date, format=c("%Y/%m/%d","h:m:s"))),]
 content.df <- subset(data.df, select=c("id", "content","source"))
 # copy copy original content previous to pre-processing
 content.df$original_content <- content.df$content
-#content.df <- content.df[1:1000,]
+# content.df <- content.df[1:1000,]
 
 #Convert content text to lowercase
 content.df$content <- stri_trans_tolower(content.df$content)
@@ -201,7 +194,7 @@ if(do_test_preprocessing) {
 }
 
 # Save the environment into an image file
-file_out <- "Preprocessing.RData"
+file_out <- image_preprocessing
 cat("\n\n")
 cat(paste("Saving image of RData to ", file_out,"...", "\n",sep=""))
 start_time1 <- Sys.time()
