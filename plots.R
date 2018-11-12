@@ -1,8 +1,8 @@
 load("Waterfall.RData")
-# out.dir <- file.path("~/FSA-Virtual-Oct18/plot_out/_dataset1_and_2/")
+# out.dir <- file.path("~/") # Set your own outdir
 # Static plots
 
-# labelled.df <- subset(labelled.df, source != "News")
+# labelled.df <- subset(labelled.df, source != "News") # when you want to remove documents from News
 library(tidyr)
 # Long Dataframe needed for certain types of plots. 
 labelled.df.long <- gather(labelled.df, Allergen, "Mentions", c(fourteen.allergen.names,other.allergen.names), factor_key = TRUE)
@@ -119,7 +119,7 @@ enquiries_source_react.bar <- ggplot(labelled.df, aes(x = source, y = allergy_en
 enquiries_source_react.bar
 
 ggsave("food_inquiries_bysource.png", plot = last_plot(), device = NULL, path = out.dir,
-       width = 30, height = 30, units = "cm",
+       width = 15, height = 15, units = "cm",
        dpi = 300)
 
 labelling_source_react.bar <- ggplot(labelled.df, aes(x = source, y = food_labelling, fill = sentiment_class))+
@@ -132,7 +132,7 @@ labelling_source_react.bar <- ggplot(labelled.df, aes(x = source, y = food_label
 labelling_source_react.bar
 
 ggsave("labelling_by_source_and_reaction.png", plot = last_plot(), device = NULL, path = out.dir,
-       width = 30, height = 30, units = "cm",
+       width = 15, height = 15, units = "cm",
        dpi = 300)
 
 int_14allergen_react <- ggplot(subset(labelled.df.long, Mentions > 0 & Allergen %in% fourteen.allergen.names), 
