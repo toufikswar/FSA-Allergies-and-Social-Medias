@@ -1,10 +1,12 @@
-# Utilities and Dictionaries
+# Utilities
 
 ## FUNCTIONS:
 
 ### LOADING DATA:
 
 library(readxl)          # library to read xlsx files (excel)
+
+### LOADING DATA FUNCTION
 
 #================================================================
 load_list_of_xlsx_files <- function(filenames,
@@ -21,9 +23,9 @@ load_list_of_xlsx_files <- function(filenames,
 
     if(i == 1) {
       # only the 1st file has the columns names
-      all_data[[i]] = read_excel(filenames[i],sheet=sheet_name,col_names=TRUE)
+      all_data[[i]] <- read_excel(filenames[i],sheet=sheet_name,col_names=TRUE)
       # save column names
-      col_names     = names(all_data[[i]])
+      col_names     <- names(all_data[[i]])
 
       if(verbose) {
         # print info about the column names of this data
@@ -51,6 +53,7 @@ load_list_of_xlsx_files <- function(filenames,
   if(verbose) cat(paste("Merging all the data into a single data.frame","\n\n",sep=""))
   df <- do.call(rbind.data.frame, all_data)
 
+  # return the concatenated data.frame
   return(df)
 
 }
@@ -63,16 +66,19 @@ test_text_preprocessing <- function(df,n.test.records)
 
   # Compares the original and preprocessed text for a random sampling of n.test.records
 
+  # number of records to print
   n.test = n.test.records
 
   # The number of test records cannot be higher than the number of records
   nrecords = nrow(df)
-  if(n.test > nrecords) n.test = nrecords
+  if(n.test > nrecords) n.test = nrecords # in such a case reset it to the total number of in the data
 
   # Set seed for test reproductivility
   set.seed(1)
+  # randomly sample the records to be printed out
   sub_sample <- sample(1:nrecords,n.test,replace=FALSE)
 
+  # Print the original and pre-processed content
   for(i in sub_sample) {
     cat("\n")
     cat(paste("Printing tweet id=",df$id[i],", (source = ",df$source[i],")\n",sep=""))
@@ -87,6 +93,9 @@ test_text_preprocessing <- function(df,n.test.records)
 
 }
 #================================================================
+
+### BUILD A DICTIONARY FROM A CSV FILE
+
 get_dictionary_from_file <- function(dict_filename)
 {
 
@@ -99,11 +108,9 @@ get_dictionary_from_file <- function(dict_filename)
 
   # opening the file with the dictionary in csv format
   con <- file(dict_filename,"r")
-  # file line counter
-  counter_line <- 0
-  # groupping line counter
-  counter_groupping <- 0
-  # read line by line
+  counter_line      <- 0 # file line counter
+  counter_groupping <- 0 # groupping line counter
+  # read file line by line
   while(TRUE) {
     # get the line
     line <- readLines(con,n=1)
@@ -111,31 +118,32 @@ get_dictionary_from_file <- function(dict_filename)
       # Exit if end of file
       break
     }
+
     # Counting the lines already read
     counter_line <- counter_line + 1
+
     # exclude empty lines
     if(line == "") next
-    # exclude comment lines (starting with #)
+    # exclude comment lines (i.e. lines starting with #)
     if(startsWith(line,"#")) next
 
-    # counter the number of groupping in the file
+    # counting the number of dictionary groups in the file
     counter_groupping <- counter_groupping + 1
-    # the elements in a line a comma separated
+    # the elements in a line are comma separated
     # get a vector with the different elements
     vec_line <- unlist(strsplit(line,","))
 
-    # the 1st element is the groupping name
+    # the 1st element is the dictionary group name
     the_names <- c(the_names,vec_line[1])
-    # the rest of the elements are the dictionary
+    # the rest are the dictionary elements
     myList[[counter_groupping]] <- vec_line[-1]
-
   }
   close(con)
 
-  # Set the groupping names
+  # Set the dictionary group names
   names(myList) <- the_names
 
-  # Stemming the dictionary
+  # Stem the dictionary words
   myList <- stem_dictionary(myList)
 
   return(dictionary(myList))
@@ -143,12 +151,14 @@ get_dictionary_from_file <- function(dict_filename)
 }
 #==================================================================
 
-## This function takes a dictionary in list format and
-## perform stemming on its terms
-## Returns the stemmed dictionary
+### STEM THE WORDS INSIDE A DICTIONARY
 
 stem_dictionary <- function(myList)
 {
+
+  # This function takes a dictionary in list format and
+  # perform stemming on its terms
+  # Returns the stemmed dictionary
 
   library(quanteda)
 
@@ -156,70 +166,91 @@ stem_dictionary <- function(myList)
   for(i in 1:length(myList)) {
     # loop over the list elements
     for(j in 1:length(myList[[i]])) {
-      term <- myList[[i]][j]
-      # separate the string into words
+      term <- myList[[i]][j] # get the different terms
+
+      # separate the terms into words (some dictionary elements can be multiple words)
       words <- unlist(strsplit(term," "))
       words <- words[words != ""]
 
-      # loop over the words
+      # loop over the words in this dictionary term
       for(k in 1:length(words)) {
-        # check if word ends with *
-        endsWithStart <- endsWith(words[k],"*")
-        # remove the * at the end of the word
+        endsWithStart <- endsWith(words[k],"*") # check if word ends with *
+
+        # if word starts with * remove it temporarily
         if(endsWithStart) words[k] <- substr(words[k],1,nchar(words[k])-1)
 
         # stem the word
         words[k] <- paste(tokens_wordstem(tokens(words[k])),collapse="")
-        # reattach the * and the end of the word
+
+        # reattach the * and the end of the word if started with it
         if(endsWithStart) words[k] <- paste(c(words[k],"*"),collapse="")
       }
-      # combine all the words into a single string
+      # combine all the words into a single term
       term <- paste(words,collapse=" ")
       myList[[i]][j] <- term
     }
-    # remove duplicates
+    # remove duplicates from the list of term of a dictionary group
     myList[[i]] <- unique(myList[[i]])
-    # order alphabetically
+    # order them alphabetically
     myList[[i]] <- sort(myList[[i]],decreasing=FALSE)
   }
 
+  # return the stemmed dictonary
   return(myList)
 
 }
 #==================================================================
 
-## Function that takes a <corpus> and a <dictonary>
-## Looks up the content their content to a DFM
-## Returns a normalized Data Frame (on one mention per document)
+### GET DTM LOOKUP FROM A CORPUS AND A DICTIONARY
 
 from_corpus_to_lookup_dataframe <- function(data.corpus, dict)
 {
+
+  # This function takes a <corpus> and a <dictonary>
+  # Looks up for dictionary appearences into corpus
+  # Returns a normalized data.frame with the dictionary group appearences
+
+  # Document term matrix (DTM) with appearences of the dictionary groups in the corpus
   data.dfm <- dfm(data.corpus, tolower = FALSE, verbose = TRUE, dictionary=dict)
+
+  # Convert appearences table into a data.frame
   processed.df <- convert(data.dfm, "data.frame")
   colnames(processed.df)[1] <- "id"
   processed.df.names <- colnames(processed.df)[-1]
-  #Normalization to one mention per document
+
+  # Normalize appearences data.frame to have one mention of the dictionary groups per document
   norm.df <- data.frame(id = processed.df$id, ifelse(processed.df[,processed.df.names] > 0, 1, 0))
+
   return (norm.df)
 }
 #================================================================
-get_time_units = function(timediff)
+
+### GET THE TIME UNITS OF A TIME DIFFERENCE
+
+get_time_units <- function(timediff)
 {
 
+  # Returns the units of a time-difference
+
+  # get the time-difference in seconds
   timediff <- as.numeric(timediff,units="secs")
 
-  amin  <- 60
-  ahour <- 60*amin
-  aday  <- 24*ahour
+  # standard time units in seconds
+  amin  <- 60        # a minute
+  ahour <- 60*amin   # an hour
+  aday  <- 24*ahour  # a day
 
   the_time_unit = "secs"
 
-  if(timediff/amin > 1) {
-    the_time_unit = "mins"
-  } else if(timediff/ahour > 1) {
-    the_time_unit = "hours"
-  } else if(timediff/aday > 1) {
+  if(timediff/aday > 1) {
+    # if the time-different is grater than a day => return "days"
     the_time_unit = "days"
+  } else if(timediff/ahour > 1) {
+    # if the time-different is smaller than a day but grater than an hour => return "hours"
+    the_time_unit = "hours"
+  } else if(timediff/amin > 1) {
+    # if the time-different is smaller than an hour but grater than a minute => return "mins"
+    the_time_unit = "mins"
   }
 
   return(the_time_unit)
