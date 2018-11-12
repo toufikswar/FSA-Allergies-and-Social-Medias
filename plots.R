@@ -8,7 +8,7 @@ load(image_analysis)
 # output file where the plots are saved
 out.dir <- file.path(paste(output_dir,"/",sep=""))
 
-# labelled.df <- subset(labelled.df, source != "News") # when you want to remove documents from News
+labelled.df <- subset(labelled.df, source != "News") # when you want to remove documents from News
 library(tidyr)
 library(magrittr)
 library(dplyr)
@@ -24,8 +24,10 @@ allergen.bysource.df <- labelled.df.long %>%
 library(ggplot2)
 library(forcats)
 
+#  Use of reorder() to order allergens by count DESC
+#  Use of gsub() to replace "_" by spaces in the axis labels
 fourteen.bysource <- ggplot(subset(allergen.bysource.df, Allergen %in% fourteen.allergen.names),
-                                 aes(x = fct_reorder2(Allergen, source, count, .desc = FALSE), y= count, fill = source)) +
+                                 aes(x = reorder(gsub("_"," ",Allergen), count), y = count, fill = source)) +
   geom_bar(stat = "identity") +
   theme_minimal() +
   scale_fill_brewer(palette="Spectral") +
@@ -42,7 +44,8 @@ ggsave("14_allergens_bysource.png", plot = last_plot(), device = NULL, path = ou
 
 other.bysource <- ggplot(subset(allergen.bysource.df,
                                 Allergen %in% other.allergen.names),
-                              aes(x = fct_reorder2(Allergen, source, count, .desc = FALSE), y= count, fill = source)) +
+                              #aes(x = fct_reorder2(Allergen, source, count, .desc = FALSE), y= count, fill = source)) +
+                                aes(x = fct_reorder2(Allergen, source, count, .desc = FALSE), y= count, fill = source)) +
   geom_bar(stat = "identity") +
   theme_minimal() +
   scale_fill_brewer(palette="Spectral") +
