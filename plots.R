@@ -1,10 +1,12 @@
 load("Waterfall.RData")
-
+# out.dir <- file.path("~/FSA-Virtual-Oct18/plot_out/_dataset1_and_2/")
 # Static plots
 
+# labelled.df <- subset(labelled.df, source != "News")
 library(tidyr)
 # Long Dataframe needed for certain types of plots. 
 labelled.df.long <- gather(labelled.df, Allergen, "Mentions", c(fourteen.allergen.names,other.allergen.names), factor_key = TRUE)
+
 
 allergen.bysource.df <- labelled.df.long %>%
   group_by(source, Allergen) %>%
@@ -24,6 +26,11 @@ fourteen.bysource <- ggplot(subset(allergen.bysource.df, Allergen %in% fourteen.
   coord_flip()
 fourteen.bysource
 
+ggsave("14_allergens_bysource.png", plot = last_plot(), device = NULL, path = out.dir,
+       width = 15, height = 15, units = "cm",
+       dpi = 300)
+
+
 other.bysource <- ggplot(subset(allergen.bysource.df, 
                                 Allergen %in% other.allergen.names),
                               aes(x = fct_reorder2(Allergen, source, count, .desc = FALSE), y= count, fill = source)) +
@@ -35,6 +42,10 @@ other.bysource <- ggplot(subset(allergen.bysource.df,
   ggtitle("Mentions of Other Allergens by Source") +
   coord_flip()
 other.bysource
+
+ggsave("other_allergens_bysource.png", plot = last_plot(), device = NULL, path = out.dir,
+       width = 15, height = 15, units = "cm",
+       dpi = 300)
 
 
 library(scales)
@@ -62,8 +73,13 @@ by.week.twitter.14 <- ggplot(all_allergens.norm.df.t14,
   theme_minimal() +
   theme(legend.position="bottom") +
   facet_grid(sentiment_class~.) +
+  ggtitle("14 Allergen Mentions over Time (Twitter Only)")+
   theme(strip.text.y = element_text(angle = 0))
 by.week.twitter.14 
+
+ggsave("14_allergens_byweek.png", plot = last_plot(), device = NULL, path = out.dir,
+       width = 30, height = 30, units = "cm",
+       dpi = 300)
 
 all_allergens.norm.df.t.other <- subset(labelled.df.long, source == "Twitter" & Allergen %in% other.allergen.names)
 
@@ -82,8 +98,14 @@ by.week.twitter.other <- ggplot(all_allergens.norm.df.t.other, aes(x = Week, y =
   theme_minimal()+
   theme(legend.position="bottom") +
   facet_grid(sentiment_class~.) +
+  ggtitle("Other Allergen Mentions over Time (Twitter Only)")+
   theme(strip.text.y = element_text(angle = 0))
 by.week.twitter.other
+
+ggsave("other_allergens_byweek.png", plot = last_plot(), device = NULL, path = out.dir,
+       width = 30, height = 30, units = "cm",
+       dpi = 300)
+
 
 ## Intersections
 
@@ -96,6 +118,10 @@ enquiries_source_react.bar <- ggplot(labelled.df, aes(x = source, y = allergy_en
   ggtitle("Allergen Enquiries by Source and Sentiment Class")
 enquiries_source_react.bar
 
+ggsave("food_inquiries_bysource.png", plot = last_plot(), device = NULL, path = out.dir,
+       width = 30, height = 30, units = "cm",
+       dpi = 300)
+
 labelling_source_react.bar <- ggplot(labelled.df, aes(x = source, y = food_labelling, fill = sentiment_class))+
   stat_summary(fun.y = sum, # adds up all observations for the month
                geom = "bar") +
@@ -105,6 +131,9 @@ labelling_source_react.bar <- ggplot(labelled.df, aes(x = source, y = food_label
   ggtitle("Food Labelling Mentions by Source and Sentiment Class")
 labelling_source_react.bar
 
+ggsave("labelling_by_source_and_reaction.png", plot = last_plot(), device = NULL, path = out.dir,
+       width = 30, height = 30, units = "cm",
+       dpi = 300)
 
 int_14allergen_react <- ggplot(subset(labelled.df.long, Mentions > 0 & Allergen %in% fourteen.allergen.names), 
                                aes(x = Week, y = reactions_report, fill = reactions_report))+
@@ -123,6 +152,11 @@ int_14allergen_react <- ggplot(subset(labelled.df.long, Mentions > 0 & Allergen 
   theme(legend.position="bottom")+
   facet_grid(Allergen~.)
 int_14allergen_react
+
+ggsave("14_allergens_reactions.png", plot = last_plot(), device = NULL, path = out.dir,
+       width = 30, height = 30, units = "cm",
+       dpi = 300)
+
 
 allergen.react.df <- subset(labelled.df.long, Allergen %in% fourteen.allergen.names) %>%
   group_by(Allergen, Month, sentiment_class, reactions_report) %>%
@@ -146,6 +180,10 @@ allergen.react.bubble <- ggplot(allergen.react.df, aes(x = Month, y = fct_reorde
   facet_grid(sentiment_class~.)
 allergen.react.bubble
 
+ggsave("14_allergens_reactions_bubble.png", plot = last_plot(), device = NULL, path = out.dir,
+       width = 30, height = 30, units = "cm",
+       dpi = 300)
+
 allergen.react.labelling.df <- subset(labelled.df.long, Allergen %in% fourteen.allergen.names & food_labelling > 0) %>%
   group_by(Allergen, Month, sentiment_class, reactions_report) %>%
   summarise(Count= sum(Mentions))
@@ -167,6 +205,10 @@ allergen.react.labelling.bubble <- ggplot(allergen.react.labelling.df, aes(x = M
   theme(strip.text.y = element_text(angle = 0))+
   facet_grid(sentiment_class~.)
 allergen.react.labelling.bubble
+
+ggsave("14_allergens_labelling_bubble.png", plot = last_plot(), device = NULL, path = out.dir,
+       width = 30, height = 30, units = "cm",
+       dpi = 300)
 
 allergen.react.inquiries.df <- subset(labelled.df.long, Allergen %in% fourteen.allergen.names & allergy_enquiries > 0) %>%
   group_by(Allergen, Month, sentiment_class, reactions_report) %>%
@@ -190,6 +232,9 @@ allergen.react.inquiries.bubble <- ggplot(allergen.react.labelling.df, aes(x = M
   facet_grid(sentiment_class~.)
 allergen.react.inquiries.bubble
 
+ggsave("14_allergens_inquiries.png", plot = last_plot(), device = NULL, path = out.dir,
+       width = 30, height = 30, units = "cm",
+       dpi = 300)
 
 int_otherallergen_react <- ggplot(subset(labelled.df.long, Mentions > 0 & Allergen %in% other.allergen.names), 
                                aes(x = Week, y = reactions_report, fill = reactions_report))+
@@ -209,6 +254,10 @@ int_otherallergen_react <- ggplot(subset(labelled.df.long, Mentions > 0 & Allerg
   theme(panel.grid.minor = element_blank())
 int_otherallergen_react
 
+ggsave("other_allergens_reactions.png", plot = last_plot(), device = NULL, path = out.dir,
+       width = 30, height = 30, units = "cm",
+       dpi = 300)
+
 Int_enquiry_reaction <- ggplot(subset(labelled.df, allergy_enquiries > 0 ), aes(x = Week, y = allergy_enquiries, fill = reactions_report))+
   stat_summary(fun.y = sum, # adds up all observations for the month
                geom = "bar") +
@@ -225,6 +274,11 @@ Int_enquiry_reaction <- ggplot(subset(labelled.df, allergy_enquiries > 0 ), aes(
   theme(panel.grid.minor = element_blank())
 Int_enquiry_reaction
 
+ggsave("enquiries_reactions.png", plot = last_plot(), device = NULL, path = out.dir,
+       width = 30, height = 30, units = "cm",
+       dpi = 300)
+
+
 labelling_reaction <- ggplot(subset(labelled.df, food_labelling > 0 ), aes(x = Week, y = food_labelling, fill = reactions_report))+
   stat_summary(fun.y = sum, # adds up all observations for the month
                geom = "bar") +
@@ -240,6 +294,11 @@ labelling_reaction <- ggplot(subset(labelled.df, food_labelling > 0 ), aes(x = W
   theme(strip.text.y = element_text(angle = 0))+
   theme(panel.grid.minor = element_blank())
 labelling_reaction
+
+ggsave("labelling_reactions.png", plot = last_plot(), device = NULL, path = out.dir,
+      width = 30, height = 30, units = "cm",
+       dpi = 300)
+
 
 
 load("Tweet_allergens.RData")
