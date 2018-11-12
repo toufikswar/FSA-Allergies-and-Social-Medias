@@ -64,4 +64,46 @@ c("cereals_contain_gluten","gluten","wheat","rye","barley","barli","oat")
 `
 
 
+```{r, exampleplotchunk, echo=FALSE}
+
+if (knitr:::is_latex_output()) {
+  
+labelling_reaction <- ggplot(subset(labelled.df, food_labelling > 0 ), aes(x = Week, y = food_labelling, fill = reactions_report))+
+  stat_summary(fun.y = sum, # adds up all observations for the month
+               geom = "bar") +
+  theme_minimal()+
+  labs(x="Month", y="Mentions Flagged for Food Labelling", fill="Class of Reported Reaction")+
+  theme(legend.position="bottom")+
+  scale_x_date(breaks = "month")+
+  scale_fill_manual(values = c("grey90","yellow","red"))+
+  ggtitle("Food Labelling Over Time by Sentiment Class (All Sources)")+
+  facet_grid(sentiment_class~.)+
+  theme(axis.text.x = element_text(angle = 45, vjust = 1,
+                                   size = 12, hjust = 1))+
+  theme(strip.text.y = element_text(angle = 0))+
+  theme(panel.grid.minor = element_blank())
+labelling_reaction
+  
+} else {
+shinyApp(
+
+  ui = fluidPage(
+    selectInput("region", "Region:",
+                choices = colnames(WorldPhones)),
+    plotOutput("phonePlot")
+  ),
+
+  server = function(input, output) {
+    output$phonePlot = renderPlot({
+      barplot(WorldPhones[,input$region]*1000,
+              ylab = "Number of Telephones", xlab = "Year")
+    })
+  },
+
+  options = list(height = 500)
+)
+}
+```
+
+
 
