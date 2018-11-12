@@ -6,9 +6,119 @@
 
 library(readxl)          # library to read xlsx files (excel)
 
+#================================================================
+
+### READ CONFIG FILE AND LOAD ANALYSIS CONFIGURATION
+
+read_config_file <- function(config_file,configuration)
+{
+
+  # read the configuration file and sets the configuration variables
+
+  # opening the config file
+  con <- file(config_file,"r")
+  while(TRUE) {
+    # get the line
+    line <- readLines(con,n=1)
+    if(length(line) == 0) {
+      # Exit if end of file
+      break
+    }
+    # exclude empty lines
+    if(line == "") next
+    # exclude comment lines (starting with #)
+    if(startsWith(line,"#")) next
+
+    # the elements in a whitespace separated line
+    # get a vector with the different elements
+    vec_line <- unlist(strsplit(line," "))
+    vec_line <- vec_line[vec_line != ""]
+
+    # Extrat the configuration variables from config file
+    if(length(vec_line) == 2 & vec_line[1] == "input_file_dir:") {
+      # getting the input file directory
+      configuration$input_dir <- vec_line[2]
+    } else if(length(vec_line) >= 2 & vec_line[1] == "input_file_list:") {
+      # getting the list of input files
+      configuration$input_file_list <- vec_line[-1]
+    } else if(length(vec_line) == 2 & vec_line[1] == "sheet_name:") {
+      # getting the data sheet name
+      configuration$sheet_name <- vec_line[2]
+    } else if(length(vec_line) >= 2 & vec_line[1] == "project_name:") {
+      # getting the list of input files
+      configuration$project_name <- paste(vec_line[-1],collapse = "_")
+    } else if(length(vec_line) == 2 & vec_line[1] == "rerun_data_processing:") {
+      # boolean to decide if re-run data processing
+      if(vec_line[2] == "YES" | vec_line[2] == "Yes" | vec_line[2] == "yes" | vec_line[2] == "y" | vec_line[2] == "Y") {
+        configuration$rerun_data_processing <- TRUE
+      } else if(vec_line[2] == "NO" | vec_line[2] == "No" | vec_line[2] == "no" | vec_line[2] == "n" | vec_line[2] == "N") {
+        configuration$rerun_data_processing <- FALSE
+      }
+    } else if(length(vec_line) == 2 & vec_line[1] == "do_static_plots:") {
+      # boolean to decide if doing static plots
+      if(vec_line[2] == "YES" | vec_line[2] == "Yes" | vec_line[2] == "yes" | vec_line[2] == "y" | vec_line[2] == "Y") {
+        configuration$do_static_plots <- TRUE
+      } else if(vec_line[2] == "NO" | vec_line[2] == "No" | vec_line[2] == "no" | vec_line[2] == "n" | vec_line[2] == "N") {
+        configuration$do_static_plots <- FALSE
+      }
+    } else if(length(vec_line) == 2 & vec_line[1] == "output_report:") {
+      # boolean to decide if doing output report
+      if(vec_line[2] == "YES" | vec_line[2] == "Yes" | vec_line[2] == "yes" | vec_line[2] == "y" | vec_line[2] == "Y") {
+        configuration$output_report <- TRUE
+      } else if(vec_line[2] == "NO" | vec_line[2] == "No" | vec_line[2] == "no" | vec_line[2] == "n" | vec_line[2] == "N") {
+        configuration$output_report <- FALSE
+      }
+    } else if(length(vec_line) == 2 & vec_line[1] == "launch_shiny_dash_board:") {
+      # boolean to decide if launch the shiny dashboard
+      if(vec_line[2] == "YES" | vec_line[2] == "Yes" | vec_line[2] == "yes" | vec_line[2] == "y" | vec_line[2] == "Y") {
+        configuration$launch_shiny_dash_board <- TRUE
+      } else if(vec_line[2] == "NO" | vec_line[2] == "No" | vec_line[2] == "no" | vec_line[2] == "n" | vec_line[2] == "N") {
+        configuration$launch_shiny_dash_board <- FALSE
+      }
+    }
+
+  }
+  close(con)
+
+  return(configuration)
+
+}
+#================================================================
+
+### PRINT THE LOADED CONFIGURATION FROM CONFIG FILE
+
+print_config <- function(configuration)
+{
+
+  # print the contents of the configuration data structure
+
+  cat("\n")
+  cat(paste("Data analysis configuration:","\n",sep=""))
+
+  cat(paste("  Input directory:                ",configuration$input_dir,"\n",sep=""))
+  file_list <- paste(configuration$input_file_list,collapse=", ")
+  cat(paste("  Input file list:                ",file_list,"\n",sep=""))
+  cat(paste("  Sheet name:                     ",configuration$sheet_name,"\n",sep=""))
+  cat(paste("  Project name:                   ",configuration$project_name,"\n",sep=""))
+  answer <- "No"
+  if(configuration$rerun_data_processing) answer <- "Yes"
+  cat(paste("  Re-run data processing:         ",answer,"\n",sep=""))
+  answer <- "No"
+  if(configuration$do_static_plots) answer <- "Yes"
+  cat(paste("  Doing static plots:             ",answer,"\n",sep=""))
+  answer <- "No"
+  if(configuration$output_report) answer <- "Yes"
+  cat(paste("  Producing output report:        ",answer,"\n",sep=""))
+  answer <- "No"
+  if(configuration$launch_shiny_dash_board) answer <- "Yes"
+  cat(paste("  Launching shiny dash-board:     ",answer,"\n",sep=""))
+  cat("\n")
+
+}
+#================================================================
+
 ### LOADING DATA FUNCTION
 
-#================================================================
 load_list_of_xlsx_files <- function(filenames,
                                     sheet_name="Sheet1",
                                     verbose=FALSE)
