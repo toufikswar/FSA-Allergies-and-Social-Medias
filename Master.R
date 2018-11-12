@@ -78,10 +78,10 @@ allergies_and_social_media <- function(config_file)
 
   # IPORTANT NOTE: this part of the code not final
   # Here we should put some code for plots and stuff
-  # if(configuration$do_static_plots) {
-  #   source("plots.R")
-  # }
-  #
+  if(configuration$do_static_plots) {
+    source("plots.R")
+  }
+
   # if(configuration$output_report) {
   #   # some stuff
   # }

@@ -1,3 +1,5 @@
+### Data labelling script
+
 load(image_preprocessing)
 library(quanteda)
 library(tidyr)

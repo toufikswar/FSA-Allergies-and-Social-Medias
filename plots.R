@@ -1,9 +1,18 @@
+### Static plots script
+
+cat("\n\n")
+cat(paste("Start static plots script","\n",sep=""))
+
 load(image_analysis)
-# out.dir <- file.path("~/") # Set your own outdir
-# Static plots
+
+# output file where the plots are saved
+out.dir <- file.path(paste(output_dir,"/",sep=""))
 
 # labelled.df <- subset(labelled.df, source != "News") # when you want to remove documents from News
 library(tidyr)
+library(magrittr)
+library(dplyr)
+
 # Long Dataframe needed for certain types of plots.
 labelled.df.long <- gather(labelled.df, Allergen, "Mentions", c(fourteen.allergen.names,other.allergen.names), factor_key = TRUE)
 
@@ -301,7 +310,7 @@ ggsave("labelling_reactions.png", plot = last_plot(), device = NULL, path = out.
 
 
 
-load("Tweet_allergens.RData")
+load(image_preprocessing)
 library(quanteda)
 library(tidyr)
 source("utils.R")
@@ -429,3 +438,9 @@ ggplot(data = melted_cormat_per_14, aes(Var1, Var2, fill = value))+  # plot heat
   theme(axis.text.x = element_text(angle = 45, vjust = 1,
                                    size = 12, hjust = 1))+
   coord_fixed()
+
+
+cat(paste("Finished static plots script","\n",sep=""))
+cat("\n\n")
+
+#
