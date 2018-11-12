@@ -1,7 +1,4 @@
-### Parent Script for Finding Public Mentions of Allergens in Tweet Data
-
-# Set working directory to current folder
-# setwd(dirname(sys.frame(1)$ofile))
+### Data loading, cleaning and pre-processing script
 
 
 ### ======================INITIALIZATION========================== ###
@@ -35,7 +32,7 @@ cat(paste("Start loading the data","\n",sep=""))
 # verbose variable
 verbose = TRUE
 data.df <- load_list_of_xlsx_files(filenames,sheet_name,verbose)
-cat(paste("N records = ",nrow(data.df),"\n",sep=""))
+cat(paste("Total number of records in the data = ",nrow(data.df),"\n",sep=""))
 
 # flag to run preprocessing test
 do_test_preprocessing <- FALSE
@@ -48,7 +45,7 @@ cat(paste("Loading data time:  ",round(as.numeric(atimediff,units=the_time_unit)
 cat(paste("Finished loading the data","\n",sep=""))
 cat("\n\n")
 
-### =============PREPROCESSING & TEXT CLEANING================= ###
+### =============TEXT CLEANING & PREPROCESSING================= ###
 
 # Set time for beginning of text pre-preprocessing
 
@@ -57,7 +54,7 @@ cat(paste("Start 1st data preprocessing","\n",sep=""))
 
 start_time1 <- Sys.time()
 
-# Lets drop some spurious columns
+# List of spurious columns to drop
 columns_to_drop <- c("search",
                      "language",
                      "main emotion",
@@ -72,61 +69,56 @@ columns_to_drop <- c("search",
                      "no. of likes",
                      "no. of comments",
                      "no. of engagements")
-
 data.df <- data.df[,-match(columns_to_drop,names(data.df))]
-#print(names(data.df))
 
-# Sorting data by date in increasing order
+# In this part of the pre-processing some generic string operations are applied
+
+# Sort data by date in increasing order
 data.df <- data.df[order(as.Date(data.df$date, format=c("%Y/%m/%d","h:m:s"))),]
 
-# Subset dataframe with only 'id' and 'content' columns : content.df
+# Subset dataframe with only 'id', 'content' and source columns : content.df
 content.df <- subset(data.df, select=c("id", "content","source"))
+# copy copy original content previous to pre-processing
 content.df$original_content <- content.df$content
 #content.df <- content.df[1:1000,]
 
-#Convert to lowercase
+#Convert content text to lowercase
 content.df$content <- stri_trans_tolower(content.df$content)
 
-# Remove Retweets
+# Remove Retweets (RT) ==> records starting with the rt text
 content.df <- content.df[-grep("^rt", content.df$content),]
 
-# Remove duplicate original tweets
+# Remove duplicated records
 content.df <- content.df[!duplicated(content.df$content),]
 
-# Convert tweets text to ascii format
+# Convert content text from latin1 to ascii format
 content.df$content <- iconv(content.df$content, from = "latin1", to = "ascii", sub = "byte")
 
-library(dplyr)
-
-# Extract usernames to new column
+# Extract usernames (words starting with @) and put them into a new column: users column
 content.df$users <- stri_extract_all_regex(content.df$content, "@\\w+")
-# Merge usernames to data.df
-data.df <- left_join(data.df, content.df[,c("id","users")], "id")
 
-# Extract hashtags to new column
+# Extract hashtags from content text and put them into a new column: hashtags
 content.df$hashtags <- stri_extract_all_regex(content.df$content, "#\\w+")
-# Merge hashtags to data.df
-data.df <- left_join(data.df, content.df[,c("id","hashtags")], "id")
 
-#Remove Usernames starting with @, Emoticons (<xx> tags) and HTML entities (e.g. &amp;)
+#Remove Usernames, Emoticons (<xx> tags) and HTML entities (e.g. &amp;)
 content.df$content <- gsub("@\\w+|<\\w+>|&.*;","", content.df$content)
 
-# #Replace % by percent
+#Replace % symbol by the word percent
 content.df$content <- stri_replace_all_fixed(content.df$content, "%", " percent ")
-#Replace ~ by whitespace
+#Replace ~ symbol by a white-space
 content.df$content <- stri_replace_all_fixed(content.df$content, "~", " ")
 
 # expand acronyms
+# uses a dictionary with several acronyms and expand them (e.g. asap ==> as soon as possible)
 acronym_key        <- read.csv("resources/acronyms.csv", header=FALSE,col.names = c("abv","repl"))  # acronyms map
 abv  <- paste("\\b",acronym_key$abv,"\\b",sep="")
 repl <- paste(acronym_key$repl,sep="")
-# content.df$content <- replace_abbreviation(content.df$content, acronym_key)
 content.df$content <- stri_replace_all_regex(content.df$content, abv, repl, vectorize_all=FALSE)
 
 #Remove all punctuation
 content.df$content <- stri_replace_all(content.df$content, "", regex = "[[:punct:]]")
 
-# Expand the english contractions
+# Expand the english contractions (e.g. he's ==> he is)
 english_contraction_key  <- read.csv("resources/english_contractions.csv", header=FALSE,col.names = c("contraction","expansion"))  # acronyms map
 contraction <- paste("\\b",english_contraction_key$contraction,"\\b",sep="")
 expansion   <- paste(" ",english_contraction_key$expansion," ",sep="")
@@ -139,8 +131,9 @@ content.df$content <- gsub("url\\w+|http\\w+", "", content.df$content)
 #Replace ~ and . by whitespace
 content.df$content <- stri_replace_all_fixed(content.df$content, ".", " ")
 
-# string surroundings whitespace
+# remove white-spaces at the begining and the end of the content text
 content.df$content <- stri_trim(content.df$content)
+
 end_time1 <- Sys.time()
 atimediff <- as.difftime(end_time1 - start_time1, units = "secs")
 the_time_unit <- get_time_units(atimediff)
@@ -150,21 +143,28 @@ cat("\n\n")
 
 start_time1 <- Sys.time()
 
-# Stemming & Stopword Removal
+# In this 2nd part of the data two operations will be applied
+# - stop word removal: will remove a set of stop words from the english language (e.g. is, a, you, ...)
+# - word stemming: a rule-based algorithm that converts inflected forms of words into their base forms (stems)
+#
+# This part of pre-processing is a bit computationally intensive. Will run this steps in parallel
+# using the cores available.
+library(parallel)
+Ncores <- detectCores() # detect the number of cores available
 cat("\n\n")
-cat(paste("Start Stemming & Stopword Removal","\n",sep=""))
+cat(paste("Start Stopword Removal & Stemming","\n",sep=""))
 cat("Depending on the size of the Data this step can take 5-10 minutes. Be patient please.")
-cat(" Distributing jobs to available CPU cores...\n")
-# words_to_remove   <- stopwords("english") # list of engish stop words
+cat(" Distributing jobs to ",Ncores," available CPU cores ...\n")
 # Emojis emoji_dictionary from (https://raw.githubusercontent.com/lyons7/emojidictionary/master/emoji_dictionary.csv)
 #emoticons         <- read.csv("resources/emoji_dictionary.csv", header = TRUE) # emojis emoji_dictionary
 
-library(parallel)
-instance <- makeCluster(detectCores()) # Start a local cluster with the cores available
+# Start a local cluster with the cores available
+instance <- makeCluster(Ncores)
 clusterEvalQ(instance, {
   library(quanteda)
 })
 
+# parallelized application of stop-word removal and stemming
 content.df$content <- parLapply(instance, content.df$content,
   function(i) {
     i %>%
@@ -174,6 +174,7 @@ content.df$content <- parLapply(instance, content.df$content,
     paste(collapse = " ")
   }
 )
+# Stop the local cluster instance
 stopCluster(instance)
 rm(instance)
 
@@ -184,24 +185,26 @@ cat(paste("Stemming & Stopword Removal time:  ",round(as.numeric(atimediff,units
 cat(paste("Finished Stemming & Stopword Removal","\n",sep=""))
 cat("\n\n")
 
-# Removing duplicates
+# Final removal of records duplicates
 content.df <- content.df[!duplicated(content.df$content),]
 
-# Running test to compare the oirignal and preprocessed texts
-# of a randomly selected set of records
+# Collapse tokenized words to character vector
+content.df$content <- as.character(content.df$content)  # This may interfere with tokenization for stream 1 - be aware
+
+# Testing structure
 if(do_test_preprocessing) {
-  n.test.records = 500
+  # Run a comparison between the oirignal and preprocessed texts
+  # for a randomly selected set of records
+
+  n.test.records = 500 # number of random records to printout
   test_text_preprocessing(content.df,n.test.records)
 }
 
-file_out <- "Tweet_allergens.RData"
+# Save the environment into an image file
+file_out <- "Preprocessing.RData"
 cat("\n\n")
 cat(paste("Saving image of RData to ", file_out,"...", "\n",sep=""))
 start_time1 <- Sys.time()
-# Collapse tokenized words to character vectors
-content.df$content <- as.character(content.df$content)  # This may interfere with tokenization for stream 1 - be aware
-# Create a corpus including id for identifier
-content.corpus <- corpus(content.df, docid_field = "id", text_field = "content") # Username and Hashtag metadata is retained
 save.image(file = file_out)
 
 end_time1 <- Sys.time()
