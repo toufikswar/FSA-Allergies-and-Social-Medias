@@ -20,7 +20,7 @@ project_name: Data set 1
 rerun_data_preprocessing: No
 
 # set this parameter to yes if want to rerun data labelling only
-rerun_data_labelling: Yes
+rerun_data_labelling: No
 
 
 ########################
