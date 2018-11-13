@@ -8,23 +8,31 @@ library(sp)
 
 API_KEY = "AIzaSyCzk2FoBaNzkPoGUcRzfzbVN0YOqq2S_aA"
 
-uk_county_shapefiles   <- readOGR(dsn = "UK_Local_Authority_2016", layer = "Local_Authority_Districts_December_2016_Super_Generalised_Clipped_Boundaries_in_the_UK")
+uk_county_shapefiles   <- readOGR(dsn = "resources/UK_Local_Authority_2016", layer = "Local_Authority_Districts_December_2016_Super_Generalised_Clipped_Boundaries_in_the_UK")
 wgs.84 <- "+proj=longlat +datum=WGS84"
 uk_county_shapefiles   <- spTransform(uk_county_shapefiles, CRS(wgs.84)) # Convert to WGS84 format
 shape.df <- fortify(uk_county_shapefiles)
 
 labelled.df.geo <- labelled.df[!is.na(labelled.df$latitude),] # Some rows don't have Latitute and longitude. Drop them
 require(sp)
-local_authority <- over( labelled.df.geo[,c("longitude","latitude")], uk_county_shapefiles ) # doesn't work
-labelled.df.geo <- cbind( labelled.df.geo , local_authority )
+# Letting R know that these are specifically spatial coordinates
+sp <- SpatialPoints(labelled.df.geo[c("longitude", "latitude")])
+# To ensure the same coordinate system
+proj4string(sp) <- "+proj=longlat +datum=WGS84"
 
+# Match coordinates to each uk region in uk shapefile
+local_authority <- over( sp, uk_county_shapefiles ) 
+labelled.df.geo <- cbind( labelled.df.geo , local_authority ) 
+
+
+# test plots
 
 UK <- geocode("United Kingdom", source = "dsk")
 UKrefmap <- get_map(location = c(lon = UK$lon, lat = UK$lat),
-                    maptype = "terrain", color="bw", zoom = 5 )
+                    maptype = "terrain", color="bw", api_key = API_KEY, zoom = 5 )
 
 london <- get_map(location = c(lon = -0.129, lat = 51.51),
-                  maptype = "terrain", color="bw", zoom = 10 )
+                  maptype = "terrain", color="bw", api_key = API_KEY, zoom = 10 )
 
 UK_map <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
   # geom_polygon(data = shape.df, aes(x = long, y=lat, group=group), 
