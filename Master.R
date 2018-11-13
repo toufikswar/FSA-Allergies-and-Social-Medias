@@ -15,7 +15,7 @@ configuration = list(input_dir                = "",
 
 output_dir <- "output_files"
 # If output_dir doesn't exist, create it.
-ifelse(!dir.exists(file.path(output_dir)), dir.create(file.path(output_dir)), FALSE)
+if(!dir.exists(file.path(output_dir))) dir.create(file.path(output_dir))
 
 image_preprocessing <- ""
 image_analysis      <- ""

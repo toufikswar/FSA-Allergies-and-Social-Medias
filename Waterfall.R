@@ -140,6 +140,9 @@ labelled.df$Week  <- as.Date(cut(labelled.df$date, breaks = "week"))
 names(labelled.df)[names(labelled.df) == "sentiment class"] <- "sentiment_class" #rename sentiment class to a single string
 labelled.df$sentiment_class[labelled.df$sentiment_class %in% c("not_evaluable", "processing")] <- "neutral" # collapse not evaluable and procesing into neutral
 
+# get the UK local authorities map and normalization data
+source("GeoMaps_and_Normalization.R")
+
 # save image file for data-labelling
 cat("\n\n")
 cat(paste("Saving image of RData to ", image_analysis,"...", "\n",sep=""))
@@ -150,9 +153,9 @@ global_time <- as.difftime(end_time - start_time, units = "secs")
 
 # summary of the output data.frame
 cat("\n\n")
-cat(paste("Preprocessed data records = ",nrow(labelled.df),"\n",sep=""))
+cat(paste("Preprocessed data records with UK map information = ",nrow(labelled.df.geo),"\n",sep=""))
 cat(paste("Labelled data.frame column names:","\n",sep=""))
-print(colnames(labelled.df))
+print(colnames(labelled.df.geo))
 cat("\n\n")
 
 # summary of the excecution times
