@@ -13,7 +13,10 @@ configuration = list(input_dir                = "",
                      output_report            = FALSE,
                      launch_shiny_dash_board  = FALSE)
 
-output_dir <- "output_files/"
+output_dir <- "output_files"
+# If output_dir doesn't exist, create it.
+ifelse(!dir.exists(file.path(output_dir)), dir.create(file.path(output_dir)), FALSE)
+
 image_preprocessing <- ""
 image_analysis      <- ""
 
@@ -46,11 +49,11 @@ allergies_and_social_media <- function(config_file)
 
   # Set preprocessing image file name. Use deparse and assign functions to change the configuration global variable value
   image_preprocessing_tmp <- deparse(substitute(image_preprocessing))
-  image_preprocessing     <- paste(output_dir,"/Preprocessing.RData",sep="")
+  image_preprocessing     <- paste(output_dir,"Preprocessing.RData",sep="")
   assign(image_preprocessing_tmp,image_preprocessing,pos=parent.frame())
   # Set analysis image file name. Use deparse and assign functions to change the configuration global variable value
   image_analysis_tmp <- deparse(substitute(image_analysis))
-  image_analysis     <- paste(output_dir,"/Waterfall.RData",sep="")
+  image_analysis     <- paste(output_dir,"Waterfall.RData",sep="")
   assign(image_analysis_tmp,image_analysis,pos=parent.frame())
 
   # data pre-processing
