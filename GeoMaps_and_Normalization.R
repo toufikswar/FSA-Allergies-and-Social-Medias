@@ -95,7 +95,7 @@ labelled.df.geo <- labelled.df.geo[!is.na(labelled.df.geo$lad16nm),]
 # create a new column with the lad16nm cleaned
 labelled.df.geo$lad16nm_clean <- clean_UK_local_authorities_names(labelled.df.geo$lad16nm)
 
-# In order to get the normalization information the lad16nm_clean columns from labelled.df.geo and restaurants_per_local_authority.df have to be matched
+# In order to get the normalization information the lad16nm_clean columns from labelled.df.geo and normalization_per_local_authority.df have to be matched
 
 
 #
