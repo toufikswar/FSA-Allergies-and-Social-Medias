@@ -63,7 +63,7 @@ names(normalization_per_local_authority.df) <- list_of_variables
 # create a new column with the LAName cleaned
 normalization_per_local_authority.df$lad16nm_clean <- clean_UK_local_authorities_names(normalization_per_local_authority.df$LAName)
 
-# Know load the UK map of local authorities
+# Now load the UK map of local authorities
 # https://blog.exploratory.io/making-maps-for-uk-countries-and-local-authorities-areas-in-r-b7d222939597
 
 library(ggmap)
