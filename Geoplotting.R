@@ -8,7 +8,7 @@ library(sp)
 
 API_KEY = "AIzaSyCzk2FoBaNzkPoGUcRzfzbVN0YOqq2S_aA"
 
-uk_county_shapefiles   <- readOGR(dsn = "UK_Local_Authority_2016", layer = "Local_Authority_Districts_December_2016_Super_Generalised_Clipped_Boundaries_in_the_UK")
+uk_county_shapefiles   <- readOGR(dsn = "resources/UK_Local_Authority_2016", layer = "Local_Authority_Districts_December_2016_Super_Generalised_Clipped_Boundaries_in_the_UK")
 wgs.84 <- "+proj=longlat +datum=WGS84"
 uk_county_shapefiles   <- spTransform(uk_county_shapefiles, CRS(wgs.84)) # Convert to WGS84 format
 shape.df <- fortify(uk_county_shapefiles)
