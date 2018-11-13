@@ -8,7 +8,7 @@ meat,meat,pork,beef,lamb,
 gelatine,gelatine,
 
 # seeds
-seed,seed,sunflower,poppy,seed oil,
+seed,seed,sunflower,poppy,seed oil,poppy_seeds,poppy seed,poppyseed,
 
 # spices
 spice,spice,coriander,garlic,cinnamon,chilli,
@@ -45,9 +45,6 @@ peas,peas,
 
 # chickpeas
 chickpeas,chickpeas,chick peas,
-
-# poppy seeds
-poppy_seeds,poppy seed,poppyseed,
 
 # pepper
 pepper,pepper,bell pepper,

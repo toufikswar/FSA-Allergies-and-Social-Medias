@@ -124,6 +124,9 @@ start_time1 <- Sys.time()
 other_allergens.df.norm <- from_corpus_to_lookup_dataframe(content.corpus, other_allergens.dict)
 other.allergen.names    <- colnames(other_allergens.df.norm)[-1]
 labelled.df             <- cbind(labelled.df,other_allergens.df.norm[,other.allergen.names])
+# Disambiguate Nuts and Seeds categories
+labelled.df$nuts <- ifelse(labelled.df$nuts == 1 & labelled.df$tree_nuts == 0,1,0)
+labelled.df$seeds <- ifelse(labelled.df$seeds == 1 & labelled.df$sesame_seeds == 0,1,0)
 end_time1 <- Sys.time()
 other_allergens_time <- as.difftime(end_time1 - start_time1, units = "secs")
 
