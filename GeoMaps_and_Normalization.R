@@ -77,8 +77,6 @@ wgs.84                 <- "+proj=longlat +datum=WGS84"
 uk_county_shapefiles   <- spTransform(uk_county_shapefiles, CRS(wgs.84)) # Convert to WGS84 format
 shape.df               <- fortify(uk_county_shapefiles)
 
-# uk_county_shapefiles$lad16nm_clean <- clean_UK_local_authorities_names(uk_county_shapefiles$lad16nm)
-
 # Some rows don't have Latitute and longitude. Drop them
 labelled.df.geo <- labelled.df[!is.na(labelled.df$latitude),]
 
