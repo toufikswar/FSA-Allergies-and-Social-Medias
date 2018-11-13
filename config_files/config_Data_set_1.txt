@@ -16,16 +16,20 @@ sheet_name:  Sheet1
 # project name
 project_name: Data set 1
 
-# set this parameter to yes if want to rerun data-processing and labelling
-rerun_data_processing: No
+# set this parameter to yes if want to rerun data pre-processing and labelling
+rerun_data_preprocessing: No
+
+# set this parameter to yes if want to rerun data labelling only
+rerun_data_labelling: Yes
+
 
 ########################
 ## Data visualization ##
 ########################
 
-do_static_plots: Yes
+do_static_plots: No
 
-output_report:   Yes
+output_report:   No
 
 launch_shiny_dash_board: No
 
