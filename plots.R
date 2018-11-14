@@ -50,7 +50,6 @@ ggsave("14_allergens_bysource.png", plot = last_plot(), device = NULL, path = ou
 
 other.bysource <- ggplot(subset(allergen.bysource.df,
                                 Allergen %in% other.allergen.names),
-                                #aes(x = fct_reorder2(Allergen, source, count, .desc = FALSE), y= count, fill = source)) +
                                 aes(x = reorder(gsub("_"," ", Allergen),count), y = count, fill = source)) +
   geom_bar(stat = "identity") +
   theme_minimal() +
@@ -68,22 +67,20 @@ ggsave("other_allergens_bysource.png", plot = last_plot(), device = NULL, path =
 
 
 #### TOP 10 ALL Allergens Histograme
-top.ten.df.long <- subset(labelled.df.long, select = c("Allergen","Mentions", "source"))
+total_count_per_allergen <- labelled.df %>% subset(select = c(fourteen.allergen.names,other.allergen.names)) %>% colSums(na.rm=T) %>% sort(decreasing=T)
+top_10_names <- names(total_count_per_allergen)[1:10]
 
-top.ten.groupby.source.df <- top.ten.df.long %>% 
-  group_by(source, Allergen) %>%
-  summarise(count = sum(Mentions))
-
-top10.allergens <- ggplot(top.ten.groupby.source.df, 
-                          aes(x= reorder(Allergen, count) ,y = count, fill = source)) +
-  geom_bar(stat="identity") +
+top10.bysource <- ggplot(subset(allergen.bysource.df, Allergen %in% top_10_names),
+                            aes(x = reorder(gsub("_"," ",Allergen), count), y = count, fill = source)) +
+  geom_bar(stat = "identity") +
   theme_minimal() +
   scale_fill_brewer(palette="Spectral") +
-  xlab("Allergens") +
+  xlab("Allergen")+
   ylab("Mentions") +
-  ggtitle("TOP 10 of all Allergens") +
+  ggtitle("TOP 10 Allergens by Source")+
   coord_flip()
-top10.allergens
+top10.bysource
+
 
 ggsave("top10_allergens.png", plot = last_plot(), device = NULL, path = out.dir,
        width = 15, height = 15, units = "cm",
