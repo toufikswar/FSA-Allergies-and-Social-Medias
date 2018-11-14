@@ -5,8 +5,9 @@ cat(paste("Start static plots script","\n",sep=""))
 
 load(image_analysis)
 
-# output file where the plots are saved
-out.dir <- file.path(paste(output_dir,"/",sep=""))
+# output directory where the plots are saved
+out.dir <- file.path(paste(output_dir,"plots",sep=""))
+if(!dir.exists(file.path(out.dir))) dir.create(file.path(out.dir))
 
 # Removal of News as a datasource from our data
 labelled.df <- subset(labelled.df, source != "News")
