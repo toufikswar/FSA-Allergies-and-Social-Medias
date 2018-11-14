@@ -24,16 +24,20 @@ To use **Allergater**, download or clone the repo to a folder on your computer, 
 
 **Prior to running the Pipeline install:**
 
-```install.packages(c("readxl","stringi","quanteda","magrittr","tidyr","ggplot2","ggpubr","bookdown", "shiny","leaflet","sp","rgdal"))```
+```r
+install.packages(c("readxl","stringi","quanteda","magrittr","tidyr","ggplot2","ggpubr","bookdown", "shiny","leaflet","sp","rgdal"))
+```
 
 and
 
 The latest ggmap must be installed from github:
 
-```if(!requireNamespace("devtools")) install.packages("devtools") devtools::install_github("dkahle/ggmap", ref = "tidyup")```
+```r
+if(!requireNamespace("devtools")) install.packages("devtools") devtools::install_github("dkahle/ggmap", ref = "tidyup")
+```
 
 And configured for use with a valid Google Maps API key: https://developers.google.com/maps/ . Add your valid API key to the config file under 'API_KEY'.
 
 ## Outputs
 
-Output files include .RData, static plots, and report can be found in `output_files/$projectID/`
+Output files include the report, the .RData, and static plots, and can be found in `output_files/$projectID/`
