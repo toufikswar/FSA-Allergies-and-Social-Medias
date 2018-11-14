@@ -17,6 +17,7 @@ To use **Allergater**, download or clone the repo to a folder on your computer, 
 * [ggplot2](https://ggplot2.tidyverse.org/)
 * [ggpubr](http://www.sthda.com/english/rpkgs/ggpubr/)
 * [bookdown](https://github.com/rstudio/bookdown)
+* [tinytex](https://yihui.name/tinytex/)
 * [leaflet](https://rstudio.github.io/leaflet/)
 * [rgdal](https://cran.r-project.org/web/packages/rgdal/index.html)
 * [sp](https://cran.r-project.org/web/packages/sp/index.html)
@@ -27,7 +28,7 @@ To use **Allergater**, download or clone the repo to a folder on your computer, 
 ```r
 install.packages(c(
   "readxl","stringi","quanteda","magrittr",
-  "tidyr","ggplot2","ggpubr","bookdown",
+  "tidyr","ggplot2","ggpubr","bookdown","tinytex",
   "shiny","leaflet","sp","rgdal"))
 ```
 
@@ -42,6 +43,11 @@ devtools::install_github("dkahle/ggmap", ref = "tidyup")
 ```
 
 And configured for use with a valid Google Maps API key: https://developers.google.com/maps/ . Add your valid API key to the config file under 'API_KEY'.
+
+For PDF Generation (TinyTex), run the command in the R console:
+```r
+tinytex::install_tinytex()
+```
 
 ## Outputs
 

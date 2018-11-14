@@ -1,8 +1,9 @@
 # Introduction
 
-```{r data-load, echo=FALSE}
-load("../.RData")
+```{r load_data, echo=FALSE, cache=TRUE}
+load("../output_files/Data_set_1/Waterfall.RData") # to be changed later to load(paste("../",image_analysis))```
 ```
+
 
 ## Context
 
