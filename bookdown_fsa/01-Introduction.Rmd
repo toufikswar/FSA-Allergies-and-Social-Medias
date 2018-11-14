@@ -1,5 +1,9 @@
 # Introduction
 
+```{r data-load, echo=FALSE}
+load("../.RData")
+```
+
 ## Context
 
 Using social media data, FSA wants to be able to track endorcement of allergen based legislations in the UK.

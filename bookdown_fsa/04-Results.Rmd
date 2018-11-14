@@ -1,0 +1,49 @@
+# Results and Plots
+
+## 14 allergens
+
+In the representation below, we display the number of mentions of predefined list of 14 allergens, whether coming from Blog, News, Review, Forum or Twitter
+
+```{r 14-allergens, echo=FALSE, message=FALSE}
+library(tidyr)
+library(magrittr)
+library(dplyr)
+
+# Long Dataframe needed for certain types of plots.
+labelled.df.long <- gather(labelled.df, Allergen, "Mentions", c(fourteen.allergen.names,other.allergen.names), factor_key = TRUE)
+
+
+allergen.bysource.df <- labelled.df.long %>%
+  group_by(source, Allergen) %>%
+  summarise(count=sum(Mentions))
+
+library(ggplot2)
+library(forcats)
+
+fourteen.bysource <- ggplot(subset(allergen.bysource.df, Allergen %in% fourteen.allergen.names),
+                                 aes(x = fct_reorder2(Allergen, source, count, .desc = FALSE), y= count, fill = source)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  scale_fill_brewer(palette="Spectral") +
+  xlab("Allergen")+
+  ylab("Mentions") +
+  ggtitle("Mentions of the 14 Allergens by Source")+
+  coord_flip()
+fourteen.bysource
+```
+
+## Other Allergens
+
+```{r other-allergens, message=FALSE}
+other.bysource <- ggplot(subset(allergen.bysource.df,
+                                Allergen %in% other.allergen.names),
+                              aes(x = fct_reorder2(Allergen, source, count, .desc = FALSE), y= count, fill = source)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  scale_fill_brewer(palette="Spectral") +
+  xlab("Allergen") +
+  ylab("Mentions") +
+  ggtitle("Mentions of Other Allergens by Source") +
+  coord_flip()
+other.bysource
+```

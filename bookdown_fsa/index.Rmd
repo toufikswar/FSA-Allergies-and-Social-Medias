@@ -6,7 +6,7 @@ documentclass: book
 output_dir: docs
 output:
   bookdown::gitbook: default
-  #bookdown::pdf_book: default
+  bookdown::pdf_book: default
 ---
 
 # Preface {-}

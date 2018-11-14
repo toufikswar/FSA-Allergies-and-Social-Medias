@@ -65,6 +65,8 @@ c("cereals_contain_gluten","gluten","wheat","rye","barley","barli","oat")
 
 
 ```{r, exampleplotchunk, echo=FALSE}
+library(ggplot2)
+library(shiny)
 
 if (knitr:::is_latex_output()) {
   
