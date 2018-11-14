@@ -50,7 +50,8 @@ ggsave("14_allergens_bysource.png", plot = last_plot(), device = NULL, path = ou
 
 other.bysource <- ggplot(subset(allergen.bysource.df,
                                 Allergen %in% other.allergen.names),
-                                aes(x = fct_reorder2(Allergen, source, count, .desc = FALSE), y= count, fill = source)) +
+                                #aes(x = fct_reorder2(Allergen, source, count, .desc = FALSE), y= count, fill = source)) +
+                                aes(x = reorder(gsub("_"," ", Allergen),count), y = count, fill = source)) +
   geom_bar(stat = "identity") +
   theme_minimal() +
   scale_fill_brewer(palette="Spectral") +
@@ -66,16 +67,15 @@ ggsave("other_allergens_bysource.png", plot = last_plot(), device = NULL, path =
 
 
 
-#### TOP 10 Allergens Histograme
-total_count_per_allergens <- subset(labelled.df, select  = c(fourteen.allergen.names, other.allergen.names)) %>%
-  colSums() %>% data.frame()
-total_count_per_allergens$allergens <- rownames(total_count_per_allergens)
-colnames(total_count_per_allergens) <- c("total", "allergens")
-rownames(total_count_per_allergens) <- 1:nrow(total_count_per_allergens)
+#### TOP 10 ALL Allergens Histograme
+top.ten.df.long <- subset(labelled.df.long, select = c("Allergen","Mentions", "source"))
 
-top10.allergens <- ggplot(total_count_per_allergens[1:10,], 
-                          aes(x= reorder(gsub("_"," ",allergens),total), y = total )) +
-  
+top.ten.groupby.source.df <- top.ten.df.long %>% 
+  group_by(source, Allergen) %>%
+  summarise(count = sum(Mentions))
+
+top10.allergens <- ggplot(top.ten.groupby.source.df, 
+                          aes(x= reorder(Allergen, count) ,y = count, fill = source)) +
   geom_bar(stat="identity") +
   theme_minimal() +
   scale_fill_brewer(palette="Spectral") +
@@ -97,6 +97,8 @@ library(ggrepel)
 all_allergens.norm.df.t14 <- subset(labelled.df.long,
                                     source == "Twitter" &
                                       Allergen %in% fourteen.allergen.names)
+# Remove "_" from allergens name
+all_allergens.norm.df.t14$Allergen <- gsub("_"," ",all_allergens.norm.df.t14$Allergen)
 
 by.month.twitter.14 <- ggplot(all_allergens.norm.df.t14,
                                    aes(x = Month, y = Mentions, colour = Allergen),
@@ -125,6 +127,8 @@ ggsave("14_allergens_byweek.png", plot = last_plot(), device = NULL, path = out.
        dpi = 300)
 
 all_allergens.norm.df.t.other <- subset(labelled.df.long, source == "Twitter" & Allergen %in% other.allergen.names)
+# Remove "_" from allergens name
+all_allergens.norm.df.t.other$Allergen <- gsub("_"," ",all_allergens.norm.df.t.other$Allergen)
 
 by.month.twitter.other <- ggplot(all_allergens.norm.df.t.other, aes(x = Month, y = Mentions, colour = Allergen), group = Allergen)+
   stat_summary(fun.y = sum, # adds up all observations for the month
@@ -192,12 +196,11 @@ stream1.issues.sentiment.groupedby <-stream1.issues.df.long %>%
   summarise(counts = sum(Mentions))
   
 stream1.issues.bar <- ggplot(stream1.issues.sentiment.groupedby,
-                             aes(x = Issue, y = counts, fill = sentiment_class)) +
+                             aes(x = gsub("_", " ", Issue), y = counts, fill = sentiment_class)) +
   geom_bar(stat = "identity") +
   theme_minimal() +
-  scale_fill_brewer(palette="Paired") +
-  xlab("Issue") +
-  ylab("Mentions") +
+  labs(x= "Issues", y="Mentions", fill = "Sentiment Class") +
+  scale_fill_manual(values = c("#DF3309","grey80","#0D83E6"))+
   theme(legend.position="bottom") +
   ggtitle("Stream 1 issues per sentiment")
 stream1.issues.bar
@@ -221,16 +224,30 @@ colnames(fourteen.allergens.total.df) <- c("mild","severe","total")
 
 fourteen.allergens.total.df$perc_mild <- round((fourteen.allergens.total.df$mild/fourteen.allergens.total.df$total)*100,1)
 fourteen.allergens.total.df$perc_severe <- round((fourteen.allergens.total.df$severe/fourteen.allergens.total.df$total)*100,1)
+fourteen.allergens.total.df$allergen <- rownames(fourteen.allergens.total.df)
 
-fourteen.allergen.mentions <- ggplot(fourteen.allergen.mild.severe.total.df,
-                                     aes(x = row.names(fourteen.allergen.mild.severe.total.df),
-                                         y = (severe/total)*100)) +
-  geom_bar(stat = "identity", position = "dodge")
+fourteen.allergen.total.long <- gather(fourteen.allergens.total.df, severity, "percentage", c("perc_mild","perc_severe"), factor_key = TRUE)
+
+
+fourteen.allergen.mentions <- ggplot(fourteen.allergen.total.long,
+                                     aes(x = gsub("_"," ", allergen),
+                                         y = percentage, fill = severity)) +
+  geom_bar(width = 0.4 ,position = "dodge", stat="identity") +
+  theme_minimal() +
+  scale_fill_manual(values=c("#ffa64d", "#cc0000"), 
+                    breaks=c("perc_mild", "perc_severe"),
+                    labels=c("% Midl", "% Severe")) +
+  labs(x= "Allergens", y="Percentage", fill = "Severity") +
+  ggtitle("Percentage of Mild/Severe reactions over 14 allergens mentions") +
+  coord_flip()
 fourteen.allergen.mentions
   
 #######
-  
-int_14allergen_react <- ggplot(subset(labelled.df.long, Mentions > 0 & Allergen %in% fourteen.allergen.names),
+## Subsetting to remove "_' from the Allergy names
+int_14allergen_react.df <- subset(labelled.df.long, Mentions > 0 & Allergen %in% fourteen.allergen.names)
+int_14allergen_react.df$Allergen <- gsub("_"," ", int_14allergen_react.df$Allergen)
+
+int_14allergen_react <- ggplot(int_14allergen_react.df,
                                aes(x = Week, y = reactions_report, fill = reactions_report))+
   stat_summary(fun.y = sum, # adds up all observations for the month
                geom = "bar") +
@@ -253,10 +270,13 @@ ggsave("14_allergens_reactions.png", plot = last_plot(), device = NULL, path = o
        dpi = 300)
 
 
+#####
 allergen.react.df <- subset(labelled.df.long, Allergen %in% fourteen.allergen.names) %>%
   group_by(Allergen, Month, sentiment_class, reactions_report) %>%
   summarise(Count= sum(Mentions))
 
+#Remove "_" from allergens names
+allergen.react.df$Allergen <- gsub("_"," ",allergen.react.df$Allergen)
 allergen.react.bubble <- ggplot(allergen.react.df, aes(x = Month, y = fct_reorder(Allergen, Count),
                                                 size = ifelse(Count == 0, NA, Count),
                                                 colour = reactions_report))+
@@ -282,6 +302,9 @@ ggsave("14_allergens_reactions_bubble.png", plot = last_plot(), device = NULL, p
 allergen.react.labelling.df <- subset(labelled.df.long, Allergen %in% fourteen.allergen.names & food_labelling > 0) %>%
   group_by(Allergen, Month, sentiment_class, reactions_report) %>%
   summarise(Count= sum(Mentions))
+
+#Remove "_" from allergen names
+allergen.react.labelling.df$Allergen <- gsub("_", " ", allergen.react.labelling.df$Allergen)
 
 allergen.react.labelling.bubble <- ggplot(allergen.react.labelling.df, aes(x = Month, y = fct_reorder(Allergen, Count),
                                                        size = ifelse(Count == 0, NA, Count),
@@ -331,7 +354,12 @@ ggsave("14_allergens_enquiries.png", plot = last_plot(), device = NULL, path = o
        width = 30, height = 30, units = "cm",
        dpi = 300)
 
-int_otherallergen_react <- ggplot(subset(labelled.df.long, Mentions > 0 & Allergen %in% other.allergen.names),
+
+#####
+# Subseting to remove "_" from allergen names
+int_otherallergen_react.df <- subset(labelled.df.long, Mentions > 0 & Allergen %in% other.allergen.names)
+int_otherallergen_react.df$Allergen <- gsub("_", " ", int_otherallergen_react.df$Allergen)
+int_otherallergen_react <- ggplot(int_otherallergen_react.df,
                                aes(x = Week, y = reactions_report, fill = reactions_report))+
   stat_summary(fun.y = sum, # adds up all observations for the month
                geom = "bar") +
@@ -352,6 +380,8 @@ int_otherallergen_react
 ggsave("other_allergens_reactions.png", plot = last_plot(), device = NULL, path = out.dir,
        width = 30, height = 30, units = "cm",
        dpi = 300)
+
+
 
 Int_enquiry_reaction <- ggplot(subset(labelled.df, allergy_enquiries > 0 ), aes(x = Week, y = allergy_enquiries, fill = reactions_report))+
   stat_summary(fun.y = sum, # adds up all observations for the month
