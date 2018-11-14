@@ -8,7 +8,13 @@ load(image_analysis)
 # output file where the plots are saved
 out.dir <- file.path(paste(output_dir,"/",sep=""))
 
-labelled.df <- subset(labelled.df, source != "News") # when you want to remove documents from News
+# Removal of News as a datasource from our data
+labelled.df <- subset(labelled.df, source != "News")
+
+# Creation of 2 columns in labelled.df called <severe_reaction>, <mild_reaction> for plotting purposes
+labelled.df$severe_reaction <- ifelse(labelled.df$reactions_report == "Severe-reaction", 1, 0)
+labelled.df$mild_reaction <- ifelse(labelled.df$reactions_report == "Mild-reaction", 1, 0)
+
 library(tidyr)
 library(magrittr)
 library(dplyr)
@@ -27,8 +33,7 @@ library(forcats)
 #  Use of reorder() to order allergens by count DESC
 #  Use of gsub() to replace "_" by spaces in the axis labels
 fourteen.bysource <- ggplot(subset(allergen.bysource.df, Allergen %in% fourteen.allergen.names),
-                                 aes(x = reorder(gsub("_"," ",Allergen), count), 
-                                     y = count, fill = source)) +
+                                 aes(x = reorder(gsub("_"," ",Allergen), count), y = count, fill = source)) +
   geom_bar(stat = "identity") +
   theme_minimal() +
   scale_fill_brewer(palette="Spectral") +
@@ -43,9 +48,9 @@ ggsave("14_allergens_bysource.png", plot = last_plot(), device = NULL, path = ou
        dpi = 300)
 
 
-other.bysource <- ggplot(subset(allergen.bysource.df,Allergen %in% other.allergen.names),
-                              aes(x = reorder(gsub("_"," ",Allergen), count), 
-                                  y = count, fill = source)) +
+other.bysource <- ggplot(subset(allergen.bysource.df,
+                                Allergen %in% other.allergen.names),
+                                aes(x = fct_reorder2(Allergen, source, count, .desc = FALSE), y= count, fill = source)) +
   geom_bar(stat = "identity") +
   theme_minimal() +
   scale_fill_brewer(palette="Spectral") +
@@ -58,6 +63,32 @@ other.bysource
 ggsave("other_allergens_bysource.png", plot = last_plot(), device = NULL, path = out.dir,
        width = 15, height = 15, units = "cm",
        dpi = 300)
+
+
+
+#### TOP 10 Allergens Histograme
+total_count_per_allergens <- subset(labelled.df, select  = c(fourteen.allergen.names, other.allergen.names)) %>%
+  colSums() %>% data.frame()
+total_count_per_allergens$allergens <- rownames(total_count_per_allergens)
+colnames(total_count_per_allergens) <- c("total", "allergens")
+rownames(total_count_per_allergens) <- 1:nrow(total_count_per_allergens)
+
+top10.allergens <- ggplot(total_count_per_allergens[1:10,], 
+                          aes(x= reorder(gsub("_"," ",allergens),total), y = total )) +
+  
+  geom_bar(stat="identity") +
+  theme_minimal() +
+  scale_fill_brewer(palette="Spectral") +
+  xlab("Allergens") +
+  ylab("Mentions") +
+  ggtitle("TOP 10 of all Allergens") +
+  coord_flip()
+top10.allergens
+
+ggsave("top10_allergens.png", plot = last_plot(), device = NULL, path = out.dir,
+       width = 15, height = 15, units = "cm",
+       dpi = 300)
+
 
 
 library(scales)
@@ -130,7 +161,7 @@ enquiries_source_react.bar <- ggplot(labelled.df, aes(x = source, y = allergy_en
   ggtitle("Allergen Enquiries by Source and Sentiment Class")
 enquiries_source_react.bar
 
-ggsave("food_inquiries_bysource.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave("food_enquiries_bysource.png", plot = last_plot(), device = NULL, path = out.dir,
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
@@ -147,6 +178,58 @@ ggsave("labelling_by_source_and_reaction.png", plot = last_plot(), device = NULL
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
+
+
+### Stream 1 issues combined in a single plot by sentiment class
+
+stream1.issues.names <- c("allergy_enquiries","food_labelling","mild_reaction","severe_reaction")
+stream1.issues.df <- subset(labelled.df, select = c(stream1.issues.names,"sentiment_class"))
+
+stream1.issues.df.long <- gather(stream1.issues.df, Issue, "Mentions", stream1.issues.names, factor_key = TRUE)
+
+stream1.issues.sentiment.groupedby <-stream1.issues.df.long %>%
+  group_by(Issue, sentiment_class) %>%
+  summarise(counts = sum(Mentions))
+  
+stream1.issues.bar <- ggplot(stream1.issues.sentiment.groupedby,
+                             aes(x = Issue, y = counts, fill = sentiment_class)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  scale_fill_brewer(palette="Paired") +
+  xlab("Issue") +
+  ylab("Mentions") +
+  theme(legend.position="bottom") +
+  ggtitle("Stream 1 issues per sentiment")
+stream1.issues.bar
+
+ggsave("stream1_issues_bar.png", plot = last_plot(), device = NULL, path = out.dir,
+       width = 15, height = 15, units = "cm",
+       dpi = 300)
+
+
+
+
+### Percentage of 14 allergens mentions for which we have a mild/severe reaction
+
+fourteen.allergen.mild <- colSums(labelled.df[labelled.df$mild_reaction == 1,fourteen.allergen.names])
+fourteen.allergen.severe <- colSums(labelled.df[labelled.df$severe_reaction == 1,fourteen.allergen.names])
+fourteen.allergen.total <- colSums(labelled.df[,fourteen.allergen.names])
+
+fourteen.allergens.total.df <- data.frame(fourteen.allergen.mild,fourteen.allergen.severe,fourteen.allergen.total)
+
+colnames(fourteen.allergens.total.df) <- c("mild","severe","total")
+
+fourteen.allergens.total.df$perc_mild <- round((fourteen.allergens.total.df$mild/fourteen.allergens.total.df$total)*100,1)
+fourteen.allergens.total.df$perc_severe <- round((fourteen.allergens.total.df$severe/fourteen.allergens.total.df$total)*100,1)
+
+fourteen.allergen.mentions <- ggplot(fourteen.allergen.mild.severe.total.df,
+                                     aes(x = row.names(fourteen.allergen.mild.severe.total.df),
+                                         y = (severe/total)*100)) +
+  geom_bar(stat = "identity", position = "dodge")
+fourteen.allergen.mentions
+  
+#######
+  
 int_14allergen_react <- ggplot(subset(labelled.df.long, Mentions > 0 & Allergen %in% fourteen.allergen.names),
                                aes(x = Week, y = reactions_report, fill = reactions_report))+
   stat_summary(fun.y = sum, # adds up all observations for the month
@@ -222,11 +305,11 @@ ggsave("14_allergens_labelling_bubble.png", plot = last_plot(), device = NULL, p
        width = 30, height = 30, units = "cm",
        dpi = 300)
 
-allergen.react.inquiries.df <- subset(labelled.df.long, Allergen %in% fourteen.allergen.names & allergy_enquiries > 0) %>%
+allergen.react.enquiries.df <- subset(labelled.df.long, Allergen %in% fourteen.allergen.names & allergy_enquiries > 0) %>%
   group_by(Allergen, Month, sentiment_class, reactions_report) %>%
   summarise(Count= sum(Mentions))
 
-allergen.react.inquiries.bubble <- ggplot(allergen.react.labelling.df, aes(x = Month, y = fct_reorder(Allergen, Count),
+allergen.react.enquiries.bubble <- ggplot(allergen.react.labelling.df, aes(x = Month, y = fct_reorder(Allergen, Count),
                                                                            size = ifelse(Count == 0, NA, Count),
                                                                            colour = reactions_report))+
   geom_point()+
@@ -242,9 +325,9 @@ allergen.react.inquiries.bubble <- ggplot(allergen.react.labelling.df, aes(x = M
   theme(strip.text.y = element_text(angle = 0))+
   theme(panel.grid.minor = element_blank())+
   facet_grid(sentiment_class~.)
-allergen.react.inquiries.bubble
+allergen.react.enquiries.bubble
 
-ggsave("14_allergens_inquiries.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave("14_allergens_enquiries.png", plot = last_plot(), device = NULL, path = out.dir,
        width = 30, height = 30, units = "cm",
        dpi = 300)
 
@@ -278,7 +361,7 @@ Int_enquiry_reaction <- ggplot(subset(labelled.df, allergy_enquiries > 0 ), aes(
   theme(legend.position="bottom")+
   scale_x_date(breaks = "month")+
   scale_fill_manual(values = c("grey90","yellow","red"))+
-  ggtitle("Allergen Inquiries Over Time by Sentiment Class (All Sources)")+
+  ggtitle("Allergen Enquiries Over Time by Sentiment Class (All Sources)")+
   facet_grid(sentiment_class~.)+
   theme(axis.text.x = element_text(angle = 45, vjust = 1,
                                    size = 12, hjust = 1))+

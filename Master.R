@@ -62,49 +62,51 @@ allergies_and_social_media <- function(config_file)
   if(!file_exists_preprocessing | configuration$rerun_data_preprocessing) {
     # if output image for preprocessing don't exits or the user request rerun_data_preprocessing, then run preprocessing + labelling
     if(!file_exists_preprocessing) {
-      cat("\n\n")
+      cat("\n")
       cat(paste("Preprocessing image file ",image_preprocessing," doesn't exists. Running preprocessing and labelling to generate it.","\n",sep=""))
-      cat("\n\n")
+      cat("\n")
     } else if(file_exists_preprocessing & configuration$rerun_data_preprocessing) {
-      cat("\n\n")
+      cat("\n")
       cat(paste("Preprocessing image file ",image_preprocessing," exists, but user specified rerun_data_processing = yes. Re-running preprocessing and labelling.","\n",sep=""))
-      cat("\n\n")
+      cat("\n")
     }
 
     source("Preprocessing.R")  # Data pre-processing
     source("Waterfall.R")      # Data labelling
     generated_labelling <- TRUE
   } else {
-    cat("\n\n")
+    cat("\n")
     cat(paste("Preprocessing image file ",image_preprocessing," exists and user specified rerun_data_preprocessing = no. Passing to next pipe-line step.","\n",sep=""))
-    cat("\n\n")
+    cat("\n")
   }
 
   file_exists_analysis <- file.exists(image_analysis) # checks if analysis image file exists
   if(!file_exists_analysis | (configuration$rerun_data_labelling & !generated_labelling)) {
     # if output image for labelling don't exits or the user request rerun_data_labelling, then run labelling only
     if(!file_exists_analysis) {
-      cat("\n\n")
+      cat("\n")
       cat(paste("Labelling image file ",image_analysis," doesn't exists. Running labelling to generate it.","\n",sep=""))
-      cat("\n\n")
+      cat("\n")
     } else if(file_exists_analysis & (configuration$rerun_data_labelling & !generated_labelling)) {
-      cat("\n\n")
+      cat("\n")
       cat(paste("Labelling image file ",image_analysis," exists, but user specified rerun_data_labelling = yes. Re-running labelling.","\n",sep=""))
-      cat("\n\n")
+      cat("\n")
     }
 
     source("Waterfall.R")      # Data labelling
   } else if(!generated_labelling) {
-    cat("\n\n")
+    cat("\n")
     cat(paste("Labelling image file ",image_analysis," exists and user specified rerun_data_labelling = no. Passing to next pipe-line step.","\n",sep=""))
-    cat("\n\n")
+    cat("\n")
   }
 
 
   # IPORTANT NOTE: this part of the code not final
-  # Here we should put some code for plots and stuff
   if(configuration$do_static_plots) {
+    # Producing static plots
+
     source("plots.R")
+    # source("Geoplotting.R")
   }
 
   # if(configuration$output_report) {
