@@ -1,12 +1,13 @@
 load("output_files/Data_set_1/Waterfall.RData")
-
+if(!requireNamespace("devtools")) install.packages("devtools")
+devtools::install_github("dkahle/ggmap", ref = "tidyup")
 # https://blog.exploratory.io/making-maps-for-uk-countries-and-local-authorities-areas-in-r-b7d222939597
 library(ggmap)
 library(rgdal)
 library(spdplyr)
 library(sp)
 # 
-# API_KEY = "AIzaSyCzk2FoBaNzkPoGUcRzfzbVN0YOqq2S_aA"
+API_KEY = "AIzaSyCzk2FoBaNzkPoGUcRzfzbVN0YOqq2S_aA"
 # 
 
 names(labelled.df.geo)[names(labelled.df.geo) == "lad16nm_clean"] <- "District"
@@ -83,28 +84,26 @@ radius.by.count.14 <- leaflet(data = labelled.df.geo.summary.14) %>%
 radius.by.count.14
 
 
-# dev.off()
-# dev.set(dev.next())
-# dev.set(dev.next())
-# dev.off()
+dev.off()
+dev.set(dev.next())
+dev.set(dev.next())
+dev.off()
 
-# 
-# # test plots
-# library(ggmap)
-# 
-# UK <- geocode("United Kingdom", source = "dsk")
-# UKrefmap <- get_map(location = c(lon = UK$lon, lat = UK$lat),
-#                     maptype = "terrain", color="bw", api_key = API_KEY, zoom = 5 )
-# 
-# london <- get_map(location = c(lon = -0.129, lat = 51.51),
-#                   maptype = "terrain", color="bw", api_key = API_KEY, zoom = 10 )
-# 
-# UK_map <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
-#   # geom_polygon(data = shape.df, aes(x = long, y=lat, group=group), 
-#   #              fill="blue", alpha=0.2) +
-#   geom_path(data=shape.df, aes(x=long, y=lat, group=group), 
-#             color="gray50", size=0.3) +
-#   geom_point(data = all_allergens.norm.df.t14, aes(x = longitude, y = latitude, colour = Allergen),
-#              size = 0.5, alpha = 0.5)
-# UK_map 
-# register_google(key = key)
+## Static Plots
+register_google(key = "AIzaSyB72eS6FLuG9IMoCtXKViGkougdlUT0HFE")
+
+UK <- geocode("UK")
+UKrefmap <- get_map(location = c(lon = UK$lon, lat = UK$lat),
+                    maptype = "terrain", color="bw", zoom = 5 )
+
+london <- get_map(location = c(lon = -0.129, lat = 51.51),
+                  maptype = "terrain", color="bw", api_key = API_KEY, zoom = 10 )
+
+fourteen.summary.geo <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
+  #geom_polygon(data = shape.df, aes(x = long, y=lat, group=group),
+  #              fill="blue", alpha=0.2) +
+  geom_path(data=shape.df, aes(x=long, y=lat, group=group),
+            color="gray50", size=0.3) +
+  geom_point(data = labelled.df.geo.summary.14, aes(x = long, y = lat, colour = Allergen, size = count),
+              alpha = 0.5)
+fourteen.summary.geo
