@@ -382,7 +382,7 @@ ggsave("other_allergens_reactions.png", plot = last_plot(), device = NULL, path 
 
 
 Int_enquiry_reaction <- ggplot(subset(labelled.df, allergy_enquiries > 0 ), aes(x = Week, y = allergy_enquiries, fill = reactions_report))+
-  stat_summary(fun.y = sum, # adds up all observations for the month
+  stat_summary(fun.y = sum, # adds up all observations for the week
                geom = "bar") +
   theme_minimal()+
   labs(x="Month", y="Allergy Enquiries", fill="Class of Reported Reaction")+
@@ -423,18 +423,9 @@ ggsave("labelling_reactions.png", plot = last_plot(), device = NULL, path = out.
        dpi = 300)
 
 
-load(image_preprocessing)
-library(quanteda)
-library(tidyr)
-source("utils.R")
-
-# Lookup 14 allergens and other aleergens in content.dfm
-fourteen_allergens.df.norm <- from_corpus_to_lookup_dataframe(content.corpus, fourteen_allergens.dict)
-other_allergens.df.norm <- from_corpus_to_lookup_dataframe(content.corpus, other_allergens.dict)
-
 # to create subset for 14 allergens and other allergens
-fourteen_allergens.df.norm.subset <- fourteen_allergens.df.norm[2:15]
-other_allergens.df.norm.subset <- other_allergens.df.norm[2:25]
+fourteen_allergens.df.norm.subset <- labelled.df[,fourteen.allergen.names]
+other_allergens.df.norm.subset <- labelled.df[,other.allergen.names]
 
 # creating percentage matrix for heatmap 1 for fourteen allergens
 
@@ -497,10 +488,7 @@ ggsave("percentage_14_allergens_1.png", plot = g, device = NULL, path = out.dir,
        width = 30, height = 30, units = "cm",
        dpi = 300)
 
-
-
 # creating 14x14 matrix for heatmap 2 for fourteen allergens
-
 for (i in 1:(number_of_cols)){
   for (j in i:number_of_cols){
     temp = table(fourteen_allergens.df.norm.subset[,i] + fourteen_allergens.df.norm.subset[,j])
@@ -560,7 +548,7 @@ ggsave("percentage_14_allergens_1.png", plot = p2, device = NULL, path = out.dir
 
 # other allergen heatmaps
 
-other_allergens.df.norm.subset <- other_allergens.df.norm[2:25]
+other_allergens.df.norm.subset <- other_allergens.df.norm[, other.allergen.names]
 
 #to stop getting error, some columns are excluded
 drops <- c("corn", "meat", "latex", "gelatine", "seed", "spice", "vegetable", "carrageenan", "coconut", "chestnut", "kiwi",
