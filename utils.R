@@ -47,12 +47,19 @@ read_config_file <- function(config_file,configuration)
     } else if(length(vec_line) >= 2 & vec_line[1] == "project_name:") {
       # getting the list of input files
       configuration$project_name <- paste(vec_line[-1],collapse = "_")
-    } else if(length(vec_line) == 2 & vec_line[1] == "rerun_data_processing:") {
-      # boolean to decide if re-run data processing
+    } else if(length(vec_line) == 2 & vec_line[1] == "rerun_data_preprocessing:") {
+      # boolean to decide if re-run data pre-processing
       if(vec_line[2] == "YES" | vec_line[2] == "Yes" | vec_line[2] == "yes" | vec_line[2] == "y" | vec_line[2] == "Y") {
-        configuration$rerun_data_processing <- TRUE
+        configuration$rerun_data_preprocessing <- TRUE
       } else if(vec_line[2] == "NO" | vec_line[2] == "No" | vec_line[2] == "no" | vec_line[2] == "n" | vec_line[2] == "N") {
-        configuration$rerun_data_processing <- FALSE
+        configuration$rerun_data_preprocessing <- FALSE
+      }
+    } else if(length(vec_line) == 2 & vec_line[1] == "rerun_data_labelling:") {
+      # boolean to decide if re-run data labelling
+      if(vec_line[2] == "YES" | vec_line[2] == "Yes" | vec_line[2] == "yes" | vec_line[2] == "y" | vec_line[2] == "Y") {
+        configuration$rerun_data_labelling <- TRUE
+      } else if(vec_line[2] == "NO" | vec_line[2] == "No" | vec_line[2] == "no" | vec_line[2] == "n" | vec_line[2] == "N") {
+        configuration$rerun_data_labelling <- FALSE
       }
     } else if(length(vec_line) == 2 & vec_line[1] == "do_static_plots:") {
       # boolean to decide if doing static plots
@@ -101,8 +108,10 @@ print_config <- function(configuration)
   cat(paste("  Sheet name:                     ",configuration$sheet_name,"\n",sep=""))
   cat(paste("  Project name:                   ",configuration$project_name,"\n",sep=""))
   answer <- "No"
-  if(configuration$rerun_data_processing) answer <- "Yes"
-  cat(paste("  Re-run data processing:         ",answer,"\n",sep=""))
+  if(configuration$rerun_data_preprocessing) answer <- "Yes"
+  cat(paste("  Re-run data pre-processing:     ",answer,"\n",sep=""))
+  if(configuration$rerun_data_labelling) answer <- "Yes"
+  cat(paste("  Re-run data labelling:          ",answer,"\n",sep=""))
   answer <- "No"
   if(configuration$do_static_plots) answer <- "Yes"
   cat(paste("  Doing static plots:             ",answer,"\n",sep=""))

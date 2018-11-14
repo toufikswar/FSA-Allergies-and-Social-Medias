@@ -1,45 +1,110 @@
-library(ggmap)
+load("output_files/Data_set_1/Waterfall.RData")
 
 # https://blog.exploratory.io/making-maps-for-uk-countries-and-local-authorities-areas-in-r-b7d222939597
-
+library(ggmap)
 library(rgdal)
 library(spdplyr)
 library(sp)
+# 
+# API_KEY = "AIzaSyCzk2FoBaNzkPoGUcRzfzbVN0YOqq2S_aA"
+# 
 
-API_KEY = "AIzaSyCzk2FoBaNzkPoGUcRzfzbVN0YOqq2S_aA"
+names(labelled.df.geo)[names(labelled.df.geo) == "lad16nm_clean"] <- "District"
 
-uk_county_shapefiles   <- readOGR(dsn = "resources/UK_Local_Authority_2016", layer = "Local_Authority_Districts_December_2016_Super_Generalised_Clipped_Boundaries_in_the_UK")
-wgs.84 <- "+proj=longlat +datum=WGS84"
-uk_county_shapefiles   <- spTransform(uk_county_shapefiles, CRS(wgs.84)) # Convert to WGS84 format
-shape.df <- fortify(uk_county_shapefiles)
+labelled.df.geo <- subset(labelled.df.geo, source != "News")
 
-labelled.df.geo <- labelled.df[!is.na(labelled.df$latitude),] # Some rows don't have Latitute and longitude. Drop them
-require(sp)
-# Letting R know that these are specifically spatial coordinates
-sp <- SpatialPoints(labelled.df.geo[c("longitude", "latitude")])
-# To ensure the same coordinate system
-proj4string(sp) <- "+proj=longlat +datum=WGS84"
+labelled.df.geo <- labelled.df.geo[,c("original_content",
+                                      fourteen.allergen.names,
+                                      other.allergen.names,
+                                      "Month",
+                                      "Week",
+                                      "objectid",
+                                      "food_labelling",
+                                      "lat",
+                                      "long",
+                                      "District",
+                                      "source",
+                                      "sentiment_class")]
 
-# Match coordinates to each uk region in uk shapefile
-local_authority <- over( sp, uk_county_shapefiles ) 
-labelled.df.geo <- cbind( labelled.df.geo , local_authority ) 
+library(tidyr)
+labelled.df.geo.long <- gather(labelled.df.geo, 
+                               Allergen, 
+                               "Mentions", 
+                               c(fourteen.allergen.names,other.allergen.names), 
+                               factor_key = TRUE
+)
+library(dplyr)
+labelled.df.geo.summary <- labelled.df.geo.long %>%
+  group_by(sentiment_class, Allergen, District, Week, source, long, lat) %>%
+  summarise(count=sum(Mentions))
+
+labelled.df.geo.summary <- subset(labelled.df.geo.summary, count > 0)
+labelled.df.geo.summary$sentiment_class <- factor(labelled.df.geo.summary$sentiment_class, levels = c("negative", "neutral", "positive"))
+labelled.df.geo.summary <- labelled.df.geo.summary[!is.na(labelled.df.geo.summary$lat),]
+
+library(shiny)
+library(leaflet)
+library(RColorBrewer)
+
+cluster.map <- leaflet(data = labelled.df.geo) %>%
+  setView(lng = -3.69531, lat = 53.75844, zoom = 6) %>% 
+  addTiles() %>%
+  addMarkers(lng = ~long, lat = ~lat,
+             clusterOptions = markerClusterOptions(),
+             popup = ~as.character(original_content))
+cluster.map
 
 
-# test plots
+pal <- colorFactor(c("red", "grey60", "navy"), domain = c("negative", "neutral", "positive"))
 
-UK <- geocode("United Kingdom", source = "dsk")
-UKrefmap <- get_map(location = c(lon = UK$lon, lat = UK$lat),
-                    maptype = "terrain", color="bw", api_key = API_KEY, zoom = 5 )
+radius.by.count.sentiment <- leaflet(data = labelled.df.geo.summary) %>%
+  setView(lng = -3.69531, lat = 53.75844, zoom = 6) %>% 
+  addProviderTiles(providers$Stamen.TonerLite) %>%
+  addCircleMarkers(lng = ~long, lat = ~lat,
+                   radius = ~count,
+                   color = ~pal(sentiment_class),
+                   stroke = FALSE, fillOpacity = 0.3,
+                   popup = ~as.character(paste(Allergen, ": ", count)))
+radius.by.count.sentiment
 
-london <- get_map(location = c(lon = -0.129, lat = 51.51),
-                  maptype = "terrain", color="bw", api_key = API_KEY, zoom = 10 )
+labelled.df.geo.summary.14 <- subset(labelled.df.geo.summary, Allergen %in% fourteen.allergen.names)
+no.colours <- length(fourteen.allergen.names) 
 
-UK_map <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
-  # geom_polygon(data = shape.df, aes(x = long, y=lat, group=group), 
-  #              fill="blue", alpha=0.2) +
-  geom_path(data=shape.df, aes(x=long, y=lat, group=group), 
-            color="gray50", size=0.3) +
-  geom_point(data = all_allergens.norm.df.t14, aes(x = longitude, y = latitude, colour = Allergen),
-             size = 0.5, alpha = 0.5)
-UK_map 
-register_google(key = key)
+fal <- colorFactor(palette = "Set1", domain = fourteen.allergen.names)
+
+radius.by.count.14 <- leaflet(data = labelled.df.geo.summary.14) %>%
+  setView(lng = -3.69531, lat = 53.75844, zoom = 6) %>% 
+  addProviderTiles(providers$Stamen.TonerLite) %>%
+  addCircleMarkers(lng = ~long, lat = ~lat,
+                   radius = ~count,
+                   color = ~fal(Allergen),
+                   stroke = FALSE, fillOpacity = 0.5,
+                   popup = ~as.character(paste(Allergen, ": ", count)))
+radius.by.count.14
+
+
+# dev.off()
+# dev.set(dev.next())
+# dev.set(dev.next())
+# dev.off()
+
+# 
+# # test plots
+# library(ggmap)
+# 
+# UK <- geocode("United Kingdom", source = "dsk")
+# UKrefmap <- get_map(location = c(lon = UK$lon, lat = UK$lat),
+#                     maptype = "terrain", color="bw", api_key = API_KEY, zoom = 5 )
+# 
+# london <- get_map(location = c(lon = -0.129, lat = 51.51),
+#                   maptype = "terrain", color="bw", api_key = API_KEY, zoom = 10 )
+# 
+# UK_map <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
+#   # geom_polygon(data = shape.df, aes(x = long, y=lat, group=group), 
+#   #              fill="blue", alpha=0.2) +
+#   geom_path(data=shape.df, aes(x=long, y=lat, group=group), 
+#             color="gray50", size=0.3) +
+#   geom_point(data = all_allergens.norm.df.t14, aes(x = longitude, y = latitude, colour = Allergen),
+#              size = 0.5, alpha = 0.5)
+# UK_map 
+# register_google(key = key)

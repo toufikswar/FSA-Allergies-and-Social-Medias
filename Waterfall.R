@@ -125,7 +125,7 @@ other_allergens.df.norm <- from_corpus_to_lookup_dataframe(content.corpus, other
 other.allergen.names    <- colnames(other_allergens.df.norm)[-1]
 labelled.df             <- cbind(labelled.df,other_allergens.df.norm[,other.allergen.names])
 # Disambiguate Nuts and Seeds categories
-labelled.df$nuts <- ifelse(labelled.df$nuts == 1 & labelled.df$tree_nuts == 0,1,0)
+labelled.df$nuts  <- ifelse(labelled.df$nuts  == 1 & labelled.df$tree_nuts    == 0,1,0)
 labelled.df$seeds <- ifelse(labelled.df$seeds == 1 & labelled.df$sesame_seeds == 0,1,0)
 end_time1 <- Sys.time()
 other_allergens_time <- as.difftime(end_time1 - start_time1, units = "secs")
@@ -140,7 +140,12 @@ labelled.df$Week  <- as.Date(cut(labelled.df$date, breaks = "week"))
 names(labelled.df)[names(labelled.df) == "sentiment class"] <- "sentiment_class" #rename sentiment class to a single string
 labelled.df$sentiment_class[labelled.df$sentiment_class %in% c("not_evaluable", "processing")] <- "neutral" # collapse not evaluable and procesing into neutral
 
+# get the UK local authorities map and normalization data
+source("GeoMaps_and_Normalization.R")
+
 # save image file for data-labelling
+cat("\n\n")
+cat(paste("Saving image of RData to ", image_analysis,"...", "\n",sep=""))
 save.image(file = image_analysis)
 
 end_time <- Sys.time()
@@ -148,9 +153,9 @@ global_time <- as.difftime(end_time - start_time, units = "secs")
 
 # summary of the output data.frame
 cat("\n\n")
-cat(paste("Preprocessed data records = ",nrow(labelled.df),"\n",sep=""))
+cat(paste("Preprocessed data records with UK map information = ",nrow(labelled.df.geo),"\n",sep=""))
 cat(paste("Labelled data.frame column names:","\n",sep=""))
-print(colnames(labelled.df))
+print(colnames(labelled.df.geo))
 cat("\n\n")
 
 # summary of the excecution times

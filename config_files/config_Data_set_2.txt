@@ -16,8 +16,11 @@ sheet_name:  Contents
 # project name
 project_name: Data set 2
 
-# set this parameter to yes if want to rerun data-processing and labelling
-rerun_data_processing: No
+# set this parameter to yes if want to rerun data pre-processing and labelling
+rerun_data_preprocessing: No
+
+# set this parameter to yes if want to rerun data labelling only
+rerun_data_labelling: No
 
 ########################
 ## Data visualization ##
