@@ -61,7 +61,7 @@ names(normalization_per_local_authority.df) <- list_of_variables
 # The geographical differences plots will be normalized with the TotalEstablishments variable
 
 # create a new column with the LAName cleaned
-normalization_per_local_authority.df$lad16nm_clean <- clean_UK_local_authorities_names(normalization_per_local_authority.df$LAName)
+normalization_per_local_authority.df$District <- as.character(clean_UK_local_authorities_names(normalization_per_local_authority.df$LAName))
 
 # Now load the UK map of local authorities
 # https://blog.exploratory.io/making-maps-for-uk-countries-and-local-authorities-areas-in-r-b7d222939597
@@ -76,6 +76,16 @@ uk_county_shapefiles   <- readOGR(dsn = "resources/UK_Local_Authority_2016", lay
 wgs.84                 <- "+proj=longlat +datum=WGS84"
 uk_county_shapefiles   <- spTransform(uk_county_shapefiles, CRS(wgs.84)) # Convert to WGS84 format
 shape.df               <- fortify(uk_county_shapefiles)
+
+# data.frame for plotting number of restaurants per local authority
+library(dplyr)
+normalization_per_local_authority.df <- left_join(normalization_per_local_authority.df,
+                                                  data.frame(objectid = uk_county_shapefiles$objectid,
+                                                             long     = uk_county_shapefiles$long,
+                                                             lat      = uk_county_shapefiles$lat,
+                                                             lad16nm  = uk_county_shapefiles$lad16nm,
+                                                             District = as.character(clean_UK_local_authorities_names(as.character(uk_county_shapefiles$lad16nm)))),
+                                                  by = "District")
 
 # Some rows don't have Latitute and longitude. Drop them
 labelled.df.geo <- labelled.df[!is.na(labelled.df$latitude),]
@@ -93,7 +103,11 @@ labelled.df.geo <- cbind(labelled.df.geo, local_authority)
 labelled.df.geo <- labelled.df.geo[!is.na(labelled.df.geo$lad16nm),]
 
 # create a new column with the lad16nm cleaned
-labelled.df.geo$lad16nm_clean <- clean_UK_local_authorities_names(labelled.df.geo$lad16nm)
+labelled.df.geo$District <- clean_UK_local_authorities_names(labelled.df.geo$lad16nm)
+
+# Shift needed to match map with actual local authority
+labelled.df.geo$objectid <- as.character(labelled.df.geo$objectid)
+labelled.df.geo$objectid <- as.character(as.numeric(labelled.df.geo$objectid) + 1)
 
 # In order to get the normalization information the lad16nm_clean columns from labelled.df.geo and normalization_per_local_authority.df have to be matched
 

@@ -140,6 +140,9 @@ labelled.df$Week  <- as.Date(cut(labelled.df$date, breaks = "week"))
 names(labelled.df)[names(labelled.df) == "sentiment class"] <- "sentiment_class" #rename sentiment class to a single string
 labelled.df$sentiment_class[labelled.df$sentiment_class %in% c("not_evaluable", "processing")] <- "neutral" # collapse not evaluable and procesing into neutral
 
+labelled.df$severe_reaction <- ifelse(labelled.df$reactions_report == "Severe-reaction", 1, 0)
+labelled.df$mild_reaction   <- ifelse(labelled.df$reactions_report == "Mild-reaction",   1, 0)
+
 # get the UK local authorities map and normalization data
 source("GeoMaps_and_Normalization.R")
 
