@@ -25,7 +25,10 @@ To use **Allergater**, download or clone the repo to a folder on your computer, 
 **Prior to running the Pipeline install:**
 
 ```r
-install.packages(c("readxl","stringi","quanteda","magrittr","tidyr","ggplot2","ggpubr","bookdown", "shiny","leaflet","sp","rgdal"))
+install.packages(c(
+  "readxl","stringi","quanteda","magrittr",
+  "tidyr","ggplot2","ggpubr","bookdown",
+  "shiny","leaflet","sp","rgdal"))
 ```
 
 and
@@ -33,7 +36,9 @@ and
 The latest ggmap must be installed from github:
 
 ```r
-if(!requireNamespace("devtools")) install.packages("devtools") devtools::install_github("dkahle/ggmap", ref = "tidyup")
+if(!requireNamespace("devtools"))
+install.packages("devtools")
+devtools::install_github("dkahle/ggmap", ref = "tidyup")
 ```
 
 And configured for use with a valid Google Maps API key: https://developers.google.com/maps/ . Add your valid API key to the config file under 'API_KEY'.
