@@ -78,6 +78,7 @@ number_of_businesses.geo <- ggmap(UKrefmap, extent='device', legend="bottomleft"
   scale_fill_distiller(name = "# businesses",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5)) +
   theme_nothing(legend=TRUE) +
   labs(title="Number of businesses", fill="")
+number_of_businesses.geo
 
 ggsave("number_of_businesses_map.png", plot = last_plot(), device = NULL, path = out.dir,
        width = 15, height = 15, units = "cm",
@@ -94,6 +95,7 @@ allergy_enquiries.summary.geo.raw <- ggmap(UKrefmap, extent='device', legend="bo
   scale_fill_distiller(name = "raw mentions",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5)) +
   theme_nothing(legend=TRUE) +
   labs(title="Allergy enquiries raw mentions", fill="")
+allergy_enquiries.summary.geo.raw
 
 ggsave("allergy_enquiries_map_raw.png", plot = last_plot(), device = NULL, path = out.dir,
        width = 15, height = 15, units = "cm",
@@ -108,6 +110,7 @@ allergy_enquiries.summary.geo.norm <- ggmap(UKrefmap, extent='device', legend="b
   scale_fill_distiller(name = "norm. mentions",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5)) +
   theme_nothing(legend=TRUE) +
   labs(title=paste("Allergy enquiries mentions / ", norm_factor, " restaurants"), fill="")
+allergy_enquiries.summary.geo.norm
 
 ggsave("allergy_enquiries_map_norm.png", plot = last_plot(), device = NULL, path = out.dir,
        width = 15, height = 15, units = "cm",
@@ -124,6 +127,7 @@ food_labelling.summary.geo.raw <- ggmap(UKrefmap, extent='device', legend="botto
   scale_fill_distiller(name = "raw mentions",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5)) +
   theme_nothing(legend=TRUE) +
   labs(title="Food labelling raw mentions", fill="")
+food_labelling.summary.geo.raw
 
 ggsave("food_labelling_map_raw.png", plot = last_plot(), device = NULL, path = out.dir,
        width = 15, height = 15, units = "cm",
@@ -138,6 +142,7 @@ food_labelling.summary.geo.norm <- ggmap(UKrefmap, extent='device', legend="bott
   scale_fill_distiller(name = "norm. mentions",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5)) +
   theme_nothing(legend=TRUE) +
   labs(title=paste("Food labelling mentions / ", norm_factor, " restaurants"), fill="")
+food_labelling.summary.geo.norm
 
 ggsave("food_labelling_map_norm.png", plot = last_plot(), device = NULL, path = out.dir,
        width = 15, height = 15, units = "cm",
@@ -154,6 +159,7 @@ mild_reaction.summary.geo.raw <- ggmap(UKrefmap, extent='device', legend="bottom
   scale_fill_distiller(name = "raw mentions",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5)) +
   theme_nothing(legend=TRUE) +
   labs(title="Mild reaction raw mentions", fill="")
+mild_reaction.summary.geo.raw
 
 ggsave("mild_reaction_map_raw.png", plot = last_plot(), device = NULL, path = out.dir,
        width = 15, height = 15, units = "cm",
@@ -168,6 +174,7 @@ mild_reaction.summary.geo.norm <- ggmap(UKrefmap, extent='device', legend="botto
   scale_fill_distiller(name = "norm. mentions",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5)) +
   theme_nothing(legend=TRUE) +
   labs(title=paste("Mild reaction mentions / ", norm_factor, " restaurants"), fill="")
+mild_reaction.summary.geo.norm
 
 ggsave("mild_reaction_map_norm.png", plot = last_plot(), device = NULL, path = out.dir,
        width = 15, height = 15, units = "cm",
@@ -184,6 +191,7 @@ severe_reaction.summary.geo.raw <- ggmap(UKrefmap, extent='device', legend="bott
   scale_fill_distiller(name = "raw mentions",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5)) +
   theme_nothing(legend=TRUE) +
   labs(title="Severe reaction raw mentions", fill="")
+severe_reaction.summary.geo.raw
 
 ggsave("severe_reaction_map_raw.png", plot = last_plot(), device = NULL, path = out.dir,
        width = 15, height = 15, units = "cm",
@@ -198,6 +206,7 @@ severe_reaction.summary.geo.norm <- ggmap(UKrefmap, extent='device', legend="bot
   scale_fill_distiller(name = "norm. mentions",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5)) +
   theme_nothing(legend=TRUE) +
   labs(title=paste("Severe reaction mentions / ", norm_factor, " restaurants"), fill="")
+severe_reaction.summary.geo.norm
 
 ggsave("severe_reaction_map_norm.png", plot = last_plot(), device = NULL, path = out.dir,
        width = 15, height = 15, units = "cm",
