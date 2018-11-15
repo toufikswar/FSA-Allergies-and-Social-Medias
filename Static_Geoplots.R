@@ -324,7 +324,7 @@ fourteen.shape <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
   theme_minimal() +
   xlab("Longitude") +
   ylab("Latitude") +
-  labs(title="Normalized Fourteen Allergen Mentions by Local Authority") +
+  labs(title=paste("Fourteen Allergen Mentions by Local Authority", "\n", "(Per", norm_factor, "Establishments)")) +
   facet_wrap(~ Allergen, labeller=labeller(Allergen = remove_underscores), ncol = 7)
 fourteen.shape
 
