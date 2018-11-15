@@ -24,18 +24,12 @@ labelled.df.geo.stream1_summary <- left_join(labelled.df.geo.stream1_summary,
                                              normalization_per_local_authority.df[,c("District","TotalEstablishments")], "District")
 labelled.df.geo.stream1_summary$objectid   <- as.character(labelled.df.geo.stream1_summary$objectid)
 
-# Normalizing the counts
-labelled.df.geo.stream1_summary$norm_count_allergy_enquiries <- norm_factor*labelled.df.geo.stream1_summary$count_allergy_enquiries / labelled.df.geo.stream1_summary$TotalEstablishments
-labelled.df.geo.stream1_summary$norm_count_food_labelling    <- norm_factor*labelled.df.geo.stream1_summary$count_food_labelling    / labelled.df.geo.stream1_summary$TotalEstablishments
-labelled.df.geo.stream1_summary$norm_count_mild_reaction     <- norm_factor*labelled.df.geo.stream1_summary$count_mild_reaction     / labelled.df.geo.stream1_summary$TotalEstablishments
-labelled.df.geo.stream1_summary$norm_count_severe_reaction   <- norm_factor*labelled.df.geo.stream1_summary$count_severe_reaction   / labelled.df.geo.stream1_summary$TotalEstablishments
-
 # Joing stream 1 issues with map polygons
 names_to_join    <- c("objectid","District","TotalEstablishments",
-                      "count_allergy_enquiries","norm_count_allergy_enquiries",
-                      "count_food_labelling",   "norm_count_food_labelling",
-                      "count_mild_reaction",    "norm_count_mild_reaction",
-                      "count_severe_reaction",  "norm_count_severe_reaction")
+                      "count_allergy_enquiries",
+                      "count_food_labelling",
+                      "count_mild_reaction",
+                      "count_severe_reaction")
 shape.df.stream1 <- left_join(shape.df,labelled.df.geo.stream1_summary[,names_to_join],by = c("id" = "objectid"))
 
 library(ggmap)
@@ -92,7 +86,8 @@ ggsave("allergy_enquiries_map_raw.png", plot = last_plot(), device = NULL, path 
 
 allergy_enquiries.summary.geo.norm <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
   geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
-  geom_polygon(data = shape.df.stream1[selection_allergy_enquiries,], aes(x=long, y=lat, group=group, fill=norm_count_allergy_enquiries), color = "black", size=0.2) +
+  geom_polygon(data = shape.df.stream1[selection_allergy_enquiries,], aes(x=long, y=lat, group=group, fill=norm_factor*count_allergy_enquiries/TotalEstablishments),
+               color = "black", size=0.2) +
   scale_x_continuous(limits = lon_range, expand = c(0,0)) +
   scale_y_continuous(limits = lat_range, expand = c(0,0)) +
   coord_map() +
@@ -124,7 +119,8 @@ ggsave("food_labelling_map_raw.png", plot = last_plot(), device = NULL, path = o
 
 food_labelling.summary.geo.norm <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
   geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
-  geom_polygon(data = shape.df.stream1[selection_food_labelling,], aes(x=long, y=lat, group=group, fill=norm_count_food_labelling), color = "black", size=0.2) +
+  geom_polygon(data = shape.df.stream1[selection_food_labelling,], aes(x=long, y=lat, group=group, fill=norm_factor*count_food_labelling/TotalEstablishments),
+               color = "black", size=0.2) +
   scale_x_continuous(limits = lon_range, expand = c(0,0)) +
   scale_y_continuous(limits = lat_range, expand = c(0,0)) +
   coord_map() +
@@ -156,7 +152,8 @@ ggsave("mild_reaction_map_raw.png", plot = last_plot(), device = NULL, path = ou
 
 mild_reaction.summary.geo.norm <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
   geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
-  geom_polygon(data = shape.df.stream1[selection_mild_reaction,], aes(x=long, y=lat, group=group, fill=norm_count_mild_reaction), color = "black", size=0.2) +
+  geom_polygon(data = shape.df.stream1[selection_mild_reaction,], aes(x=long, y=lat, group=group, fill=norm_factor*count_mild_reaction/TotalEstablishments),
+               color = "black", size=0.2) +
   scale_x_continuous(limits = lon_range, expand = c(0,0)) +
   scale_y_continuous(limits = lat_range, expand = c(0,0)) +
   coord_map() +
@@ -188,7 +185,8 @@ ggsave("severe_reaction_map_raw.png", plot = last_plot(), device = NULL, path = 
 
 severe_reaction.summary.geo.norm <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
   geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
-  geom_polygon(data = shape.df.stream1[selection_severe_reaction,], aes(x=long, y=lat, group=group, fill=norm_count_severe_reaction), color = "black", size=0.2) +
+  geom_polygon(data = shape.df.stream1[selection_severe_reaction,], aes(x=long, y=lat, group=group, fill=norm_factor*count_severe_reaction/TotalEstablishments),
+               color = "black", size=0.2) +
   scale_x_continuous(limits = lon_range, expand = c(0,0)) +
   scale_y_continuous(limits = lat_range, expand = c(0,0)) +
   coord_map() +

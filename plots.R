@@ -472,7 +472,7 @@ g2  <- ggplot(data = melted_percentage_mat, aes(Var1, Var2, fill = value))+  # p
                                    size = 12, hjust = 1))+
   coord_fixed()
 
-g2 <-g2 + ggtitle("Percentage Heatmap for 14 Allergens") +
+g2 <-g2 + ggtitle("Co-occurance Heatmap for 14 Allergens") +
   xlab("Allergens") + ylab("Co-occurance with")
 
 g2
@@ -526,7 +526,7 @@ g2  <- ggplot(data = melted_percentage_mat_other, aes(Var1, Var2, fill = value))
                                    size = 12, hjust = 1))+
   coord_fixed()
 
-g2 <-g2 + ggtitle("Percentage Heatmap for Other Allergens") +
+g2 <-g2 + ggtitle("Co-occurance Heatmap for Other Allergens") +
   xlab("Allergens") + ylab("Co-occurance with")
 g2
 
