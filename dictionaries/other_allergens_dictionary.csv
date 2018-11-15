@@ -11,13 +11,16 @@ gelatine,gelatine,
 seeds,seed,sunflower,poppy,seed oil,poppy_seeds,poppy seed,poppyseed,
 
 # spices
-spice,spice,coriander,garlic,cinnamon,chilli,
+spice,spice,coriander,cinnamon,chilli,
 
 # fruits
-fruit,fruit,apple,carrot,peach,plum,tomato,banana,strawberry,
+fruit,fruit,apple,peach,plum,strawberry,blueberry,raspberry,pear,orange,
+
+# Tomato
+tomato,tomato,
 
 # vegetables
-vegetable,vegetable,
+vegetable,vegetable,carrot,
 
 # latex
 latex,latex,
