@@ -114,7 +114,7 @@ allergies_and_social_media <- function(config_file)
     # Producing static plots
 
     source("plots.R")
-    source("Geoplotting_stream1.R")
+    source("Static_Geoplots.R")
   }
 
   # if(configuration$output_report) {
