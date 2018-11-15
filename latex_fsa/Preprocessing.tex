@@ -1,0 +1,41 @@
+\section{Data Cleaning and Preprocessing}
+\label{sec:preprocessing}
+
+\subsection{Cleaning}
+\label{subsec:cleaning}
+
+First step of our code is too import the data provided by FSA in Excel Format and to load it in a DataFrame.
+This will allow us to perform the data cleaning, which is composed of the following steps:
+
+\begin{itemize}
+  \item Remove of undesiered columns
+  \item Ordering of data per dates
+  \item Lowercasing of content
+  \item Removal of undesired characters from including Emoticons, Hashtags, URLs, HTML tags and symbols and punctuation
+  \item Removal of duplicates
+  \item Removal of spaces around conten (Trimming)
+\end{itemize}
+
+For further future analysis, some information like Username and Hashtags are extracted in inserted in a new column.
+
+Lots of content is composed of abbraviations. In order to be the more relevant possible in the future analysis, we convert those to there expander meaning for e.g. "asap" becomes "as soon as possible"
+
+\subsection{Normalization}
+\label{subsec:normalization}
+
+The normalization  refers to the transformation of words into a more uniform form.
+
+We perform stop words removals where words like "the" "an" and other articles are removed from the content. This allows compuation to be more efficiant, reducing content size.
+
+We apply the stemming process, an algorithm that converts inflected forms of words into their base forms (stems). This allows us to discard variations of words (like singular, plural).
+
+The words are treated like normalized elements that we call tokens.
+
+We need to convert this set of tokens to a corpus in order to perform matricial analysis.
+
+\subsection{Document Term Matrix}
+\label{subsec:DTM}
+
+After all our data is cleaned and preprocessed, our corpus is converted into a Data Term Matrix. A DTM is a matrix in which rows are documents, columns are terms, and cells indicate how often each term occurred in each document. In our case each line represents a tweet, forum entry or news.
+
+This is the base element that we will use for Stream 1 and Stream 2 analyis.
