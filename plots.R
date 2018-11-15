@@ -422,10 +422,14 @@ ggsave("labelling_reactions.png", plot = last_plot(), device = NULL, path = out.
       width = 30, height = 30, units = "cm",
        dpi = 300)
 
+#######################################
+
+#Creating Percentage Heatmap for Allergens with Co-occurances
 
 # to create subset for 14 allergens and other allergens
 fourteen_allergens.df.norm.subset <- labelled.df[,fourteen.allergen.names]
 other_allergens.df.norm.subset <- labelled.df[,other.allergen.names]
+
 
 # creating percentage matrix for heatmap 1 for fourteen allergens
 
@@ -435,70 +439,17 @@ number_of_cols = ncol(fourteen_allergens.df.norm.subset)
 mat = matrix(list(), nrow=number_of_cols, ncol=number_of_cols)
 
 for (i in 1:(number_of_cols)){
-  for (j in i:number_of_cols){
-    temp = table(fourteen_allergens.df.norm.subset[,i] + fourteen_allergens.df.norm.subset[,j])
-    count_one = table(fourteen_allergens.df.norm.subset[,j])
-    number_of_positive = as.vector(count_one[names(count_one) ==1])
-    count_of_both_present = as.vector(temp[names(temp) ==2]) # 1,1 - are cases where both are present
-    percentage_of_2 = 100*count_of_both_present/number_of_positive
-    #print(c(column_names[j],column_names[i], percentage_of_2))
-    mat[i, j] = percentage_of_2
-    mat[j, i] = percentage_of_2
-  }
-}
-
-percentage_mat = data.frame(mat)
-colnames(percentage_mat) = column_names
-rownames(percentage_mat) = column_names
-percentage_mat <- data.matrix(percentage_mat, rownames.force = NA)
-
-library(reshape2)
-melted_cormat_per_14 <- melt(percentage_mat)
-head(melted_cormat_per_14)
-
-# plot heatmap 1 for 14 allergens
-
-library(ggplot2)
-
-get_upper_tri <- function(percentage_mat){   # to get lower triangle part of the heatmap
-  percentage_mat[lower.tri(percentage_mat)]<- NA
-  return(percentage_mat)
-}
-upper_tri <- get_upper_tri(percentage_mat)
-
-melted_cormat_per_14 <- melt(upper_tri, na.rm = TRUE)  # Melt the correlation matrix
-
-g <- ggplot(data = melted_cormat_per_14, aes(Var1, Var2, fill = value))+  # Heatmap 1 for 14 Allergens
-  geom_tile(color = "white", aes(fill = value))+
-  geom_text(aes(label = round(value, 1)))+
-  scale_fill_gradient2(low = "white", high = "red", mid = "white",
-                       midpoint = 0, limit = c(0,70), space = "Lab",
-                       name="Percentage") +
-  theme_minimal()+
-  theme(axis.text.x = element_text(angle = 45, vjust = 1,
-                                   size = 12, hjust = 1))+
-  coord_fixed()
-
-p <-g + ggtitle("Percentage Heatmap-1 for 14 Allergens") +
-  xlab("Second allergen mentioned in the main allergen text") + ylab("Main allergen in the text")
-
-plot(p)
-
-ggsave("percentage_14_allergens_1.png", plot = g, device = NULL, path = out.dir,
-       width = 30, height = 30, units = "cm",
-       dpi = 300)
-
-# creating 14x14 matrix for heatmap 2 for fourteen allergens
-for (i in 1:(number_of_cols)){
-  for (j in i:number_of_cols){
+  for (j in 1:number_of_cols){
     temp = table(fourteen_allergens.df.norm.subset[,i] + fourteen_allergens.df.norm.subset[,j])
     count_one = table(fourteen_allergens.df.norm.subset[,i])
     number_of_positive = as.vector(count_one[names(count_one) ==1])
     count_of_both_present = as.vector(temp[names(temp) ==2]) # 1,1 - are cases where both are present
+    if (length(count_of_both_present) == 0){
+      count_of_both_present = 0
+    }
     percentage_of_2 = 100*count_of_both_present/number_of_positive
     #print(c(column_names[i],column_names[j], percentage_of_2))
     mat[i, j] = percentage_of_2
-    mat[j, i] = percentage_of_2
   }
 }
 
@@ -507,55 +458,33 @@ colnames(percentage_mat) = column_names
 rownames(percentage_mat) = column_names
 percentage_mat <- data.matrix(percentage_mat, rownames.force = NA)
 
+melted_percentage_mat = melt(percentage_mat)
+
 library(reshape2)
-melted_cormat_per_14 <- melt(percentage_mat)
-head(melted_cormat_per_14)
-
-#plot heatmap 2 for 14 allergens
-
 library(ggplot2)
 
-get_upper_tri <- function(percentage_mat){   # to get upper triangle part of the heatmap
-  percentage_mat[upper.tri(percentage_mat)]<- NA
-  return(percentage_mat)
-}
-
-upper_tri <- get_upper_tri(percentage_mat)
-
-melted_cormat_per_14 <- melt(upper_tri, na.rm = TRUE)  # Melt the correlation matrix
-
-g2  <- ggplot(data = melted_cormat_per_14, aes(Var1, Var2, fill = value))+  # plot heatmap 2 for 14 Allergens
+g2  <- ggplot(data = melted_percentage_mat, aes(Var1, Var2, fill = value))+  # plot heatmap 2 for 14 Allergens
   geom_tile(color = "white", aes(fill = value))+
   geom_text(aes(label = round(value, 1)))+
   scale_fill_gradient2(low = "white", high = "red", mid = "white",
-                       midpoint = 0, limit = c(0,70), space = "Lab",
+                       midpoint = 0, limit = c(0,100), space = "Lab",
                        name="Percentage") +
   theme_minimal()+
   theme(axis.text.x = element_text(angle = 45, vjust = 1,
                                    size = 12, hjust = 1))+
   coord_fixed()
 
-p2 <-g2 + ggtitle("Percentage Heatmap-2 for 14 Allergens") +
-  xlab("Second allergen mentioned in the main allergen text") + ylab("Main allergen in the text")
+p2 <-g2 + ggtitle("Percentage Heatmap for 14 Allergens") +
+  xlab("Allergens") + ylab("Co-occurance with") 
 
 plot(p2)
 
-ggsave("percentage_14_allergens_1.png", plot = p2, device = NULL, path = out.dir,
+ggsave("percentage_14_allergens.png", plot = p2, device = NULL, path = out.dir,
        width = 30, height = 30, units = "cm",
        dpi = 300)
 
 
-
-# other allergen heatmaps
-
-other_allergens.df.norm.subset <- other_allergens.df.norm[, other.allergen.names]
-
-#to stop getting error, some columns are excluded
-drops <- c("corn", "meat", "latex", "gelatine", "seed", "spice", "vegetable", "carrageenan", "coconut", "chestnut", "kiwi",
-           "pinenut", "fungus", "edible_insects", "kidney_beans", "pepper", "buckwheat")
-other_allergens.df.norm.subset <- other_allergens.df.norm.subset[ , !(names(other_allergens.df.norm.subset) %in% drops)]
-
-# creating percentage matrix for heatmap 1 for other allergens
+# creating percentage matrix for heatmap for other allergens
 
 column_names = colnames(other_allergens.df.norm.subset)
 number_of_rows = nrow(other_allergens.df.norm.subset)
@@ -563,75 +492,18 @@ number_of_cols = ncol(other_allergens.df.norm.subset)
 mat = matrix(list(), nrow=number_of_cols, ncol=number_of_cols)
 
 for (i in 1:(number_of_cols)){
-  for (j in i:number_of_cols){
-    temp = table(other_allergens.df.norm.subset[,i] + other_allergens.df.norm.subset[,j])
-    count_one = table(other_allergens.df.norm.subset[,j])
-    number_of_positive = as.vector(count_one[names(count_one) ==1])
-    count_of_both_present = as.vector(temp[names(temp) ==2]) # 1,1 - are cases where both are present
-    print(c(column_names[j],column_names[i], count_of_both_present))
-    percentage_of_2 = 100*count_of_both_present/number_of_positive
-    #print(c(column_names[j],column_names[i], percentage_of_2))
-    mat[i, j] = percentage_of_2
-    mat[j, i] = percentage_of_2
-  }
-}
-
-percentage_mat = data.frame(mat)
-percentage_mat
-colnames(percentage_mat) = column_names
-rownames(percentage_mat) = column_names
-percentage_mat <- data.matrix(percentage_mat, rownames.force = NA)
-
-library(reshape2)
-melted_cormat_per_14 <- melt(percentage_mat)
-head(melted_cormat_per_14)
-
-# plot heatmap 1 for 14 allergens
-
-library(ggplot2)
-
-get_upper_tri <- function(percentage_mat){   # to get lower triangle part of the heatmap
-  percentage_mat[lower.tri(percentage_mat)]<- NA
-  return(percentage_mat)
-}
-upper_tri <- get_upper_tri(percentage_mat)
-
-melted_cormat_per_14 <- melt(upper_tri, na.rm = TRUE)  # Melt the correlation matrix
-
-g <- ggplot(data = melted_cormat_per_14, aes(Var1, Var2, fill = value))+  # Heatmap 1 for 14 Allergens
-  geom_tile(color = "white", aes(fill = value))+
-  geom_text(aes(label = round(value, 1)))+
-  scale_fill_gradient2(low = "white", high = "red", mid = "white",
-                       midpoint = 0, limit = c(0,70), space = "Lab",
-                       name="Percentage") +
-  theme_minimal()+
-  theme(axis.text.x = element_text(angle = 45, vjust = 1,
-                                   size = 12, hjust = 1))+
-  coord_fixed()
-
-p <-g + ggtitle("Percentage Heatmap-1 for Other Allergens") +
-  xlab("Second allergen mentioned in the main allergen text") + ylab("Main allergen in the text")
-
-plot(p)
-
-ggsave("percentage_other_allergens_1.png", plot = p, device = NULL, path = out.dir,
-       width = 30, height = 30, units = "cm",
-       dpi = 300)
-
-
-
-# creating 14x14 matrix for heatmap 2 for other allergens
-
-for (i in 1:(number_of_cols)){
-  for (j in i:number_of_cols){
+  for (j in 1:number_of_cols){
     temp = table(other_allergens.df.norm.subset[,i] + other_allergens.df.norm.subset[,j])
     count_one = table(other_allergens.df.norm.subset[,i])
     number_of_positive = as.vector(count_one[names(count_one) ==1])
     count_of_both_present = as.vector(temp[names(temp) ==2]) # 1,1 - are cases where both are present
+    if (length(count_of_both_present) == 0){
+      count_of_both_present = 0
+    }
+    print(c(column_names[i],column_names[j], count_of_both_present))
     percentage_of_2 = 100*count_of_both_present/number_of_positive
-    #print(c(column_names[i],column_names[j], percentage_of_2))
+    #print(c(column_names[j],column_names[i], percentage_of_2))
     mat[i, j] = percentage_of_2
-    mat[j, i] = percentage_of_2
   }
 }
 
@@ -639,29 +511,15 @@ percentage_mat = data.frame(mat)
 colnames(percentage_mat) = column_names
 rownames(percentage_mat) = column_names
 percentage_mat <- data.matrix(percentage_mat, rownames.force = NA)
+melted_percentage_mat_other = melt(percentage_mat)
 
-library(reshape2)
-melted_cormat_per_14 <- melt(percentage_mat)
-head(melted_cormat_per_14)
+# plot heatmap for other allergens
 
-#plot heatmap 2 for 14 allergens
-
-library(ggplot2)
-
-get_upper_tri <- function(percentage_mat){   # to get upper triangle part of the heatmap
-  percentage_mat[upper.tri(percentage_mat)]<- NA
-  return(percentage_mat)
-}
-
-upper_tri <- get_upper_tri(percentage_mat)
-
-melted_cormat_per_14 <- melt(upper_tri, na.rm = TRUE)  # Melt the correlation matrix
-
-g2  <- ggplot(data = melted_cormat_per_14, aes(Var1, Var2, fill = value))+  # plot heatmap 2 for 14 Allergens
+g2  <- ggplot(data = melted_percentage_mat_other, aes(Var1, Var2, fill = value))+  # plot heatmap 2 for 14 Allergens
   geom_tile(color = "white", aes(fill = value))+
   geom_text(aes(label = round(value, 1)))+
   scale_fill_gradient2(low = "white", high = "red", mid = "white",
-                       midpoint = 0, limit = c(0,70), space = "Lab",
+                       midpoint = 0, limit = c(0,100), space = "Lab",
                        name="Percentage") +
   theme_minimal()+
   theme(axis.text.x = element_text(angle = 45, vjust = 1,
@@ -669,14 +527,13 @@ g2  <- ggplot(data = melted_cormat_per_14, aes(Var1, Var2, fill = value))+  # pl
   coord_fixed()
 
 p2 <-g2 + ggtitle("Percentage Heatmap for Other Allergens") +
-  xlab("Second allergen mentioned in the main allergen text") + ylab("Main allergen in the text")
+  xlab("Allergens") + ylab("Co-occurance with") 
 
 plot(p2)
 
-ggsave("percentage_other_allergens_2.png", plot = p2, device = NULL, path = out.dir,
-       width = 30, height = 30, units = "cm",
+ggsave("percentage_other_allergens.png", plot = p2, device = NULL, path = out.dir,
+       width = 50, height = 50, units = "cm",
        dpi = 300)
-
 
 
 cat(paste("Finished static plots script","\n",sep=""))
