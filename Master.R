@@ -17,6 +17,8 @@ output_dir <- "output_files"
 # If output_dir doesn't exist, create it.
 if(!dir.exists(file.path(output_dir))) dir.create(file.path(output_dir))
 
+plots_output_dir <- ""
+
 image_preprocessing <- ""
 image_analysis      <- ""
 
@@ -45,7 +47,13 @@ allergies_and_social_media <- function(config_file)
   output_dir_tmp <- deparse(substitute(output_dir))
   output_dir     <- paste(output_dir,"/",configuration$project_name,"/",sep="")
   assign(output_dir_tmp,output_dir,pos=parent.frame())
-  dir.create(output_dir,showWarnings = FALSE)
+  if(!dir.exists(file.path(output_dir))) dir.create(output_dir,showWarnings = FALSE)
+
+  # Create the plots output directory. Use deparse and assign functions to change the configuration global variable value
+  plots_output_dir_tmp <- deparse(substitute(plots_output_dir))
+  plots_output_dir     <- paste(output_dir,"plots/",sep="")
+  assign(plots_output_dir_tmp,plots_output_dir,pos=parent.frame())
+  if(!dir.exists(file.path(plots_output_dir))) dir.create(plots_output_dir,showWarnings = FALSE)
 
   # Set preprocessing image file name. Use deparse and assign functions to change the configuration global variable value
   image_preprocessing_tmp <- deparse(substitute(image_preprocessing))

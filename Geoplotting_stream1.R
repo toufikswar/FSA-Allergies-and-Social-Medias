@@ -1,7 +1,7 @@
 load(image_analysis)
 
 # output file where the plots are saved
-out.dir <- file.path(paste(output_dir,"/",sep=""))
+out.dir <- file.path(plots_output_dir)
 
 # normalization factor
 norm_factor <- 100
@@ -37,17 +37,6 @@ names_to_join    <- c("objectid","District","TotalEstablishments",
                       "count_mild_reaction",    "norm_count_mild_reaction",
                       "count_severe_reaction",  "norm_count_severe_reaction")
 shape.df.stream1 <- left_join(shape.df,labelled.df.geo.stream1_summary[,names_to_join],by = c("id" = "objectid"))
-
-# fff <- !is.na(labelled.df.geo.stream1_summary$count) & labelled.df.geo.stream1_summary$count > 0
-# yyy <- labelled.df.geo.stream1_summary[fff,]
-# print(yyy)
-# print(nrow(yyy))
-# print(nrow(labelled.df.geo.stream1_summary))
-#
-# print("count         # restaurants        norm_count     District")
-# for(i in 1:nrow(yyy)) {
-#   print(paste(yyy$count[i],"       ",yyy$TotalEstablishments[i],"     ",round(yyy$norm_count[i],5),"    ",as.character(yyy$lad16nm[i]),sep=""))
-# }
 
 library(ggmap)
 library(scales)

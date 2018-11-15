@@ -6,8 +6,7 @@ cat(paste("Start static plots script","\n",sep=""))
 load(image_analysis)
 
 # output directory where the plots are saved
-out.dir <- file.path(paste(output_dir,"plots",sep=""))
-if(!dir.exists(file.path(out.dir))) dir.create(file.path(out.dir))
+out.dir <- file.path(plots_output_dir)
 
 # Removal of News as a datasource from our data
 labelled.df <- subset(labelled.df, source != "News")
@@ -192,7 +191,7 @@ stream1.issues.df.long <- gather(stream1.issues.df, Issue, "Mentions", stream1.i
 stream1.issues.sentiment.groupedby <-stream1.issues.df.long %>%
   group_by(Issue, sentiment_class) %>%
   summarise(counts = sum(Mentions))
-  
+
 stream1.issues.bar <- ggplot(stream1.issues.sentiment.groupedby,
                              aes(x = gsub("_", " ", Issue), y = counts, fill = sentiment_class)) +
   geom_bar(stat = "identity") +
@@ -232,14 +231,14 @@ fourteen.allergen.mentions <- ggplot(fourteen.allergen.total.long,
                                          y = percentage, fill = severity)) +
   geom_bar(width = 0.4 ,position = "dodge", stat="identity") +
   theme_minimal() +
-  scale_fill_manual(values=c("#ffa64d", "#cc0000"), 
+  scale_fill_manual(values=c("#ffa64d", "#cc0000"),
                     breaks=c("perc_mild", "perc_severe"),
                     labels=c("% Midl", "% Severe")) +
   labs(x= "Allergens", y="Percentage", fill = "Severity") +
   ggtitle("Percentage of Mild/Severe reactions over 14 allergens mentions") +
   coord_flip()
 fourteen.allergen.mentions
-  
+
 #######
 ## Subsetting to remove "_' from the Allergy names
 int_14allergen_react.df <- subset(labelled.df.long, Mentions > 0 & Allergen %in% fourteen.allergen.names)
@@ -458,10 +457,9 @@ colnames(percentage_mat) = column_names
 rownames(percentage_mat) = column_names
 percentage_mat <- data.matrix(percentage_mat, rownames.force = NA)
 
-melted_percentage_mat = melt(percentage_mat)
-
 library(reshape2)
 library(ggplot2)
+melted_percentage_mat = melt(percentage_mat)
 
 g2  <- ggplot(data = melted_percentage_mat, aes(Var1, Var2, fill = value))+  # plot heatmap 2 for 14 Allergens
   geom_tile(color = "white", aes(fill = value))+
@@ -474,12 +472,14 @@ g2  <- ggplot(data = melted_percentage_mat, aes(Var1, Var2, fill = value))+  # p
                                    size = 12, hjust = 1))+
   coord_fixed()
 
-p2 <-g2 + ggtitle("Percentage Heatmap for 14 Allergens") +
-  xlab("Allergens") + ylab("Co-occurance with") 
+g2 <-g2 + ggtitle("Percentage Heatmap for 14 Allergens") +
+  xlab("Allergens") + ylab("Co-occurance with")
 
-plot(p2)
+g2
+# plot(p2)
 
-ggsave("percentage_14_allergens.png", plot = p2, device = NULL, path = out.dir,
+# ggsave("percentage_14_allergens.png", plot = p2, device = NULL, path = out.dir,
+ggsave("percentage_14_allergens.png", plot = last_plot(), device = NULL, path = out.dir,
        width = 30, height = 30, units = "cm",
        dpi = 300)
 
@@ -500,7 +500,7 @@ for (i in 1:(number_of_cols)){
     if (length(count_of_both_present) == 0){
       count_of_both_present = 0
     }
-    print(c(column_names[i],column_names[j], count_of_both_present))
+    # print(c(column_names[i],column_names[j], count_of_both_present))
     percentage_of_2 = 100*count_of_both_present/number_of_positive
     #print(c(column_names[j],column_names[i], percentage_of_2))
     mat[i, j] = percentage_of_2
@@ -526,12 +526,14 @@ g2  <- ggplot(data = melted_percentage_mat_other, aes(Var1, Var2, fill = value))
                                    size = 12, hjust = 1))+
   coord_fixed()
 
-p2 <-g2 + ggtitle("Percentage Heatmap for Other Allergens") +
-  xlab("Allergens") + ylab("Co-occurance with") 
+g2 <-g2 + ggtitle("Percentage Heatmap for Other Allergens") +
+  xlab("Allergens") + ylab("Co-occurance with")
+g2
 
-plot(p2)
+# plot(p2)
 
-ggsave("percentage_other_allergens.png", plot = p2, device = NULL, path = out.dir,
+# ggsave("percentage_other_allergens.png", plot = p2, device = NULL, path = out.dir,
+ggsave("percentage_other_allergens.png", plot = last_plot(), device = NULL, path = out.dir,
        width = 50, height = 50, units = "cm",
        dpi = 300)
 
