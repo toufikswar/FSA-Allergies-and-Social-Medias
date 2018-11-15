@@ -200,7 +200,7 @@ ggsave("severe_reaction_map_norm.png", plot = last_plot(), device = NULL, path =
        dpi = 300)
 
 
-### 14 Allergen Analysis
+########################## 14 Allergen Analysis ########################################
 # Prepare two dataframes for plotting
 # labelled.df.geo.allergenSummary for centroid based plots
 # shape.df for Choropleth plots by local authority
@@ -211,6 +211,7 @@ labelled.df.geo.allergens <- labelled.df.geo[,c("original_content",
                                                 "objectid",
                                                 "food_labelling",
                                                 "reactions_report",
+                                                "allergy_enquiries",
                                                 "lat", #latitude of District, not of original entry
                                                 "long", #longitude of District, not of original entry
                                                 "District",
@@ -226,7 +227,7 @@ labelled.df.geo.allergenSummary <- gather(labelled.df.geo.allergens,
                                )
 
 labelled.df.geo.allergenSummary <- labelled.df.geo.allergenSummary %>%
-  group_by(sentiment_class, Allergen, District, long, lat, objectid, food_labelling, reactions_report) %>%
+  group_by(sentiment_class, Allergen, District, long, lat, objectid, food_labelling, reactions_report, allergy_enquiries) %>%
   summarise(count=sum(Mentions))
 
 labelled.df.geo.allergenSummary <- subset(labelled.df.geo.allergenSummary, count > 0)
@@ -239,7 +240,9 @@ labelled.df.geo.allergenSummary <- left_join(labelled.df.geo.allergenSummary,
 labelled.df.geo.allergenSummary$objectid   <- as.character(labelled.df.geo.allergenSummary$objectid)
 
 # Join allergens with map polygons
-allergens_to_join    <- c("objectid","District","TotalEstablishments","Allergen","sentiment_class", "count", "food_labelling", "reactions_report")
+allergens_to_join    <- c("objectid","District","TotalEstablishments",
+                          "Allergen","sentiment_class", "count", "food_labelling", 
+                          "allergy_enquiries", "reactions_report")
 
 shape.df.allergens <- left_join(shape.df,labelled.df.geo.allergenSummary[,allergens_to_join], by = c("id" = "objectid"))
 
@@ -257,7 +260,7 @@ fourteen.summary.geo <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
   scale_x_discrete(limits = lon_range, expand = c(0,0)) +
   scale_y_discrete(limits = lat_range, expand = c(0,0)) +
   theme_nothing(legend=TRUE) +
-  labs(title=paste("14 Allergen Mentions by Sentiment Class","\n", "(Per ", norm_factor, " Establishments"), 
+  labs(title=paste("14 Allergen Mentions by Sentiment Class","\n", "(Per ", norm_factor, " Establishments)"), 
        fill="", size = "Norm. Mentions", colour = "Sentiment Class")
 fourteen.summary.geo
 
@@ -305,7 +308,7 @@ ggsave("All_allergens_sentiment_by_authority.png", plot = last_plot(), device = 
        width = 20, height = 20, units = "cm",
        dpi = 300)
 
-# Allergen Choropleths: 
+############################ Allergen Choropleths #################################### 
 
 remove_underscores <- function(string) { # Moved to utils, here temporarily for testing
   new.string <- gsub("_"," ", string)
@@ -353,6 +356,29 @@ fourteen.labelling.shape
 ggsave("Fourteen_allergens_labelling.png", plot = last_plot(), device = NULL, path = out.dir,
        width = 35, height = 20, units = "cm",
        dpi = 300)
+
+# 14 Allergens in the context of Allergy Enquiries
+fourteen.enquiries.shape <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
+  geom_polygon(data = subset(shape.df.allergens, Allergen %in% fourteen.allergen.names & 
+                               Allergen != "nuts" &
+                               allergy_enquiries > 0 ), 
+               aes(x=long, y=lat, group=group, 
+                   fill=norm_factor*count/TotalEstablishments),
+               color = "black", size=0.01) +
+  scale_fill_distiller(name = "Normalized Mentions", palette = "Spectral", breaks=pretty_breaks(n = 5)) +
+  scale_x_continuous(limits = lon_range, expand = c(0,0)) +
+  scale_y_continuous(limits = lat_range, expand = c(0,0)) +
+  theme_minimal() +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  labs(title=paste("Fourteen Allergen Mentions in Association with an Enquiry ", "\n", "(Per ", norm_factor, " Establishments)")) +
+  facet_wrap(~ Allergen, labeller=labeller(Allergen = remove_underscores), ncol = 7)
+fourteen.enquiries.shape
+
+ggsave("Fourteen_allergens_enquiries.png", plot = last_plot(), device = NULL, path = out.dir,
+       width = 35, height = 20, units = "cm",
+       dpi = 300)
+
 
 # 14 Allergens in the context of mild reactions:
 fourteen.mild.reactions.shape <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
@@ -438,6 +464,29 @@ other.labelling.shape
 ggsave("other_allergens_labelling.png", plot = last_plot(), device = NULL, path = out.dir,
        width = 35, height = 40, units = "cm",
        dpi = 300)
+
+other.enquiries.shape <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
+  geom_polygon(data = subset(shape.df.allergens, Allergen %in% other.allergen.names & 
+                               Allergen != "nuts" &
+                               allergy_enquiries > 0 ), 
+               aes(x=long, y=lat, group=group, 
+                   fill=norm_factor*count/TotalEstablishments),
+               color = "black", size=0.01) +
+  scale_fill_distiller(name = "Normalized Mentions", palette = "Spectral", breaks=pretty_breaks(n = 5)) +
+  scale_x_continuous(limits = lon_range, expand = c(0,0)) +
+  scale_y_continuous(limits = lat_range, expand = c(0,0)) +
+  theme_minimal() +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  labs(title=paste("Other Allergen' Mentions in the Context of Food labelling ", "\n", "(Per ", norm_factor, " Establishments)")) +
+  facet_wrap(~ Allergen, labeller=labeller(Allergen = remove_underscores), ncol = 7)
+other.enquiries.shape
+
+ggsave("other_allergens_enquiries.png", plot = last_plot(), device = NULL, path = out.dir,
+       width = 35, height = 40, units = "cm",
+       dpi = 300)
+
+
 
 # Other Allergens associated with mild reactions:
 other.mild.reactions.shape <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
