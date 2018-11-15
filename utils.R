@@ -375,6 +375,17 @@ get_time_units <- function(timediff)
   return(the_time_unit)
 
 }
+
+
+### Simple function to remove underscores
+
+remove_underscores <- function(string) {
+  new.string <- gsub("_"," ", string)
+  paste(new.string)
+}
+
+
+
 #================================================================
 
 
