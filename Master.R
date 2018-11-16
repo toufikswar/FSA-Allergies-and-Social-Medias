@@ -2,11 +2,15 @@
 
 source("utils.R")
 
+# Detect operating system
+Operative_system <- as.character(Sys.info()["sysname"])
+
 # Data structure with all the configuration variables
 configuration = list(input_dir                = "",
                      input_file_list          = vector(),
                      sheet_name               = "",
                      project_name             = "",
+                     static_plot_format       = "png",
                      rerun_data_preprocessing = FALSE,
                      rerun_data_labelling     = FALSE,
                      do_static_plots          = FALSE,
@@ -18,6 +22,9 @@ output_dir <- "output_files"
 if(!dir.exists(file.path(output_dir))) dir.create(file.path(output_dir))
 
 plots_output_dir <- ""
+
+output_format <- "png"
+possible_static_plots_formats <- c("eps","ps","pdf","jpeg","tiff","png","bmp","svg")
 
 image_preprocessing <- ""
 image_analysis      <- ""
@@ -32,16 +39,32 @@ allergies_and_social_media <- function(config_file)
 
   # Check for reasonable inputs
   if(length(configuration$input_file_list) == 0) {
-    stop("Input file list has no elements.\n  Need to specify it with the flag input_file_list: followed with a list of file names separated by white-spaces.")
+    stop("Input file list has no elements.
+         \n  Need to specify it with the flag input_file_list: followed with a list of file names separated by white-spaces.")
   } else if(configuration$sheet_name == "") {
-    stop("Sheed name not specified.\n  Need to specify it with the flag sheet_name: followed with the sheet name.")
+    stop("Sheed name not specified.
+         \n  Need to specify it with the flag sheet_name: followed with the sheet name.")
   } else if(configuration$project_name == "") {
-    stop("Project name not specified.\n  Need to specify it with the flag project_name: followed with the project name.")
+    stop("Project name not specified.
+         \n  Need to specify it with the flag project_name: followed with the project name.")
   } else if(configuration$output_report & !configuration$do_static_plots) {
-    stop("Produce output report is set to yes, but do static plots is set to no.\n  If produce output report is set to yes then do static plots has to be set to yes as well.")
+    stop("Produce output report is set to yes, but do static plots is set to no.
+         \n  If produce output report is set to yes then do static plots has to be set to yes as well.")
+  }
+
+  # check if static plots format is one of the predefined formats
+  if(configuration$do_static_plots & !(configuration$static_plot_format %in% possible_static_plots_formats)) {
+    all_formats <- paste(possible_static_plots_formats,collapse = ", ")
+    stop(paste("Specified static plots format (static_plot_format: variable) is ",configuration$static_plot_format,
+               ", not consistent with any of the possible formats (",all_formats,").",sep=""))
   }
 
   print_config(configuration)
+
+  # static plots static. Use deparse and assign functions to change the configuration global variable value
+  output_format_tmp <- deparse(substitute(output_format))
+  output_format     <- configuration$static_plot_format
+  assign(output_format_tmp,output_format,pos=parent.frame())
 
   # Create the output directory. Use deparse and assign functions to change the configuration global variable value
   output_dir_tmp <- deparse(substitute(output_dir))
@@ -108,8 +131,7 @@ allergies_and_social_media <- function(config_file)
     cat("\n")
   }
 
-
-  # IPORTANT NOTE: this part of the code not final
+  # Static plotting
   if(configuration$do_static_plots) {
     # Producing static plots
 
@@ -131,7 +153,6 @@ allergies_and_social_media <- function(config_file)
 config_file <- "config_files/config_Data_set_1.txt"
 # config_file <- "config_files/config_Data_set_2.txt"
 allergies_and_social_media(config_file)
-
 
 
 #

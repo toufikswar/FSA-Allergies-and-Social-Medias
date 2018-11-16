@@ -82,6 +82,9 @@ read_config_file <- function(config_file,configuration)
       } else if(vec_line[2] == "NO" | vec_line[2] == "No" | vec_line[2] == "no" | vec_line[2] == "n" | vec_line[2] == "N") {
         configuration$launch_shiny_dash_board <- FALSE
       }
+    } else if(length(vec_line) == 2 & vec_line[1] == "static_plot_format:") {
+      # static plots format
+      configuration$static_plot_format <- vec_line[2]
     }
 
   }
@@ -115,6 +118,9 @@ print_config <- function(configuration)
   answer <- "No"
   if(configuration$do_static_plots) answer <- "Yes"
   cat(paste("  Doing static plots:             ",answer,"\n",sep=""))
+  if(configuration$do_static_plots) {
+    cat(paste("    Static plots format:          ",configuration$static_plot_format,"\n",sep=""))
+  }
   answer <- "No"
   if(configuration$output_report) answer <- "Yes"
   cat(paste("  Producing output report:        ",answer,"\n",sep=""))

@@ -55,15 +55,14 @@ for(i in 1:2) lat_range[i] <- lat_range[i] + (-1)^i*delta*scale_lat[i]
 number_of_businesses.geo <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
   geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
   geom_polygon(data = shape.df.stream1, aes(x=long, y=lat, group=group, fill=TotalEstablishments), color = "black", size=0.2) +
-  scale_x_discrete(limits = lon_range, expand = c(0,0)) +
-  scale_y_discrete(limits = lat_range, expand = c(0,0)) +
-  coord_map() +
   scale_fill_distiller(name = "# businesses",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5)) +
+  xlim(lon_range) +
+  ylim(lat_range) +
   theme_nothing(legend=TRUE) +
   labs(title="Number of businesses", fill="")
 number_of_businesses.geo
 
-ggsave("number_of_businesses_map.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("number_of_businesses_map.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
@@ -72,15 +71,14 @@ selection_allergy_enquiries <- shape.df.stream1$count_allergy_enquiries > 0
 allergy_enquiries.summary.geo.raw <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
   geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
   geom_polygon(data = shape.df.stream1[selection_allergy_enquiries,], aes(x=long, y=lat, group=group, fill=count_allergy_enquiries), color = "black", size=0.2) +
-  scale_x_continuous(limits = lon_range, expand = c(0,0)) +
-  scale_y_continuous(limits = lat_range, expand = c(0,0)) +
-  coord_map() +
   scale_fill_distiller(name = "raw mentions",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5)) +
+  xlim(lon_range) +
+  ylim(lat_range) +
   theme_nothing(legend=TRUE) +
   labs(title="Allergy enquiries raw mentions", fill="")
 allergy_enquiries.summary.geo.raw
 
-ggsave("allergy_enquiries_map_raw.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("allergy_enquiries_map_raw.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
@@ -88,15 +86,14 @@ allergy_enquiries.summary.geo.norm <- ggmap(UKrefmap, extent='device', legend="b
   geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
   geom_polygon(data = shape.df.stream1[selection_allergy_enquiries,], aes(x=long, y=lat, group=group, fill=norm_factor*count_allergy_enquiries/TotalEstablishments),
                color = "black", size=0.2) +
-  scale_x_continuous(limits = lon_range, expand = c(0,0)) +
-  scale_y_continuous(limits = lat_range, expand = c(0,0)) +
-  coord_map() +
   scale_fill_distiller(name = "norm. mentions",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5)) +
+  xlim(lon_range) +
+  ylim(lat_range) +
   theme_nothing(legend=TRUE) +
   labs(title=paste("Allergy enquiries mentions / ", norm_factor, " restaurants"), fill="")
 allergy_enquiries.summary.geo.norm
 
-ggsave("allergy_enquiries_map_norm.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("allergy_enquiries_map_norm.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
@@ -105,15 +102,14 @@ selection_food_labelling <- shape.df.stream1$count_food_labelling > 0
 food_labelling.summary.geo.raw <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
   geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
   geom_polygon(data = shape.df.stream1[selection_food_labelling,], aes(x=long, y=lat, group=group, fill=count_food_labelling), color = "black", size=0.2) +
-  scale_x_continuous(limits = lon_range, expand = c(0,0)) +
-  scale_y_continuous(limits = lat_range, expand = c(0,0)) +
-  coord_map() +
   scale_fill_distiller(name = "raw mentions",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5)) +
+  xlim(lon_range) +
+  ylim(lat_range) +
   theme_nothing(legend=TRUE) +
   labs(title="Food labelling raw mentions", fill="")
 food_labelling.summary.geo.raw
 
-ggsave("food_labelling_map_raw.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("food_labelling_map_raw.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
@@ -121,15 +117,14 @@ food_labelling.summary.geo.norm <- ggmap(UKrefmap, extent='device', legend="bott
   geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
   geom_polygon(data = shape.df.stream1[selection_food_labelling,], aes(x=long, y=lat, group=group, fill=norm_factor*count_food_labelling/TotalEstablishments),
                color = "black", size=0.2) +
-  scale_x_continuous(limits = lon_range, expand = c(0,0)) +
-  scale_y_continuous(limits = lat_range, expand = c(0,0)) +
-  coord_map() +
   scale_fill_distiller(name = "norm. mentions",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5)) +
+  xlim(lon_range) +
+  ylim(lat_range) +
   theme_nothing(legend=TRUE) +
   labs(title=paste("Food labelling mentions / ", norm_factor, " restaurants"), fill="")
 food_labelling.summary.geo.norm
 
-ggsave("food_labelling_map_norm.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("food_labelling_map_norm.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
@@ -138,15 +133,14 @@ selection_mild_reaction <- shape.df.stream1$count_mild_reaction > 0
 mild_reaction.summary.geo.raw <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
   geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
   geom_polygon(data = shape.df.stream1[selection_mild_reaction,], aes(x=long, y=lat, group=group, fill=count_mild_reaction), color = "black", size=0.2) +
-  scale_x_continuous(limits = lon_range, expand = c(0,0)) +
-  scale_y_continuous(limits = lat_range, expand = c(0,0)) +
-  coord_map() +
   scale_fill_distiller(name = "raw mentions",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5)) +
+  xlim(lon_range) +
+  ylim(lat_range) +
   theme_nothing(legend=TRUE) +
   labs(title="Mild reaction raw mentions", fill="")
 mild_reaction.summary.geo.raw
 
-ggsave("mild_reaction_map_raw.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("mild_reaction_map_raw.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
@@ -154,15 +148,14 @@ mild_reaction.summary.geo.norm <- ggmap(UKrefmap, extent='device', legend="botto
   geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
   geom_polygon(data = shape.df.stream1[selection_mild_reaction,], aes(x=long, y=lat, group=group, fill=norm_factor*count_mild_reaction/TotalEstablishments),
                color = "black", size=0.2) +
-  scale_x_continuous(limits = lon_range, expand = c(0,0)) +
-  scale_y_continuous(limits = lat_range, expand = c(0,0)) +
-  coord_map() +
   scale_fill_distiller(name = "norm. mentions",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5)) +
+  xlim(lon_range) +
+  ylim(lat_range) +
   theme_nothing(legend=TRUE) +
   labs(title=paste("Mild reaction mentions / ", norm_factor, " restaurants"), fill="")
 mild_reaction.summary.geo.norm
 
-ggsave("mild_reaction_map_norm.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("mild_reaction_map_norm.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
@@ -171,15 +164,14 @@ selection_severe_reaction <- shape.df.stream1$count_severe_reaction > 0
 severe_reaction.summary.geo.raw <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
   geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
   geom_polygon(data = shape.df.stream1[selection_severe_reaction,], aes(x=long, y=lat, group=group, fill=count_severe_reaction), color = "black", size=0.2) +
-  scale_x_continuous(limits = lon_range, expand = c(0,0)) +
-  scale_y_continuous(limits = lat_range, expand = c(0,0)) +
-  coord_map() +
   scale_fill_distiller(name = "raw mentions",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5)) +
+  xlim(lon_range) +
+  ylim(lat_range) +
   theme_nothing(legend=TRUE) +
   labs(title="Severe reaction raw mentions", fill="")
 severe_reaction.summary.geo.raw
 
-ggsave("severe_reaction_map_raw.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("severe_reaction_map_raw.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
@@ -187,15 +179,14 @@ severe_reaction.summary.geo.norm <- ggmap(UKrefmap, extent='device', legend="bot
   geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
   geom_polygon(data = shape.df.stream1[selection_severe_reaction,], aes(x=long, y=lat, group=group, fill=norm_factor*count_severe_reaction/TotalEstablishments),
                color = "black", size=0.2) +
-  scale_x_continuous(limits = lon_range, expand = c(0,0)) +
-  scale_y_continuous(limits = lat_range, expand = c(0,0)) +
-  coord_map() +
   scale_fill_distiller(name = "norm. mentions",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5)) +
+  xlim(lon_range) +
+  ylim(lat_range) +
   theme_nothing(legend=TRUE) +
   labs(title=paste("Severe reaction mentions / ", norm_factor, " restaurants"), fill="")
 severe_reaction.summary.geo.norm
 
-ggsave("severe_reaction_map_norm.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("severe_reaction_map_norm.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
@@ -219,10 +210,10 @@ labelled.df.geo.allergens <- labelled.df.geo[,c("original_content",
                                                 "sentiment_class")]
 
 library(tidyr)
-labelled.df.geo.allergenSummary <- gather(labelled.df.geo.allergens, 
-                               Allergen, 
-                               "Mentions", 
-                               c(fourteen.allergen.names,other.allergen.names), 
+labelled.df.geo.allergenSummary <- gather(labelled.df.geo.allergens,
+                               Allergen,
+                               "Mentions",
+                               c(fourteen.allergen.names,other.allergen.names),
                                factor_key = TRUE
                                )
 
@@ -234,37 +225,37 @@ labelled.df.geo.allergenSummary <- subset(labelled.df.geo.allergenSummary, count
 labelled.df.geo.allergenSummary$sentiment_class <- factor(labelled.df.geo.allergenSummary$sentiment_class, levels = c("negative", "neutral", "positive"))
 labelled.df.geo.allergenSummary <- labelled.df.geo.allergenSummary[!is.na(labelled.df.geo.allergenSummary$lat),]
 
-# join the normalization information
+# join the normalization infomation
 labelled.df.geo.allergenSummary <- left_join(labelled.df.geo.allergenSummary,
                                              normalization_per_local_authority.df[,c("District","TotalEstablishments")], "District")
 labelled.df.geo.allergenSummary$objectid   <- as.character(labelled.df.geo.allergenSummary$objectid)
 
 # Join allergens with map polygons
 allergens_to_join    <- c("objectid","District","TotalEstablishments",
-                          "Allergen","sentiment_class", "count", "food_labelling", 
+                          "Allergen","sentiment_class", "count", "food_labelling",
                           "allergy_enquiries", "reactions_report")
 
 shape.df.allergens <- left_join(shape.df,labelled.df.geo.allergenSummary[,allergens_to_join], by = c("id" = "objectid"))
 
-# 14 Allergens by sentiment 
+# 14 Allergens by sentiment
 # (each point is centered inside local authority with size proportional to normalized count)
 # 14 Allergens:
 fourteen.summary.geo <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
   geom_path(data=shape.df, aes(x=long, y=lat, group=group),
             color="black", size=0.3) +
-  geom_point(data = subset(labelled.df.geo.allergenSummary, Allergen %in% fourteen.allergen.names & Allergen != "nuts"), 
-             aes(x = long, y = lat, colour = gsub("_"," ",sentiment_class), 
+  geom_point(data = subset(labelled.df.geo.allergenSummary, Allergen %in% fourteen.allergen.names & Allergen != "nuts"),
+             aes(x = long, y = lat, colour = gsub("_"," ",sentiment_class),
                  size = norm_factor*count/TotalEstablishments),
              alpha = 0.3) +
   scale_colour_manual(values = c("red","white", "navy"))+
   scale_x_discrete(limits = lon_range, expand = c(0,0)) +
   scale_y_discrete(limits = lat_range, expand = c(0,0)) +
   theme_nothing(legend=TRUE) +
-  labs(title=paste("14 Allergen Mentions by Sentiment Class","\n", "(Per ", norm_factor, " Establishments)"), 
+  labs(title=paste("14 Allergen Mentions by Sentiment Class","\n", "(Per ", norm_factor, " Establishments)"),
        fill="", size = "Norm. Mentions", colour = "Sentiment Class")
 fourteen.summary.geo
 
-ggsave("Fourteen_allergens_sentiment_by_authority.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("Fourteen_allergens_sentiment_by_authority.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
@@ -272,19 +263,19 @@ ggsave("Fourteen_allergens_sentiment_by_authority.png", plot = last_plot(), devi
 other.sentiment.geo <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
   geom_path(data=shape.df, aes(x=long, y=lat, group=group),
             color="black", size=0.3) +
-  geom_point(data = subset(labelled.df.geo.allergenSummary, Allergen %in% other.allergen.names), 
-             aes(x = long, y = lat, colour = sentiment_class, 
+  geom_point(data = subset(labelled.df.geo.allergenSummary, Allergen %in% other.allergen.names),
+             aes(x = long, y = lat, colour = sentiment_class,
                  size = norm_factor*count/TotalEstablishments),
              alpha = 0.5) +
   scale_colour_manual(values = c("red","white", "navy"))+
   scale_x_continuous(limits = lon_range, expand = c(0,0)) +
   scale_y_continuous(limits = lat_range, expand = c(0,0)) +
   theme_nothing(legend=TRUE) +
-  labs(title=paste("Other Allergen Mentions by Sentiment Class","\n", "(Per ", norm_factor, " Establishments)"), 
+  labs(title=paste("Other Allergen Mentions by Sentiment Class","\n", "(Per ", norm_factor, " Establishments)"),
        fill="", size = "Norm. Mentions", colour = "Sentiment Class")
 other.sentiment.geo
 
-ggsave("Other_allergens_sentiment_by_authority.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("Other_allergens_sentiment_by_authority.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
@@ -292,23 +283,23 @@ ggsave("Other_allergens_sentiment_by_authority.png", plot = last_plot(), device 
 all.allergen.sentiment.geo <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
   geom_path(data=shape.df, aes(x=long, y=lat, group=group),
             color="black", size=0.3) +
-  geom_point(data = labelled.df.geo.allergenSummary, 
-             aes(x = long, y = lat, colour = sentiment_class, 
+  geom_point(data = labelled.df.geo.allergenSummary,
+             aes(x = long, y = lat, colour = sentiment_class,
                  size = norm_factor*count/TotalEstablishments),
              alpha = 0.5) +
   scale_colour_manual(values = c("red","white", "navy"))+
   scale_x_continuous(limits = lon_range, expand = c(0,0)) +
   scale_y_continuous(limits = lat_range, expand = c(0,0)) +
   theme_nothing(legend=TRUE) +
-  labs(title=paste("All Allergen Mentions by Sentiment Class","\n", "(Per ", norm_factor, " Establishments)"), 
+  labs(title=paste("All Allergen Mentions by Sentiment Class","\n", "(Per ", norm_factor, " Establishments)"),
        fill="", size = "Norm. Mentions", colour = "Sentiment Class")
 all.allergen.sentiment.geo
 
-ggsave("All_allergens_sentiment_by_authority.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("All_allergens_sentiment_by_authority.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
        width = 20, height = 20, units = "cm",
        dpi = 300)
 
-############################ Allergen Choropleths #################################### 
+############################ Allergen Choropleths ####################################
 
 remove_underscores <- function(string) { # Moved to utils, here temporarily for testing
   new.string <- gsub("_"," ", string)
@@ -317,8 +308,8 @@ remove_underscores <- function(string) { # Moved to utils, here temporarily for 
 
 # 14 Allergens:
 fourteen.shape <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
-  geom_polygon(data = subset(shape.df.allergens, Allergen %in% fourteen.allergen.names & Allergen != "nuts"), 
-               aes(x=long, y=lat, group=group, 
+  geom_polygon(data = subset(shape.df.allergens, Allergen %in% fourteen.allergen.names & Allergen != "nuts"),
+               aes(x=long, y=lat, group=group,
                    fill=norm_factor*count/TotalEstablishments),
                color = "black", size=0.01) +
   scale_fill_distiller(name = "Normalized Mentions", palette = "Spectral", breaks=pretty_breaks(n = 5)) +
@@ -331,16 +322,16 @@ fourteen.shape <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
   facet_wrap(~ Allergen, labeller=labeller(Allergen = remove_underscores), ncol = 7)
 fourteen.shape
 
-ggsave("Fourteen_allergens_by_authority.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("Fourteen_allergens_by_authority.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
        width = 35, height = 20, units = "cm",
        dpi = 300)
 
 # 14 Allergens in the context of food labelling:
 fourteen.labelling.shape <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
-  geom_polygon(data = subset(shape.df.allergens, Allergen %in% fourteen.allergen.names & 
+  geom_polygon(data = subset(shape.df.allergens, Allergen %in% fourteen.allergen.names &
                                Allergen != "nuts" &
-                               food_labelling > 0 ), 
-               aes(x=long, y=lat, group=group, 
+                               food_labelling > 0 ),
+               aes(x=long, y=lat, group=group,
                    fill=norm_factor*count/TotalEstablishments),
                color = "black", size=0.01) +
   scale_fill_distiller(name = "Normalized Mentions", palette = "Spectral", breaks=pretty_breaks(n = 5)) +
@@ -353,16 +344,16 @@ fourteen.labelling.shape <- ggmap(UKrefmap, extent='device', legend="bottomleft"
   facet_wrap(~ Allergen, labeller=labeller(Allergen = remove_underscores), ncol = 7)
 fourteen.labelling.shape
 
-ggsave("Fourteen_allergens_labelling.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("Fourteen_allergens_labelling.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
        width = 35, height = 20, units = "cm",
        dpi = 300)
 
 # 14 Allergens in the context of Allergy Enquiries
 fourteen.enquiries.shape <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
-  geom_polygon(data = subset(shape.df.allergens, Allergen %in% fourteen.allergen.names & 
+  geom_polygon(data = subset(shape.df.allergens, Allergen %in% fourteen.allergen.names &
                                Allergen != "nuts" &
-                               allergy_enquiries > 0 ), 
-               aes(x=long, y=lat, group=group, 
+                               allergy_enquiries > 0 ),
+               aes(x=long, y=lat, group=group,
                    fill=norm_factor*count/TotalEstablishments),
                color = "black", size=0.01) +
   scale_fill_distiller(name = "Normalized Mentions", palette = "Spectral", breaks=pretty_breaks(n = 5)) +
@@ -375,17 +366,17 @@ fourteen.enquiries.shape <- ggmap(UKrefmap, extent='device', legend="bottomleft"
   facet_wrap(~ Allergen, labeller=labeller(Allergen = remove_underscores), ncol = 7)
 fourteen.enquiries.shape
 
-ggsave("Fourteen_allergens_enquiries.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("Fourteen_allergens_enquiries.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
        width = 35, height = 20, units = "cm",
        dpi = 300)
 
 
 # 14 Allergens in the context of mild reactions:
 fourteen.mild.reactions.shape <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
-  geom_polygon(data = subset(shape.df.allergens, Allergen %in% fourteen.allergen.names & 
+  geom_polygon(data = subset(shape.df.allergens, Allergen %in% fourteen.allergen.names &
                                Allergen != "nuts" &
-                               reactions_report == "Mild-reaction" ), 
-               aes(x=long, y=lat, group=group, 
+                               reactions_report == "Mild-reaction" ),
+               aes(x=long, y=lat, group=group,
                    fill=norm_factor*count/TotalEstablishments),
                color = "black", size=0.1) +
   scale_fill_distiller(name = "Normalized Mentions", palette = "Spectral", breaks=pretty_breaks(n = 5)) +
@@ -398,16 +389,16 @@ fourteen.mild.reactions.shape <- ggmap(UKrefmap, extent='device', legend="bottom
   facet_wrap(~ Allergen, labeller=labeller(Allergen = remove_underscores), ncol = 7)
 fourteen.mild.reactions.shape
 
-ggsave("Fourteen_allergens_mild.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("Fourteen_allergens_mild.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
        width = 35, height = 20, units = "cm",
        dpi = 300)
 
 # 14 Allergens in the context of severe reactions:
 fourteen.severe.reactions.shape <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
-  geom_polygon(data = subset(shape.df.allergens, Allergen %in% fourteen.allergen.names & 
+  geom_polygon(data = subset(shape.df.allergens, Allergen %in% fourteen.allergen.names &
                                Allergen != "nuts" &
-                               reactions_report == "Severe-reaction" ), 
-               aes(x=long, y=lat, group=group, 
+                               reactions_report == "Severe-reaction" ),
+               aes(x=long, y=lat, group=group,
                    fill=norm_factor*count/TotalEstablishments),
                color = "black", size=0.1) +
   scale_fill_distiller(name = "Normalized Mentions", palette = "Spectral", breaks=pretty_breaks(n = 5)) +
@@ -420,14 +411,14 @@ fourteen.severe.reactions.shape <- ggmap(UKrefmap, extent='device', legend="bott
   facet_wrap(~ Allergen, labeller=labeller(Allergen = remove_underscores), ncol = 7)
 fourteen.severe.reactions.shape
 
-ggsave("Fourteen_allergens_severe.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("Fourteen_allergens_severe.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
        width = 35, height = 20, units = "cm",
        dpi = 300)
 
 # Other allergens:
 other.shape <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
-  geom_polygon(data = subset(shape.df.allergens, Allergen %in% other.allergen.names & Allergen != "nuts"), 
-               aes(x=long, y=lat, group=group, 
+  geom_polygon(data = subset(shape.df.allergens, Allergen %in% other.allergen.names & Allergen != "nuts"),
+               aes(x=long, y=lat, group=group,
                    fill=norm_factor*count/TotalEstablishments),
                color = "black", size=0.01) +
   scale_fill_distiller(name = "Normalized Mentions", palette = "Spectral", breaks=pretty_breaks(n = 5)) +
@@ -440,15 +431,15 @@ other.shape <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
   facet_wrap(~ Allergen, labeller=labeller(Allergen = remove_underscores), ncol = 7)
 other.shape
 
-ggsave("Other_allergens_by_authority.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("Other_allergens_by_authority.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
        width = 35, height = 35, units = "cm",
        dpi = 300)
 
 # Other Allergens in the Context of Food Labelling:
 other.labelling.shape <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
-  geom_polygon(data = subset(shape.df.allergens, Allergen %in% other.allergen.names & 
-                               food_labelling > 0 ), 
-               aes(x=long, y=lat, group=group, 
+  geom_polygon(data = subset(shape.df.allergens, Allergen %in% other.allergen.names &
+                               food_labelling > 0 ),
+               aes(x=long, y=lat, group=group,
                    fill=norm_factor*count/TotalEstablishments),
                color = "black", size=0.1) +
   scale_fill_distiller(name = "Normalized Mentions", palette = "Spectral", breaks=pretty_breaks(n = 5)) +
@@ -461,15 +452,15 @@ other.labelling.shape <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
   facet_wrap(~ Allergen, labeller=labeller(Allergen = remove_underscores), ncol = 6)
 other.labelling.shape
 
-ggsave("other_allergens_labelling.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("other_allergens_labelling.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
        width = 35, height = 40, units = "cm",
        dpi = 300)
 
 other.enquiries.shape <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
-  geom_polygon(data = subset(shape.df.allergens, Allergen %in% other.allergen.names & 
+  geom_polygon(data = subset(shape.df.allergens, Allergen %in% other.allergen.names &
                                Allergen != "nuts" &
-                               allergy_enquiries > 0 ), 
-               aes(x=long, y=lat, group=group, 
+                               allergy_enquiries > 0 ),
+               aes(x=long, y=lat, group=group,
                    fill=norm_factor*count/TotalEstablishments),
                color = "black", size=0.01) +
   scale_fill_distiller(name = "Normalized Mentions", palette = "Spectral", breaks=pretty_breaks(n = 5)) +
@@ -482,7 +473,7 @@ other.enquiries.shape <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
   facet_wrap(~ Allergen, labeller=labeller(Allergen = remove_underscores), ncol = 7)
 other.enquiries.shape
 
-ggsave("other_allergens_enquiries.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("other_allergens_enquiries.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
        width = 35, height = 40, units = "cm",
        dpi = 300)
 
@@ -490,10 +481,10 @@ ggsave("other_allergens_enquiries.png", plot = last_plot(), device = NULL, path 
 
 # Other Allergens associated with mild reactions:
 other.mild.reactions.shape <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
-  geom_polygon(data = subset(shape.df.allergens, Allergen %in% other.allergen.names & 
+  geom_polygon(data = subset(shape.df.allergens, Allergen %in% other.allergen.names &
                                Allergen != "nuts" &
-                               reactions_report == "Mild-reaction" ), 
-               aes(x=long, y=lat, group=group, 
+                               reactions_report == "Mild-reaction" ),
+               aes(x=long, y=lat, group=group,
                    fill=norm_factor*count/TotalEstablishments),
                color = "black", size=0.1) +
   scale_fill_distiller(name = "Normalized Mentions", palette = "Spectral", breaks=pretty_breaks(n = 5)) +
@@ -506,16 +497,16 @@ other.mild.reactions.shape <- ggmap(UKrefmap, extent='device', legend="bottomlef
   facet_wrap(~ Allergen, labeller=labeller(Allergen = remove_underscores), ncol = 6)
 other.mild.reactions.shape
 
-ggsave("other_allergens_mild.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("other_allergens_mild.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
        width = 35, height = 40, units = "cm",
        dpi = 300)
 
 # Other Allergens associated with severe reactions:
 other.severe.reactions.shape <- ggmap(UKrefmap, extent='device', legend="bottomleft") +
-  geom_polygon(data = subset(shape.df.allergens, Allergen %in% other.allergen.names & 
+  geom_polygon(data = subset(shape.df.allergens, Allergen %in% other.allergen.names &
                                Allergen != "nuts" &
-                               reactions_report == "Severe-reaction" ), 
-               aes(x=long, y=lat, group=group, 
+                               reactions_report == "Severe-reaction" ),
+               aes(x=long, y=lat, group=group,
                    fill=norm_factor*count/TotalEstablishments),
                color = "black", size=0.1) +
   scale_fill_distiller(name = "Normalized Mentions", palette = "Spectral", breaks=pretty_breaks(n = 5)) +
@@ -528,9 +519,11 @@ other.severe.reactions.shape <- ggmap(UKrefmap, extent='device', legend="bottoml
   facet_wrap(~ Allergen, labeller=labeller(Allergen = remove_underscores), ncol = 6)
 other.severe.reactions.shape
 
-ggsave("other_allergens_severe.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("other_allergens_severe.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
        width = 35, height = 40, units = "cm",
        dpi = 300)
+
+
 
 
 # You have reached the end of the script. how sad.

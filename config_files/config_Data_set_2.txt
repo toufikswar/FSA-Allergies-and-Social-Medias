@@ -28,7 +28,10 @@ rerun_data_labelling: No
 
 do_static_plots: Yes
 
-output_report:   Yes
+# output files format
+static_plot_format: png
+
+output_report:   no
 
 launch_shiny_dash_board: No
 

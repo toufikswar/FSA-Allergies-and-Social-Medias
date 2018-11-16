@@ -17,17 +17,20 @@ sheet_name:  Sheet1
 project_name: Data set 1
 
 # set this parameter to yes if want to rerun data pre-processing and labelling
-rerun_data_preprocessing: No
+rerun_data_preprocessing: no
 
 # set this parameter to yes if want to rerun data labelling only
-rerun_data_labelling: No
+rerun_data_labelling: no
 
 
 ########################
 ## Data visualization ##
 ########################
 
-do_static_plots: No
+do_static_plots: yes
+
+# output files format
+static_plot_format: png
 
 output_report:   No
 

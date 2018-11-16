@@ -5,7 +5,7 @@ library(quanteda)
 library(tidyr)
 
 ## columns names from the original data to be merged with the streams labellings
-retained_metadata <- c("id", "latitude", "longitude","date","sentiment","sentiment class","topics")
+retained_metadata <- c("id", "latitude", "longitude","date","sentiment","sentiment class","topics","user name","user screen name","user source id")
 
 ### =============LOAD DICTIONARIES================= ###
 # (will only create if library(quanteda) is loaded correctly)
