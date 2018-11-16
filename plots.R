@@ -486,6 +486,9 @@ ggsave("percentage_14_allergens.png", plot = last_plot(), device = NULL, path = 
 
 # creating percentage matrix for heatmap for other allergens
 
+drops <- c("kidney_beans")
+other_allergens.df.norm.subset <- other_allergens.df.norm.subset[ , !(names(other_allergens.df.norm.subset) %in% drops)]
+
 column_names = colnames(other_allergens.df.norm.subset)
 number_of_rows = nrow(other_allergens.df.norm.subset)
 number_of_cols = ncol(other_allergens.df.norm.subset)
