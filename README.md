@@ -63,3 +63,9 @@ For the outputs, the user can also specify in the config file what is desired an
 * `do_static_plots:` ("yes" or "no") Specify whether to export static plot files (Default: yes)
 * `static_plot_format:` Desired output format for output plots. Can be any one of `png`,`jpeg`,`pdf`,`eps`,`svg`,`tif`,`bmp`.
 * `launch_shiny_dash_board:` ("yes" or no") To launch shiny dash board change this option to "yes".
+
+
+## Analysis
+
+To run the analysis, open an R console and run `source("GetNuts.R")`.
+On Unix systems this can also be run from the terminal using `Rscript GetNuts.R`
