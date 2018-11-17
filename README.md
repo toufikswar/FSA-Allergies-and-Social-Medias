@@ -60,7 +60,6 @@ To perform an analysis, the user must specify a `config.txt` file to run with Ge
 * `rerun_data_labelling:` ("yes" or "no") Data labelling refers to when the preprocessed data is checked against the supplied dictionaries (in `/Dictionaries`). If a change is made to a dictionary, the analysis does not need to be re-run from the beginning, it can begin here if set to "yes". (Default: no)
 
 For the outputs, the user can also specify in the config file what is desired and in which format.
-* `do_static_plots:` Output static plots to `/output_files/plots` What are the desired outputs (Report, Dashboard or Static plots)
-* Which format the Static plots are to be in
-
-output files include the report, the .RData, and static plots, and can be found in `output_files/$projectID/`
+* `do_static_plots:` ("yes" or "no") Specify whether to export static plot files (Default: yes)
+* `static_plot_format:` Desired output format for output plots. Can be any one of `png`,`jpeg`,`pdf`,`eps`,`svg`,`tif`,`bmp`.
+* `launch_shiny_dash_board:` ("yes" or no") To launch shiny dash board change this option to "yes".
