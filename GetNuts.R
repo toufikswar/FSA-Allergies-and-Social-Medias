@@ -1,6 +1,6 @@
 ### Master Script for Finding Public Mentions of Allergens in Social Media Data
 
-source("utils.R")
+source("scripts/utils.R")
 
 cat("\n")
 cat("\n")
@@ -81,7 +81,7 @@ if(!dir.exists(file.path(output_dir))) dir.create(file.path(output_dir))
 plots_output_dir <- ""
 
 output_format <- "png"
-possible_static_plots_formats <- c("eps","ps","pdf","jpeg","tiff","png","bmp","svg")
+possible_static_plots_formats <- c("eps","ps","pdf","jpeg","tif","png","bmp","svg")
 
 image_preprocessing <- ""
 image_analysis      <- ""
@@ -97,23 +97,23 @@ allergies_and_social_media <- function(config_file)
   # Check for reasonable inputs
   if(length(configuration$input_file_list) == 0) {
     stop("Input file list has no elements.
-         \n  Need to specify it with the flag input_file_list: followed with a list of file names separated by white-spaces.")
+         \n  You must specify one or more files (separated by white spaces) in the config file after 'input_file_list:'.")
   } else if(configuration$sheet_name == "") {
-    stop("Sheed name not specified.
-         \n  Need to specify it with the flag sheet_name: followed with the sheet name.")
+    stop("Sheet name not specified.
+         \n  Please specify the sheet name of the excel data file under 'sheet_name:' in the config gile")
   } else if(configuration$project_name == "") {
     stop("Project name not specified.
-         \n  Need to specify it with the flag project_name: followed with the project name.")
+         \n  Please specify a project name under 'project_name:' in the config file.")
   } else if(configuration$output_report & !configuration$do_static_plots) {
     stop("Produce output report is set to yes, but do static plots is set to no.
-         \n  If produce output report is set to yes then do static plots has to be set to yes as well.")
+         \n  If produce output report is set to yes then do static plots has to be set to yes as well.") # we can maybe change this later
   }
 
   # check if static plots format is one of the predefined formats
   if(configuration$do_static_plots & !(configuration$static_plot_format %in% possible_static_plots_formats)) {
     all_formats <- paste(possible_static_plots_formats,collapse = ", ")
-    stop(paste("Specified static plots format (static_plot_format: variable) is ",configuration$static_plot_format,
-               ", not consistent with any of the possible formats (",all_formats,").",sep=""))
+    stop(paste("Specified static plot output filetype ", configuration$static_plot_format,
+               " is not a supported filetype.  (Plot output filetype can be one of ",all_formats,").",sep=""))
   }
 
   print_config(configuration)
@@ -151,20 +151,20 @@ allergies_and_social_media <- function(config_file)
     # if output image for preprocessing don't exits or the user request rerun_data_preprocessing, then run preprocessing + labelling
     if(!file_exists_preprocessing) {
       cat("\n")
-      cat(paste("Preprocessing image file ",image_preprocessing," doesn't exists. Running preprocessing and labelling to generate it.","\n",sep=""))
+      cat(paste("Preprocessing .RData image file ",image_preprocessing," doesn't exist. Running preprocessing and labelling to generate it.","\n",sep=""))
       cat("\n")
     } else if(file_exists_preprocessing & configuration$rerun_data_preprocessing) {
       cat("\n")
-      cat(paste("Preprocessing image file ",image_preprocessing," exists, but user specified rerun_data_processing = yes. Re-running preprocessing and labelling.","\n",sep=""))
+      cat(paste("Preprocessing image file ",image_preprocessing," exists, but rerun_data_processing is set to 'yes'. Re-running preprocessing and labelling.","\n",sep=""))
       cat("\n")
     }
 
-    source("Preprocessing.R")  # Data pre-processing
-    source("Waterfall.R")      # Data labelling
+    source("scripts/Preprocessing.R")  # Data pre-processing
+    source("scripts/Waterfall.R")      # Data labelling
     generated_labelling <- TRUE
   } else {
     cat("\n")
-    cat(paste("Preprocessing image file ",image_preprocessing," exists and user specified rerun_data_preprocessing = no. Passing to next pipe-line step.","\n",sep=""))
+    cat(paste("Preprocessing .RData image file ",image_preprocessing," exists and rerun_data_preprocessing is set to 'no'. Passing to next pipe-line step.","\n",sep=""))
     cat("\n")
   }
 
@@ -173,18 +173,18 @@ allergies_and_social_media <- function(config_file)
     # if output image for labelling don't exits or the user request rerun_data_labelling, then run labelling only
     if(!file_exists_analysis) {
       cat("\n")
-      cat(paste("Labelling image file ",image_analysis," doesn't exists. Running labelling to generate it.","\n",sep=""))
+      cat(paste("Labelling .RData image file ",image_analysis," doesn't exist. Running labelling to generate it.","\n",sep=""))
       cat("\n")
     } else if(file_exists_analysis & (configuration$rerun_data_labelling & !generated_labelling)) {
       cat("\n")
-      cat(paste("Labelling image file ",image_analysis," exists, but user specified rerun_data_labelling = yes. Re-running labelling.","\n",sep=""))
+      cat(paste("Labelling .RData image file ",image_analysis," exists, but rerun_data_labelling is set to 'yes'. Re-running labelling.","\n",sep=""))
       cat("\n")
     }
 
-    source("Waterfall.R")      # Data labelling
+    source("scripts/Waterfall.R")      # Data labelling
   } else if(!generated_labelling) {
     cat("\n")
-    cat(paste("Labelling image file ",image_analysis," exists and user specified rerun_data_labelling = no. Passing to next pipe-line step.","\n",sep=""))
+    cat(paste("Labelling .RData image file ",image_analysis," exists and rerun_data_labelling is set to 'no'. Passing to next pipe-line step.","\n",sep=""))
     cat("\n")
   }
 
@@ -192,8 +192,8 @@ allergies_and_social_media <- function(config_file)
   if(configuration$do_static_plots) {
     # Producing static plots
 
-    source("plots.R")
-    source("Static_Geoplots.R")
+    source("scripts/plots.R")
+    source("scripts/Static_Geoplots.R")
   }
 
   # if(configuration$output_report) {
