@@ -15,7 +15,7 @@ library(quanteda)
 library(magrittr)
 
 # Read in Functions stored in utils.R
-source("utils.R")
+source("scripts/utils.R")
 
 sheet_name <- configuration$sheet_name
 filenames  <- paste(configuration$input_dir,"/",configuration$input_file_list,sep="")
