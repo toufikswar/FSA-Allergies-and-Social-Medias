@@ -43,7 +43,7 @@ fourteen.bysource <- ggplot(subset(allergen.bysource.df, Allergen %in% fourteen.
   coord_flip()
 fourteen.bysource
 
-ggsave("14_allergens_bysource.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("14_allergens_bysource.",output_format,sep = ""), plot = last_plot(), device = NULL, path = out.dir,
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
@@ -60,7 +60,7 @@ other.bysource <- ggplot(subset(allergen.bysource.df,
   coord_flip()
 other.bysource
 
-ggsave("other_allergens_bysource.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("other_allergens_bysource.",output_format,sep = ""), plot = last_plot(), device = NULL, path = out.dir,
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
@@ -82,7 +82,7 @@ top10.bysource <- ggplot(subset(allergen.bysource.df, Allergen %in% top_10_names
 top10.bysource
 
 
-ggsave("top10_allergens.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("top10_allergens.",output_format,sep = ""), plot = last_plot(), device = NULL, path = out.dir,
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
@@ -119,7 +119,7 @@ by.week.twitter.14 <- ggplot(all_allergens.norm.df.t14,
   theme(strip.text.y = element_text(angle = 0))
 by.week.twitter.14
 
-ggsave("14_allergens_byweek.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("14_allergens_byweek.",output_format,sep =""), plot = last_plot(), device = NULL, path = out.dir,
        width = 30, height = 30, units = "cm",
        dpi = 300)
 
@@ -146,7 +146,7 @@ by.week.twitter.other <- ggplot(all_allergens.norm.df.t.other, aes(x = Week, y =
   theme(strip.text.y = element_text(angle = 0))
 by.week.twitter.other
 
-ggsave("other_allergens_byweek.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("other_allergens_byweek.", output_format, sep = ""), plot = last_plot(), device = NULL, path = out.dir,
        width = 30, height = 30, units = "cm",
        dpi = 300)
 
@@ -162,7 +162,7 @@ enquiries_source_react.bar <- ggplot(labelled.df, aes(x = source, y = allergy_en
   ggtitle("Allergen Enquiries by Source and Sentiment Class")
 enquiries_source_react.bar
 
-ggsave("food_enquiries_bysource.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("food_enquiries_bysource.",output_format,sep = ""), plot = last_plot(), device = NULL, path = out.dir,
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
@@ -175,7 +175,7 @@ labelling_source_react.bar <- ggplot(labelled.df, aes(x = source, y = food_label
   ggtitle("Food Labelling Mentions by Source and Sentiment Class")
 labelling_source_react.bar
 
-ggsave("labelling_by_source_and_reaction.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("labelling_by_source_and_reaction.", output_format, sep = ""), plot = last_plot(), device = NULL, path = out.dir,
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
@@ -202,7 +202,7 @@ stream1.issues.bar <- ggplot(stream1.issues.sentiment.groupedby,
   ggtitle("Stream 1 issues per sentiment")
 stream1.issues.bar
 
-ggsave("stream1_issues_bar.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("stream1_issues_bar.", output_format, sep = ""), plot = last_plot(), device = NULL, path = out.dir,
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
@@ -262,7 +262,7 @@ int_14allergen_react <- ggplot(int_14allergen_react.df,
   facet_grid(Allergen~.)
 int_14allergen_react
 
-ggsave("14_allergens_reactions.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("14_allergens_reactions.",output_format, sep = ""), plot = last_plot(), device = NULL, path = out.dir,
        width = 30, height = 30, units = "cm",
        dpi = 300)
 
@@ -292,7 +292,7 @@ allergen.react.bubble <- ggplot(allergen.react.df, aes(x = Month, y = fct_reorde
   facet_grid(sentiment_class~.)
 allergen.react.bubble
 
-ggsave("14_allergens_reactions_bubble.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("14_allergens_reactions_bubble.", output_format, sep = ""), plot = last_plot(), device = NULL, path = out.dir,
        width = 30, height = 30, units = "cm",
        dpi = 300)
 
@@ -321,7 +321,7 @@ allergen.react.labelling.bubble <- ggplot(allergen.react.labelling.df, aes(x = M
   facet_grid(sentiment_class~.)
 allergen.react.labelling.bubble
 
-ggsave("14_allergens_labelling_bubble.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("14_allergens_labelling_bubble.", output_format, sep = ""), plot = last_plot(), device = NULL, path = out.dir,
        width = 30, height = 30, units = "cm",
        dpi = 300)
 
@@ -347,7 +347,7 @@ allergen.react.enquiries.bubble <- ggplot(allergen.react.labelling.df, aes(x = M
   facet_grid(sentiment_class~.)
 allergen.react.enquiries.bubble
 
-ggsave("14_allergens_enquiries.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("14_allergens_enquiries.", output_format, sep = ""), plot = last_plot(), device = NULL, path = out.dir,
        width = 30, height = 30, units = "cm",
        dpi = 300)
 
@@ -374,7 +374,7 @@ int_otherallergen_react <- ggplot(int_otherallergen_react.df,
   theme(panel.grid.minor = element_blank())
 int_otherallergen_react
 
-ggsave("other_allergens_reactions.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("other_allergens_reactions.", output_format, sep = ""), plot = last_plot(), device = NULL, path = out.dir,
        width = 30, height = 30, units = "cm",
        dpi = 300)
 
@@ -396,7 +396,7 @@ Int_enquiry_reaction <- ggplot(subset(labelled.df, allergy_enquiries > 0 ), aes(
   theme(panel.grid.minor = element_blank())
 Int_enquiry_reaction
 
-ggsave("enquiries_reactions.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("enquiries_reactions.", output_format, sep = ""), plot = last_plot(), device = NULL, path = out.dir,
        width = 30, height = 30, units = "cm",
        dpi = 300)
 
@@ -417,7 +417,7 @@ labelling_reaction <- ggplot(subset(labelled.df, food_labelling > 0 ), aes(x = W
   theme(panel.grid.minor = element_blank())
 labelling_reaction
 
-ggsave("labelling_reactions.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("labelling_reactions.", output_format, sep = ""), plot = last_plot(), device = NULL, path = out.dir,
       width = 30, height = 30, units = "cm",
        dpi = 300)
 
@@ -479,7 +479,7 @@ g2
 # plot(p2)
 
 # ggsave("percentage_14_allergens.png", plot = p2, device = NULL, path = out.dir,
-ggsave("percentage_14_allergens.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("percentage_14_allergens.", output_format, sep = ""), plot = last_plot(), device = NULL, path = out.dir,
        width = 30, height = 30, units = "cm",
        dpi = 300)
 
@@ -536,7 +536,7 @@ g2
 # plot(p2)
 
 # ggsave("percentage_other_allergens.png", plot = p2, device = NULL, path = out.dir,
-ggsave("percentage_other_allergens.png", plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("percentage_other_allergens.", output_format, sep = ""), plot = last_plot(), device = NULL, path = out.dir,
        width = 50, height = 50, units = "cm",
        dpi = 300)
 
