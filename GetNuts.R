@@ -5,7 +5,7 @@ source("scripts/utils.R")
 cat("\n")
 cat("\n")
 cat("\n")
-cat("       ############################# GetNuts 1.0 #####################################")
+cat("       ################################ GetNuts 1.0 ##################################")
 cat("\n")
 
 cat(c("       ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
@@ -48,6 +48,13 @@ cat(c("       ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 ), sep = "\n")
 cat("       ###############################################################################")
 cat("\n")
+cat("       Authors:\n")
+cat("         A. Newman\n")
+cat("         A. Perez Perez\n")
+cat("         O. Pervane\n")
+cat("         T. Swar\n")
+cat("       ###############################################################################")
+cat("\n")
 cat("\n")
 cat("\n")
 
@@ -71,7 +78,6 @@ configuration = list(input_dir                = "",
                      rerun_data_preprocessing = FALSE,
                      rerun_data_labelling     = FALSE,
                      do_static_plots          = FALSE,
-                     output_report            = FALSE,
                      launch_shiny_dash_board  = FALSE)
 
 output_dir <- "output_files"
@@ -80,7 +86,6 @@ if(!dir.exists(file.path(output_dir))) dir.create(file.path(output_dir))
 
 plots_output_dir <- ""
 
-output_format <- "png"
 possible_static_plots_formats <- c("eps","ps","pdf","jpeg","tif","png","bmp","svg")
 
 image_preprocessing <- ""
@@ -104,9 +109,6 @@ allergies_and_social_media <- function(config_file)
   } else if(configuration$project_name == "") {
     stop("Project name not specified.
          \n  Please specify a project name under 'project_name:' in the config file.")
-  } else if(configuration$output_report & !configuration$do_static_plots) {
-    stop("Produce output report is set to yes, but do static plots is set to no.
-         \n  If produce output report is set to yes then do static plots has to be set to yes as well.") # we can maybe change this later
   }
 
   # check if static plots format is one of the predefined formats
@@ -117,11 +119,6 @@ allergies_and_social_media <- function(config_file)
   }
 
   print_config(configuration)
-
-  # static plots static. Use deparse and assign functions to change the configuration global variable value
-  output_format_tmp <- deparse(substitute(output_format))
-  output_format     <- configuration$static_plot_format
-  assign(output_format_tmp,output_format,pos=parent.frame())
 
   # Create the output directory. Use deparse and assign functions to change the configuration global variable value
   output_dir_tmp <- deparse(substitute(output_dir))
@@ -187,6 +184,9 @@ allergies_and_social_media <- function(config_file)
     cat(paste("Labelling .RData image file ",image_analysis," exists and rerun_data_labelling is set to 'no'. Passing to next pipe-line step.","\n",sep=""))
     cat("\n")
   }
+
+  # set the format of static plots
+  output_format <<- configuration$static_plot_format
 
   # Static plotting
   if(configuration$do_static_plots) {

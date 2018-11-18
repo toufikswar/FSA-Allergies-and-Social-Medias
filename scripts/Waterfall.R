@@ -144,7 +144,7 @@ labelled.df$severe_reaction <- ifelse(labelled.df$reactions_report == "Severe-re
 labelled.df$mild_reaction   <- ifelse(labelled.df$reactions_report == "Mild-reaction",   1, 0)
 
 # get the UK local authorities map and normalization data
-source("GeoMaps_and_Normalization.R")
+source("scripts/GeoMaps_and_Normalization.R")
 
 # save image file for data-labelling
 cat("\n\n")

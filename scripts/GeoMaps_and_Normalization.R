@@ -109,7 +109,4 @@ labelled.df.geo$District <- clean_UK_local_authorities_names(labelled.df.geo$lad
 labelled.df.geo$objectid <- as.character(labelled.df.geo$objectid)
 labelled.df.geo$objectid <- as.character(as.numeric(labelled.df.geo$objectid) + 1)
 
-# In order to get the normalization information the lad16nm_clean columns from labelled.df.geo and normalization_per_local_authority.df have to be matched
-
-
 #

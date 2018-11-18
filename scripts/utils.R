@@ -68,13 +68,6 @@ read_config_file <- function(config_file,configuration)
       } else if(vec_line[2] == "NO" | vec_line[2] == "No" | vec_line[2] == "no" | vec_line[2] == "n" | vec_line[2] == "N") {
         configuration$do_static_plots <- FALSE
       }
-    } else if(length(vec_line) == 2 & vec_line[1] == "output_report:") {
-      # boolean to decide if doing output report
-      if(vec_line[2] == "YES" | vec_line[2] == "Yes" | vec_line[2] == "yes" | vec_line[2] == "y" | vec_line[2] == "Y") {
-        configuration$output_report <- TRUE
-      } else if(vec_line[2] == "NO" | vec_line[2] == "No" | vec_line[2] == "no" | vec_line[2] == "n" | vec_line[2] == "N") {
-        configuration$output_report <- FALSE
-      }
     } else if(length(vec_line) == 2 & vec_line[1] == "launch_shiny_dash_board:") {
       # boolean to decide if launch the shiny dashboard
       if(vec_line[2] == "YES" | vec_line[2] == "Yes" | vec_line[2] == "yes" | vec_line[2] == "y" | vec_line[2] == "Y") {
@@ -119,11 +112,8 @@ print_config <- function(configuration)
   if(configuration$do_static_plots) answer <- "Yes"
   cat(paste("  Doing static plots:             ",answer,"\n",sep=""))
   if(configuration$do_static_plots) {
-    cat(paste("    Static plots format:          ",configuration$static_plot_format,"\n",sep=""))
+    cat(paste("   Static plots format:           ",configuration$static_plot_format,"\n",sep=""))
   }
-  answer <- "No"
-  if(configuration$output_report) answer <- "Yes"
-  cat(paste("  Producing output report:        ",answer,"\n",sep=""))
   answer <- "No"
   if(configuration$launch_shiny_dash_board) answer <- "Yes"
   cat(paste("  Launching shiny dash-board:     ",answer,"\n",sep=""))

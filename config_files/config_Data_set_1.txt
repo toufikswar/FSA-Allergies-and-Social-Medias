@@ -32,8 +32,6 @@ do_static_plots: yes
 # output files format
 static_plot_format: png
 
-output_report:   No
-
 launch_shiny_dash_board: No
 
 
