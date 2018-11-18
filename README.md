@@ -23,6 +23,7 @@ To use **GetNuts**, download or clone the repo to a folder on your computer, the
 * [sp](https://cran.r-project.org/web/packages/sp/index.html)
 * [spdplyr](https://cran.r-project.org/web/packages/spdplyr/index.html)
 * [ggmap](https://github.com/dkahle/ggmap)
+* [rgeos](https://cran.r-project.org/web/packages/rgeos/index.html)
 
 **Prior to running the Pipeline install:**
 
@@ -30,7 +31,7 @@ To use **GetNuts**, download or clone the repo to a folder on your computer, the
 install.packages(c(
   "readxl","stringi","quanteda","magrittr",
   "tidyr","ggplot2","ggpubr","bookdown","tinytex",
-  "shiny","leaflet","sp","rgdal","spdplyr"))
+  "shiny","leaflet","sp","rgdal","spdplyr","rgeos"))
 ```
 
 and
