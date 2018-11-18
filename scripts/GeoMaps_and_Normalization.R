@@ -59,15 +59,21 @@ list_of_variables  <- c("LAName","TotalEstablishments")
 names(normalization_per_local_authority.df) <- list_of_variables
 
 # The geographical differences plots will be normalized with the TotalEstablishments variable
-
 # create a new column with the LAName cleaned
 normalization_per_local_authority.df$District <- as.character(clean_UK_local_authorities_names(normalization_per_local_authority.df$LAName))
+
+# Population per local authority
+# https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/populationestimatesforukenglandandwalesscotlandandnorthernireland
+population_per_local_authority_file <- "resources/ukmidyearestimates20122016.csv" # 2012 -> 2016 population estimate
+# data,frame with local authorities information
+population_per_local_authority.df <- read.csv(file = population_per_local_authority_file, header = TRUE, sep=",")
 
 # Now load the UK map of local authorities
 # https://blog.exploratory.io/making-maps-for-uk-countries-and-local-authorities-areas-in-r-b7d222939597
 
 library(ggmap)
 library(rgdal)
+library(rgeos)
 library(spdplyr)
 library(sp)
 
@@ -75,17 +81,11 @@ library(sp)
 uk_county_shapefiles   <- readOGR(dsn = "resources/UK_Local_Authority_2016", layer = "Local_Authority_Districts_December_2016_Super_Generalised_Clipped_Boundaries_in_the_UK")
 wgs.84                 <- "+proj=longlat +datum=WGS84"
 uk_county_shapefiles   <- spTransform(uk_county_shapefiles, CRS(wgs.84)) # Convert to WGS84 format
-shape.df               <- fortify(uk_county_shapefiles)
 
-# data.frame for plotting number of restaurants per local authority
+shape.df               <- fortify(uk_county_shapefiles, region="lad16nm")
+shape.df$District <- clean_UK_local_authorities_names(shape.df$id)
+
 library(dplyr)
-normalization_per_local_authority.df <- left_join(normalization_per_local_authority.df,
-                                                  data.frame(objectid = uk_county_shapefiles$objectid,
-                                                             long     = uk_county_shapefiles$long,
-                                                             lat      = uk_county_shapefiles$lat,
-                                                             lad16nm  = uk_county_shapefiles$lad16nm,
-                                                             District = as.character(clean_UK_local_authorities_names(as.character(uk_county_shapefiles$lad16nm)))),
-                                                  by = "District")
 
 # Some rows don't have Latitute and longitude. Drop them
 labelled.df.geo <- labelled.df[!is.na(labelled.df$latitude),]
@@ -104,9 +104,5 @@ labelled.df.geo <- labelled.df.geo[!is.na(labelled.df.geo$lad16nm),]
 
 # create a new column with the lad16nm cleaned
 labelled.df.geo$District <- clean_UK_local_authorities_names(labelled.df.geo$lad16nm)
-
-# Shift needed to match map with actual local authority
-labelled.df.geo$objectid <- as.character(labelled.df.geo$objectid)
-labelled.df.geo$objectid <- as.character(as.numeric(labelled.df.geo$objectid) + 1)
 
 #

@@ -196,12 +196,10 @@ allergies_and_social_media <- function(config_file)
     source("scripts/Static_Geoplots.R")
   }
 
-  # if(configuration$output_report) {
-  #   # some stuff
-  # }
-  # if(configuration$launch_shiny_dash_board) {
-  #   # some stuff
-  # }
+  if(configuration$launch_shiny_dash_board) {
+    # Launching shiny dashboard
+    source("scripts/Geoplotting_private.R")
+  }
 
 }
 
