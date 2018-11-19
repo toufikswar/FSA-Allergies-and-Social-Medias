@@ -31,7 +31,7 @@ To use **GetNuts**, download or clone the repo to a folder on your computer, the
 install.packages(c(
   "readxl","stringi","quanteda","magrittr",
   "tidyr","ggplot2","ggpubr","bookdown","tinytex",
-  "shiny","leaflet","sp","rgdal","spdplyr","rgeos"))
+  "shiny","leaflet","sp","rgdal","spdplyr","rgeos","maptools"))
 ```
 
 and
