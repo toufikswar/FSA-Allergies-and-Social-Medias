@@ -17,13 +17,13 @@ To use **GetNuts**, download or clone the repo to a folder on your computer, the
 * [ggplot2](https://ggplot2.tidyverse.org/)
 * [ggpubr](http://www.sthda.com/english/rpkgs/ggpubr/)
 * [bookdown](https://github.com/rstudio/bookdown)
-* [tinytex](https://yihui.name/tinytex/)
 * [leaflet](https://rstudio.github.io/leaflet/)
 * [rgdal](https://cran.r-project.org/web/packages/rgdal/index.html)
 * [sp](https://cran.r-project.org/web/packages/sp/index.html)
 * [spdplyr](https://cran.r-project.org/web/packages/spdplyr/index.html)
 * [ggmap](https://github.com/dkahle/ggmap)
 * [rgeos](https://cran.r-project.org/web/packages/rgeos/index.html)
+* [maptools](https://cran.r-project.org/web/packages/maptools/index.html)
 
 **Prior to running the Pipeline install:**
 
@@ -68,11 +68,8 @@ For the outputs, the user can also specify in the config file what is desired an
 
 ## Analysis
 
-To run the analysis, open an R console and 
+To run the analysis, open an R console and
 
-* Source the main script:
-`source("GetNuts.R")`.
-* Call the function `allergies_and_social_media` with the corresponding config file
-`allergies_and_social_media(config_file)`
-
-
+* Navigate to the GetNuts Directory `setwd("your/GetNuts/Directory")
+* Source the Main script: `> source("GetNuts.R")`.
+* Call the function `allergies_and_social_media` with the corresponding config file: `> allergies_and_social_media(config_file)`
