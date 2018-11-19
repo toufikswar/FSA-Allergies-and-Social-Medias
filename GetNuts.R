@@ -198,7 +198,10 @@ allergies_and_social_media <- function(config_file)
 
   if(configuration$launch_shiny_dash_board) {
     # Launching shiny dashboard
-    source("scripts/Geoplotting_private.R")
+    # source("scripts/Geoplotting_private.R")
+    # source("scripts/Shiny_dashboard.R")
+    library(shiny)
+    runApp("Dashboard")
   }
 
 }
