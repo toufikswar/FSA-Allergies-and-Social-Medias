@@ -71,15 +71,21 @@ For the outputs, the user can also specify in the config file what is desired an
 To run the analysis, open an R console and
 
 * Navigate to the GetNuts Directory
+
 ```r
-> setwd("your/GetNuts/Directory")```
+> setwd("your/GetNuts/Directory")
+```
 
 * Source the Main script:
+
 ```r
-> source("GetNuts.R")```
+> source("GetNuts.R")
+```
 
 * Call the function `allergies_and_social_media` with the corresponding config file:
+
 ```r
-> allergies_and_social_media("config_files/config_file")```
+> allergies_and_social_media("config_files/config_file")
+```
 
 * Watch
