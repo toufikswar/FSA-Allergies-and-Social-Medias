@@ -202,8 +202,6 @@ server <- function(input, output) {
     # time selection
     selection <- selection & do_range_selection(input$timerange,the_data$Month)
 
-
-<<<<<<< HEAD
     summary_data <- the_data[selection,] %>%
       group_by(long, lat, District) %>%
       summarise(count = n())
@@ -243,13 +241,6 @@ server <- function(input, output) {
     #   clearMarkers() %>%
     #   addMarkers(lat = ~latitude,lng = ~longitude)
 
-
-=======
-    leafletProxy("map", data = the_data[selection,]) %>%
-      clearMarkers() %>%
-      addMarkers(lat = ~latitude,lng = ~longitude,
-                 popup = ~as.character(original_content))
->>>>>>> df3d0e343fe754c6b8fb246360fb8c245ed6603a
   })
 
 }
