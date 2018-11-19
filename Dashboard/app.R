@@ -198,7 +198,8 @@ server <- function(input, output) {
 
     leafletProxy("map", data = the_data[selection,]) %>%
       clearMarkers() %>%
-      addMarkers(lat = ~latitude,lng = ~longitude)
+      addMarkers(lat = ~latitude,lng = ~longitude,
+                 popup = ~as.character(original_content))
   })
 
 }
