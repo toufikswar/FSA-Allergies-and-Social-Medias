@@ -1,8 +1,9 @@
 # load the preprocessed and labelled data
-#load(paste("../",image_analysis,sep=""))
+load(paste("../",image_analysis,sep=""))
 
 library(shiny)
 library(leaflet)
+library(dplyr)
 
 ###### Functions to implement user selection
 
@@ -87,6 +88,9 @@ time_range_moth      <- range(labelled.df.geo$Month)
 time_range_moth_init <- c(time_range_moth[1],time_range_moth[1] + 1)
 if(time_range_moth_init[2] > time_range_moth[2]) time_range_moth_init[2] <- time_range_moth[2]
 
+norm_factor_businesses <- 100
+norm_factor_population <- 100000
+
 ui <- fluidPage(
   # Creation of a page with a Tab
   navbarPage("FSA Dashboard",
@@ -96,31 +100,35 @@ ui <- fluidPage(
             # 14 allergens listing
             selectInput("fourteen", "14 Allergens", fourteen.allergen.names, selected = vector(),
                         multiple = TRUE,selectize = TRUE, width = NULL, size = NULL),
-            
+
             # other allergens listing
             selectInput("other", "Other Allergens", other.allergen.names, selected = vector(),
                         multiple = TRUE,selectize = TRUE, width = NULL, size = NULL),
-            
+
             # Sources listing
             selectInput("source", "Sources", source.names, selected = source.names,
                         multiple = TRUE,selectize = TRUE, width = NULL, size = NULL),
-            
+
             # Sentiment listing
             selectInput("sentiment", "Sentimen", sentiment.names, selected = sentiment.names,
                         multiple = TRUE,selectize = TRUE, width = NULL, size = NULL),
-            
+
             # Allergy enquiries
             selectInput("allergy_enquiries", "Allergy enquiries", allergy_enquiries.name, selected = vector(),
                         multiple = TRUE,selectize = TRUE, width = NULL, size = NULL),
-            
+
             # Food labelling
             selectInput("food_labelling", "Food labelling", food_labelling.name, selected = vector(),
                         multiple = TRUE,selectize = TRUE, width = NULL, size = NULL),
-            
+
             # Reporting reactions
             selectInput("reporting_reaction", "Reporting reactions", reporting_reaction.name, selected = reporting_reaction.name,
                         multiple = TRUE,selectize = TRUE, width = NULL, size = NULL),
-            
+
+            # Normalization
+            selectInput("norm", "Normalization", c("Raw","N. Businesses","Population"), selected = "Raw",
+                  multiple = FALSE,selectize = TRUE, width = NULL, size = NULL),
+
             # Time range slider
             sliderInput("timerange", "Time interval",
                         min   = time_range_moth[1],
@@ -137,7 +145,7 @@ ui <- fluidPage(
        )
     )
 )
-  
+
 
 
 server <- function(input, output) {
@@ -162,7 +170,7 @@ server <- function(input, output) {
            lat  >= latRng[1] & lat  <= latRng[2] &
            long >= lngRng[1] & long <= lngRng[2])
   })
-  
+
   # This creates an output where we display the raw data that is on the map
   output$raw_data <- renderDataTable(dataInBounds())
 
@@ -194,12 +202,54 @@ server <- function(input, output) {
     # time selection
     selection <- selection & do_range_selection(input$timerange,the_data$Month)
 
-    print(nrow(the_data[selection,]))
 
+<<<<<<< HEAD
+    summary_data <- the_data[selection,] %>%
+      group_by(long, lat, District) %>%
+      summarise(count = n())
+
+    summary_data$Norm <- rep(1,nrow(summary_data))
+    summary_data$District <- as.character(summary_data$District)
+
+    mytitle <- "raw mentions"
+
+    if(input$norm == "N. Businesses") {
+      mytitle <- paste("mentions per ",norm_factor_businesses," Establishments",sep="")
+
+      normalization_per_local_authority.df$District <- as.character(normalization_per_local_authority.df$District)
+      summary_data      <- left_join(summary_data,normalization_per_local_authority.df[,c("District","TotalEstablishments")], by="District")
+      summary_data$Norm <- summary_data$TotalEstablishments/norm_factor_businesses
+    } else if(input$norm == "Population") {
+      mytitle <- paste("mentions per ",norm_factor_population," people",sep="")
+
+      population_per_local_authority.df$District <- as.character(population_per_local_authority.df$District)
+      summary_data      <- left_join(summary_data,population_per_local_authority.df[,c("District","all_ages")],by="District")
+      summary_data$Norm <- summary_data$all_ages/norm_factor_population
+    }
+
+    radius    <- summary_data$count/summary_data$Norm
+    colorData <- radius
+    pal       <- colorBin("viridis", colorData, 7, pretty = FALSE)
+    # radius    <- (radius / max(radius))*30000
+    radius    <- 10000
+
+    leafletProxy("map", data = summary_data) %>%
+      clearShapes() %>%
+      addCircles(~long, ~lat, radius=radius,stroke=FALSE, fillOpacity=0.4, fillColor=pal(colorData)) %>%
+      # addCircles(~long, ~lat, radius=radius,layerId=~zipcode,stroke=FALSE, fillOpacity=0.4, fillColor=pal(colorData)) %>%
+      addLegend("bottomleft", pal=pal, values=colorData, title=mytitle,layerId="colorLegend")
+
+    # leafletProxy("map", data = the_data[selection,]) %>%
+    #   clearMarkers() %>%
+    #   addMarkers(lat = ~latitude,lng = ~longitude)
+
+
+=======
     leafletProxy("map", data = the_data[selection,]) %>%
       clearMarkers() %>%
       addMarkers(lat = ~latitude,lng = ~longitude,
                  popup = ~as.character(original_content))
+>>>>>>> df3d0e343fe754c6b8fb246360fb8c245ed6603a
   })
 
 }

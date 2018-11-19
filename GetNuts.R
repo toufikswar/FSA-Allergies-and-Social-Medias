@@ -68,6 +68,7 @@ if(OS == "Linux") {
 } else if(OS == "Windows") {
   cat(paste("\n","It looks like you are running Windows","\n"))
 }
+cat("\n")
 
 # Data structure with all the configuration variables
 configuration = list(input_dir                = "",
@@ -208,9 +209,9 @@ allergies_and_social_media <- function(config_file)
 
 # IPORTANT NOTE: this part of the code not final.
 # This is a stupid way of running the Master.R code using the config file
-config_file <- "config_files/config_Data_set_1.txt"
+# config_file <- "config_files/config_Data_set_1.txt"
 # config_file <- "config_files/config_Data_set_2.txt"
-allergies_and_social_media(config_file)
+# allergies_and_social_media(config_file)
 
 
 #

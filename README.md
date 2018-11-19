@@ -68,5 +68,11 @@ For the outputs, the user can also specify in the config file what is desired an
 
 ## Analysis
 
-To run the analysis, open an R console and run `source("GetNuts.R")`.
-On Unix systems this can also be run from the terminal using `Rscript GetNuts.R`
+To run the analysis, open an R console and 
+
+* Source the main script:
+`source("GetNuts.R")`.
+* Call the function `allergies_and_social_media` with the corresponding config file
+`allergies_and_social_media(config_file)`
+
+
