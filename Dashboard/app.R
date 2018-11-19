@@ -1,5 +1,5 @@
 # load the preprocessed and labelled data
-load(paste("../",image_analysis,sep=""))
+#load(paste("../",image_analysis,sep=""))
 
 library(shiny)
 library(leaflet)
@@ -88,47 +88,57 @@ time_range_moth_init <- c(time_range_moth[1],time_range_moth[1] + 1)
 if(time_range_moth_init[2] > time_range_moth[2]) time_range_moth_init[2] <- time_range_moth[2]
 
 ui <- fluidPage(
-
-      # 14 allergens listing
-      selectInput("fourteen", "14 Allergens", fourteen.allergen.names, selected = vector(),
-                  multiple = TRUE,selectize = TRUE, width = NULL, size = NULL),
-
-      # other allergens listing
-      selectInput("other", "Other Allergens", other.allergen.names, selected = vector(),
-                  multiple = TRUE,selectize = TRUE, width = NULL, size = NULL),
-
-      # Sources listing
-      selectInput("source", "Sources", source.names, selected = source.names,
-                  multiple = TRUE,selectize = TRUE, width = NULL, size = NULL),
-
-      # Sentiment listing
-      selectInput("sentiment", "Sentimen", sentiment.names, selected = sentiment.names,
-                  multiple = TRUE,selectize = TRUE, width = NULL, size = NULL),
-
-      # Allergy enquiries
-      selectInput("allergy_enquiries", "Allergy enquiries", allergy_enquiries.name, selected = vector(),
-                  multiple = TRUE,selectize = TRUE, width = NULL, size = NULL),
-
-      # Food labelling
-      selectInput("food_labelling", "Food labelling", food_labelling.name, selected = vector(),
-                  multiple = TRUE,selectize = TRUE, width = NULL, size = NULL),
-
-      # Reporting reactions
-      selectInput("reporting_reaction", "Reporting reactions", reporting_reaction.name, selected = reporting_reaction.name,
-                  multiple = TRUE,selectize = TRUE, width = NULL, size = NULL),
-
-      # Time range slider
-      sliderInput("timerange", "Time interval",
-                  min   = time_range_moth[1],
-                  max   = time_range_moth[2],
-                  value = time_range_moth_init),
-
-      mainPanel(
-        leafletOutput("map", height = 1000)
-      )
-
-
+  # Creation of a page with a Tab
+  navbarPage("FSA Dashboard",
+    # First tab of the page
+     tabPanel("Map",
+          sidebarPanel(
+            # 14 allergens listing
+            selectInput("fourteen", "14 Allergens", fourteen.allergen.names, selected = vector(),
+                        multiple = TRUE,selectize = TRUE, width = NULL, size = NULL),
+            
+            # other allergens listing
+            selectInput("other", "Other Allergens", other.allergen.names, selected = vector(),
+                        multiple = TRUE,selectize = TRUE, width = NULL, size = NULL),
+            
+            # Sources listing
+            selectInput("source", "Sources", source.names, selected = source.names,
+                        multiple = TRUE,selectize = TRUE, width = NULL, size = NULL),
+            
+            # Sentiment listing
+            selectInput("sentiment", "Sentimen", sentiment.names, selected = sentiment.names,
+                        multiple = TRUE,selectize = TRUE, width = NULL, size = NULL),
+            
+            # Allergy enquiries
+            selectInput("allergy_enquiries", "Allergy enquiries", allergy_enquiries.name, selected = vector(),
+                        multiple = TRUE,selectize = TRUE, width = NULL, size = NULL),
+            
+            # Food labelling
+            selectInput("food_labelling", "Food labelling", food_labelling.name, selected = vector(),
+                        multiple = TRUE,selectize = TRUE, width = NULL, size = NULL),
+            
+            # Reporting reactions
+            selectInput("reporting_reaction", "Reporting reactions", reporting_reaction.name, selected = reporting_reaction.name,
+                        multiple = TRUE,selectize = TRUE, width = NULL, size = NULL),
+            
+            # Time range slider
+            sliderInput("timerange", "Time interval",
+                        min   = time_range_moth[1],
+                        max   = time_range_moth[2],
+                        value = time_range_moth_init)
+          ),
+          mainPanel(
+            leafletOutput("map", height = 1000)
+          )
+        ),
+       # Second tab to display raw data
+       tabPanel("Data",
+                dataTableOutput("raw_data")
+       )
+    )
 )
+  
+
 
 server <- function(input, output) {
 
@@ -152,6 +162,9 @@ server <- function(input, output) {
            lat  >= latRng[1] & lat  <= latRng[2] &
            long >= lngRng[1] & long <= lngRng[2])
   })
+  
+  # This creates an output where we display the raw data that is on the map
+  output$raw_data <- renderDataTable(dataInBounds())
 
   # This observer is responsible for maintaining the circles and legend,
   # according to the variables the user has chosen to map to color and size.
