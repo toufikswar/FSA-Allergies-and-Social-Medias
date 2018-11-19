@@ -31,11 +31,6 @@ clean_UK_local_authorities_names <- function(text)
   text <- stri_replace_all_fixed(text, "comhairle nan eilean siar western isles", "na h eileanan siar")
   text <- stri_replace_all_fixed(text, "na h eileanan siar", "comhairle nan eilean siar western isles")
 
-  # FSA data                          Map data
-  # Adur and Worthing        ==>   adur, worthing"
-  # babergh and mid suffolk  ==>   babergh, mid suffolk
-  # rother and wealden       ==>   rother, wealden
-
   text <- stri_trim(text)
 
   return(text)
@@ -48,19 +43,19 @@ restaurants_per_local_authority_file <- "resources/2016-17-enforcement-data-food
 # restaurants_per_local_authority_file <- "resources/2017-18-enforcement-data-food-hygiene.csv" # 2017/2018 Enforcement Data - Food Hygiene
 
 # data,frame with local authorities information
-normalization_per_local_authority.df <- read.csv(file = restaurants_per_local_authority_file, header = TRUE, sep=",")
+restaurants_per_local_authority.df <- read.csv(file = restaurants_per_local_authority_file, header = TRUE, sep=",")
 
 # select only the Local authority name and TotalEstablishments.IncludingNotYetRated.Outside.
 original_list_of_variables <- c("LAName","TotalEstablishments.IncludingNotYetRated.Outside.")
-normalization_per_local_authority.df <- subset(normalization_per_local_authority.df, select = original_list_of_variables)
+restaurants_per_local_authority.df <- subset(restaurants_per_local_authority.df, select = original_list_of_variables)
 
 # rename column names
 list_of_variables  <- c("LAName","TotalEstablishments")
-names(normalization_per_local_authority.df) <- list_of_variables
+names(restaurants_per_local_authority.df) <- list_of_variables
 
 # The geographical differences plots will be normalized with the TotalEstablishments variable
 # create a new column with the LAName cleaned
-normalization_per_local_authority.df$District <- as.character(clean_UK_local_authorities_names(normalization_per_local_authority.df$LAName))
+restaurants_per_local_authority.df$District <- as.character(clean_UK_local_authorities_names(restaurants_per_local_authority.df$LAName))
 
 # Population per local authority
 # https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/populationestimatesforukenglandandwalesscotlandandnorthernireland

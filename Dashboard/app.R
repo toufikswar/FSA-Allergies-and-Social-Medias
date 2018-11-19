@@ -1,5 +1,5 @@
 # load the preprocessed and labelled data
-#load(paste("../",image_analysis,sep=""))
+load(paste("../",image_analysis,sep=""))
 
 library(shiny)
 library(leaflet)
@@ -88,9 +88,6 @@ time_range_moth      <- range(labelled.df.geo$Month)
 time_range_moth_init <- c(time_range_moth[1],time_range_moth[1] + 1)
 if(time_range_moth_init[2] > time_range_moth[2]) time_range_moth_init[2] <- time_range_moth[2]
 
-norm_factor_businesses <- 100
-norm_factor_population <- 100000
-
 ui <- fluidPage(
   # Creation of a page with a Tab
   navbarPage("FSA Dashboard",
@@ -161,6 +158,7 @@ server <- function(input, output) {
   dataInBounds <- reactive({
     if (is.null(input$map_bounds))
       return(the_data[FALSE,])
+
     bounds <- input$map_bounds
     latRng <- range(bounds$north, bounds$south)
     lngRng <- range(bounds$east,  bounds$west)
@@ -177,6 +175,12 @@ server <- function(input, output) {
   # according to the variables the user has chosen to map to color and size.
   observe({
     selection <- rep(TRUE,nrow(the_data))
+
+    # # in bounds
+    # bounds <- input$map_bounds
+    # latRng <- range(bounds$north, bounds$south)
+    # lngRng <- range(bounds$east,  bounds$west)
+    # selection <- selection & (the_data$lat  >= latRng[1] & the_data$lat  <= latRng[2]) & (the_data$long >= lngRng[1] & the_data$long <= lngRng[2])
 
     # Allergens
     # 14 allergens selection
@@ -213,8 +217,8 @@ server <- function(input, output) {
     if(input$norm == "N. Businesses") {
       mytitle <- paste("mentions per ",norm_factor_businesses," Establishments",sep="")
 
-      normalization_per_local_authority.df$District <- as.character(normalization_per_local_authority.df$District)
-      summary_data      <- left_join(summary_data,normalization_per_local_authority.df[,c("District","TotalEstablishments")], by="District")
+      restaurants_per_local_authority.df$District <- as.character(restaurants_per_local_authority.df$District)
+      summary_data      <- left_join(summary_data,restaurants_per_local_authority.df[,c("District","TotalEstablishments")], by="District")
       summary_data$Norm <- summary_data$TotalEstablishments/norm_factor_businesses
     } else if(input$norm == "Population") {
       mytitle <- paste("mentions per ",norm_factor_population," people",sep="")
@@ -228,7 +232,8 @@ server <- function(input, output) {
     colorData <- radius
     pal       <- colorBin("viridis", colorData, 7, pretty = FALSE)
     # radius    <- (radius / max(radius))*30000
-    radius    <- 10000
+    # radius    <- 10000
+    radius    <- 2500
 
     leafletProxy("map", data = summary_data) %>%
       clearShapes() %>%

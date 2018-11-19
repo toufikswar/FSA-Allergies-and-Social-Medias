@@ -92,6 +92,10 @@ possible_static_plots_formats <- c("eps","ps","pdf","jpeg","tif","png","bmp","sv
 image_preprocessing <- ""
 image_analysis      <- ""
 
+# nomaliation factors
+norm_factor_businesses <- 100      # mentions per 100 Establishments
+norm_factor_population <- 100000   # mentions per 100000 people
+
 allergies_and_social_media <- function(config_file)
 {
 
