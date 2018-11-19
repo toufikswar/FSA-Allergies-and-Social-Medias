@@ -1,6 +1,6 @@
 # GetNuts
 
-**GetNuts** is a pipeline that takes data tables (`.xlsx`) pulled from Pulsar and can output a report (in either pdf or gitbook html format), a series of static plots, as well as an interactive shiny dashboard. This pipeline is tested to work on Windows, macOS and Linux.
+**GetNuts** is a pipeline that takes data tables (`.xlsx`) pulled from Pulsar and can output a series of static plots as well as an interactive shiny dashboard. This pipeline is tested to work on Windows, macOS and Linux.
 
 To use **GetNuts**, download or clone the repo to a folder on your computer, then create a folder `/Data` where pulsar `.xlsx` data can be placed. **Important:** if using multiple excel files, it is important that only the first file has header information in the table.
 
@@ -72,4 +72,4 @@ To run the analysis, open an R console and
 
 * Navigate to the GetNuts Directory `setwd("your/GetNuts/Directory")`
 * Source the Main script: `> source("GetNuts.R")`.
-* Call the function `allergies_and_social_media` with the corresponding config file: `> allergies_and_social_media(config_file)`
+* Call the function `allergies_and_social_media` with the corresponding config file: `> allergies_and_social_media("config_files/config_file")`
