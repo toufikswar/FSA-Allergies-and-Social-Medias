@@ -1,5 +1,5 @@
 # load the preprocessed and labelled data
-load(paste("../",image_analysis,sep=""))
+#load(paste("../",image_analysis,sep=""))
 
 library(shiny)
 library(leaflet)
@@ -114,7 +114,7 @@ ui <- fluidPage(
                         multiple = TRUE,selectize = TRUE, width = NULL, size = NULL),
 
             # Allergy enquiries
-            selectInput("allergy_enquiries", "Allergy enquiries", allergy_enquiries.name, selected = vector(),
+            selectInput(allergy_enquiries.name, "Allergy enquiries", allergy_enquiries.name, selected = vector(),
                         multiple = TRUE,selectize = TRUE, width = NULL, size = NULL),
 
             # Food labelling
@@ -126,8 +126,7 @@ ui <- fluidPage(
                         multiple = TRUE,selectize = TRUE, width = NULL, size = NULL),
 
             # Normalization
-            selectInput("norm", "Normalization", c("Raw","N. Businesses","Population"), selected = "Raw",
-                  multiple = FALSE,selectize = TRUE, width = NULL, size = NULL),
+            radioButtons("norm", "Normalization", choices = list("Raw","N. Businesses","Population"), selected = "Raw"),
 
             # Time range slider
             sliderInput("timerange", "Time interval",
@@ -239,7 +238,8 @@ server <- function(input, output) {
 
     # leafletProxy("map", data = the_data[selection,]) %>%
     #   clearMarkers() %>%
-    #   addMarkers(lat = ~latitude,lng = ~longitude)
+    #   addMarkers(lat = ~latitude,lng = ~longitude,
+    #                popup = ~as.character(original_content))
 
   })
 
