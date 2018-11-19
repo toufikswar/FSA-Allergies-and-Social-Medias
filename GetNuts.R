@@ -110,7 +110,7 @@ allergies_and_social_media <- function(config_file)
          \n  You must specify one or more files (separated by white spaces) in the config file after 'input_file_list:'.")
   } else if(configuration$sheet_name == "") {
     stop("Sheet name not specified.
-         \n  Please specify the sheet name of the excel data file under 'sheet_name:' in the config gile")
+         \n  Please specify the sheet name of the excel data file under 'sheet_name:' in the config file")
   } else if(configuration$project_name == "") {
     stop("Project name not specified.
          \n  Please specify a project name under 'project_name:' in the config file.")
@@ -210,12 +210,5 @@ allergies_and_social_media <- function(config_file)
   }
 
 }
-
-# IPORTANT NOTE: this part of the code not final.
-# This is a stupid way of running the Master.R code using the config file
-# config_file <- "config_files/config_Data_set_1.txt"
-# config_file <- "config_files/config_Data_set_2.txt"
-# allergies_and_social_media(config_file)
-
 
 #
