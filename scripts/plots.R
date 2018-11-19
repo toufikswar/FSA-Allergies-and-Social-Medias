@@ -4,6 +4,7 @@ cat("\n\n")
 cat(paste("Start static plots script","\n",sep=""))
 
 load(image_analysis)
+options(warn=-1) # to stop receiving warnings from coercion and from reseting x and y axis during plotting
 
 # output directory where the plots are saved
 out.dir <- file.path(plots_output_dir)
@@ -21,7 +22,6 @@ library(dplyr)
 
 # Long Dataframe needed for certain types of plots.
 labelled.df.long <- gather(labelled.df, Allergen, "Mentions", c(fourteen.allergen.names,other.allergen.names), factor_key = TRUE)
-
 
 allergen.bysource.df <- labelled.df.long %>%
   group_by(source, Allergen) %>%
@@ -203,7 +203,7 @@ stream1.issues.bar <- ggplot(stream1.issues.sentiment.groupedby,
 stream1.issues.bar
 
 ggsave(paste("Summary_of_Contextual_info_bar.", output_format, sep = ""), plot = last_plot(), device = NULL, path = out.dir,
-       width = 10, height = 10, units = "cm",
+       width = 15, height = 15, units = "cm",
        dpi = 300)
 
 
