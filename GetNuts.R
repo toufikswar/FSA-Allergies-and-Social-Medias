@@ -93,8 +93,8 @@ image_preprocessing <- ""
 image_analysis      <- ""
 
 # nomaliation factors
-norm_factor_businesses <- 100      # mentions per 100 Establishments
-norm_factor_population <- 100000   # mentions per 100000 people
+norm_factor_businesses <- 100      # mentions per    100  Establishments
+norm_factor_population <- 100000   # mentions per 100000  People
 
 allergies_and_social_media <- function(config_file)
 {
@@ -197,18 +197,18 @@ allergies_and_social_media <- function(config_file)
   if(configuration$do_static_plots) {
     # Producing static plots
 
-    source("scripts/plots.R")
-    source("scripts/Static_Geoplots.R")
+    source("scripts/plots.R")             # summary plots
+    source("scripts/Static_Geoplots.R")   # geographical differences plots
   }
 
   if(configuration$launch_shiny_dash_board) {
     # Launching shiny dashboard
-    # source("scripts/Geoplotting_private.R")
-    # source("scripts/Shiny_dashboard.R")
     library(shiny)
     runApp("Dashboard")
   }
 
 }
+
+
 
 #
