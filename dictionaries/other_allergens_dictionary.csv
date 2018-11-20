@@ -2,7 +2,11 @@
 corn,corn,maize,sweetcorn,
 
 # meat
-meat,meat,pork,beef,lamb,
+# meat,meat,pork,beef,lamb
+# Separating meat categories
+pork,pork,
+beef,beef,
+lamb,lamb,
 
 # gelatine
 gelatine,gelatine,
@@ -14,7 +18,17 @@ seeds,seed,sunflower,poppy,seed oil,poppy_seeds,poppy seed,poppyseed,
 spice,spice,coriander,cinnamon,chilli,
 
 # fruits
-fruit,fruit,apple,peach,plum,strawberry,blueberry,raspberry,pear,orange,
+# fruit,fruit,apple,peach,plum,strawberry,blueberry,raspberry,pear,orange,
+# Separating fruits categories
+apple,apple,
+peach,peach,
+plum,plum,
+strawberry,strawberry,
+blueberry,blueberry,
+raspberry,raspberry,
+pear,pear,
+orange,orange,
+
 
 # Tomato
 tomato,tomato,
