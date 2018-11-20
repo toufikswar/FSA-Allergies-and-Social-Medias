@@ -238,7 +238,7 @@ fourteen.allergen.mentions <- ggplot(fourteen.allergen.total.long,
   theme_minimal() +
   scale_fill_manual(values=c("#ffa64d", "#cc0000"),
                     breaks=c("perc_mild", "perc_severe"),
-                    labels=c("% Midl", "% Severe")) +
+                    labels=c("% Mild", "% Severe")) +
   labs(x= "Allergens", y="Percentage", fill = "Severity") +
   ggtitle("Percentage of Mild/Severe reactions over 14 allergens mentions") +
   coord_flip()
