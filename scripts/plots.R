@@ -154,9 +154,11 @@ ggsave(paste("other_allergens_byweek.", output_format, sep = ""), plot = last_pl
 
 ## Intersections
 
-enquiries_source_react.bar <- ggplot(labelled.df, aes(x = source, y = allergy_enquiries, fill = sentiment_class))+
-  stat_summary(fun.y = sum, # adds up all observations for the month
-               geom = "bar") +
+enquiries_source_react.bar <- ggplot(labelled.df %>%
+                                       group_by(source, sentiment_class) %>%
+                                       summarise(count = sum(allergy_enquiries)),
+                                     aes(x = source, y = count, fill = sentiment_class)) +
+  geom_bar(stat = "identity") +
   theme_minimal() +
   labs(x= "Source", y="Allergen Enquiries", fill = "Sentiment Class") +
   scale_fill_manual(values = c("#DF3309","grey80","#0D83E6"))+
@@ -167,9 +169,11 @@ ggsave(paste("food_enquiries_bysource.",output_format,sep = ""), plot = last_plo
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
-labelling_source_react.bar <- ggplot(labelled.df, aes(x = source, y = food_labelling, fill = sentiment_class))+
-  stat_summary(fun.y = sum, # adds up all observations for the month
-               geom = "bar") +
+labelling_source_react.bar <- ggplot(labelled.df %>%
+                                       group_by(sentiment_class, source) %>%
+                                       summarise(count = sum(food_labelling)), 
+                                     aes(x = source, y = count, fill = sentiment_class))+
+  geom_bar(stat = "identity") +
   theme_minimal() +
   labs(x= "Source", y="Mentions Flagged for Food Labelling", fill = "Sentiment Class") +
   scale_fill_manual(values = c("#DF3309","grey80","#0D83E6"))+
