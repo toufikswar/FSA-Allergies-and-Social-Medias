@@ -28,8 +28,6 @@ rerun_data_labelling:
 
 do_static_plots: Yes
 
-output_report:   Yes
-
 static_plot_format: pdf
 
 launch_shiny_dash_board: No
