@@ -85,6 +85,12 @@ library(dplyr)
 # Some rows don't have Latitute and longitude. Drop them
 labelled.df.geo <- labelled.df[!is.na(labelled.df$latitude),]
 
+# Some entries without original longitude and latitude are assigned the generic "UK" longitude and latitude of 55.37805, -3.435973
+# and supriously inflate measurements in Dumfries and Galloway, so these are removed:
+labelled.df.geo <- subset(labelled.df.geo,
+                          latitude !=   55.37805 &
+                            longitude !=  -3.435973 )
+
 # Letting R know that these are specifically spatial coordinates
 sp <- SpatialPoints(labelled.df.geo[,c("longitude", "latitude")])
 # To ensure the same coordinate system
