@@ -69,6 +69,7 @@ ggsave(paste("other_allergens_bysource.",output_format,sep = ""), plot = last_pl
 #### TOP 10 ALL Allergens Histograme
 total_count_per_allergen <- labelled.df %>% subset(select = c(fourteen.allergen.names,other.allergen.names)) %>% colSums(na.rm=T) %>% sort(decreasing=T)
 top_10_names <- names(total_count_per_allergen)[1:10]
+top_4_names <- top_10_names[1:4]
 
 top10.bysource <- ggplot(subset(allergen.bysource.df, Allergen %in% top_10_names),
                             aes(x = reorder(gsub("_"," ",Allergen), count), y = count, fill = source)) +
@@ -238,6 +239,11 @@ fourteen.allergen.mentions <- ggplot(fourteen.allergen.total.long,
   ggtitle("Percentage of Mild/Severe reactions over 14 allergens mentions") +
   coord_flip()
 fourteen.allergen.mentions
+
+ggsave(paste("Percentage_14_allergens_mentions_mild_severe.", output_format, sep = ""), plot = last_plot(), device = NULL, path = out.dir,
+       width = 20, height = 15, units = "cm",
+       dpi = 300)
+
 
 #######
 ## Subsetting to remove "_' from the Allergy names
