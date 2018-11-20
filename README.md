@@ -15,7 +15,6 @@ To use **GetNuts**, download or clone the repo to a folder on your computer, the
 * [magrittr](https://github.com/tidyverse/magrittr)
 * [tidyr](https://cran.r-project.org/web/packages/tidyr/index.html)
 * [ggplot2](https://ggplot2.tidyverse.org/)
-* [ggpubr](http://www.sthda.com/english/rpkgs/ggpubr/)
 * [bookdown](https://github.com/rstudio/bookdown)
 * [leaflet](https://rstudio.github.io/leaflet/)
 * [rgdal](https://cran.r-project.org/web/packages/rgdal/index.html)
@@ -30,7 +29,7 @@ To use **GetNuts**, download or clone the repo to a folder on your computer, the
 ```r
 install.packages(c(
   "readxl","stringi","quanteda","magrittr",
-  "tidyr","ggplot2","ggpubr","bookdown","tinytex",
+  "tidyr","ggplot2","ggpubr","bookdown",
   "shiny","leaflet","sp","rgdal","spdplyr","rgeos","maptools"))
 ```
 
@@ -44,8 +43,7 @@ install.packages("devtools")
 devtools::install_github("dkahle/ggmap", ref = "tidyup")
 ```
 
-And configured for use with a valid Google Maps API key: https://developers.google.com/maps/ . Add your valid API key to the config file under 'API_KEY'.
-
+Then, clone or download the **GetNuts** repository to your local computer.
 
 ## Configuration
 
@@ -62,7 +60,7 @@ To perform an analysis, the user must specify a `config.txt` file to run with Ge
 
 For the outputs, the user can also specify in the config file what is desired and in which format.
 * `do_static_plots:` ("yes" or "no") Specify whether to export static plot files (Default: yes)
-* `static_plot_format:` Desired output format for output plots. Can be any one of `png`,`jpeg`,`pdf`,`eps`,`svg`,`tif`,`bmp`.
+* `static_plot_format:` Desired output format for output plots. Can be any one of `png`,`jpeg`,`pdf`,`eps`,`svg`,`tif`,`bmp`. (no default)
 * `launch_shiny_dash_board:` ("yes" or no") To launch shiny dash board change this option to "yes".
 
 
@@ -73,19 +71,21 @@ To run the analysis, open an R console and
 * Navigate to the GetNuts Directory
 
 ```r
-> setwd("your/GetNuts/Directory")
+setwd("your/GetNuts/Directory")
 ```
 
 * Source the Main script:
 
 ```r
-> source("GetNuts.R")
+source("GetNuts.R")
 ```
 
-* Call the function `allergies_and_social_media` with the corresponding config file:
+* Call the function `allergies_and_social_media` with the desired config file:
 
 ```r
-> allergies_and_social_media("config_files/config_file")
+allergies_and_social_media("config_files/your_config_file")
 ```
 
-* Watch
+Which will run the entire pipeline with the configuration supplied.
+
+* Check `output_files/$project_name/` for all outputs from the analysis.
