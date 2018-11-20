@@ -498,6 +498,33 @@ ggsave(paste("All_allergens_sentiment_pop_norm.",output_format,sep=""), plot = l
        width = 20, height = 20, units = "cm",
        dpi = 300)
 
+
+# Generate same plot as above but discarding neutral sentiment
+all.allergen.sentiment.geo.pop <- suppressMessages(
+  ggmap(UKrefmap, extent='device', legend="bottomleft") +
+    geom_path(data=shape.df, aes(x=long, y=lat, group=group),
+              color="black", size=0.1) +
+    geom_point(data = subset(labelled.df.geo.allergenSummary, sentiment_class %in% c("negative", "positive")),
+               aes(x = long, y = lat, colour = sentiment_class,
+                   size = norm_factor_population*count/all_ages),
+               alpha = 0.5) +
+    scale_colour_manual(values = c("red","blue", "navy"))+
+    scale_x_continuous(limits = lon_range, expand = c(0,0)) +
+    scale_y_continuous(limits = lat_range, expand = c(0,0)) +
+    theme_nothing(legend=TRUE) +
+    labs(title=paste("All Allergen Mentions by Sentiment Class","\n", "(Per ", norm_factor_population/1000, "k people)"),
+         fill="", size = "Norm. Mentions", colour = "Sentiment Class")
+)
+all.allergen.sentiment.geo.pop
+
+ggsave(paste("All_allergens_sentiment_pop_norm_pos_neg.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
+       width = 20, height = 20, units = "cm",
+       dpi = 300)
+
+
+
+
+
 ############################ Allergen Choropleths ####################################
 
 # 14 Allergens:
@@ -522,9 +549,10 @@ ggsave(paste("Fourteen_allergens_rest_norm.",output_format,sep=""), plot = last_
        width = 35, height = 20, units = "cm",
        dpi = 300)
 
+
 fourteen.shape.pop <- suppressMessages(
   ggmap(UKrefmap, extent='device', legend="bottomleft") +
-  geom_polygon(data = subset(shape.df.allergens, Allergen %in% fourteen.allergen.names & Allergen != "nuts"),
+  geom_polygon(data = subset(shape.df.allergens, Allergen %in% top_4_names),
                aes(x=long, y=lat, group=group,
                    fill=norm_factor_population*count/all_ages),
                color = "black", size=0.01) +
@@ -534,14 +562,16 @@ fourteen.shape.pop <- suppressMessages(
   theme_minimal() +
   xlab("Longitude") +
   ylab("Latitude") +
-  labs(title=paste("Fourteen Allergen Mentions by Local Authority", "\n", "(Per", norm_factor_population/1000, "k people)")) +
+  labs(title=paste("TOP 4 Allergens Mentions by Local Authority", "\n", "(Per", norm_factor_population/1000, "k people)")) +
   facet_wrap(~ Allergen, labeller=labeller(Allergen = remove_underscores), ncol = 7)
 )
 fourteen.shape.pop
 
-ggsave(paste("Fourteen_allergens_pop_norm.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
+ggsave(paste("TOP4_allergens_pop_norm.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
        width = 35, height = 20, units = "cm",
        dpi = 300)
+
+
 
 # 14 Allergens in the context of food labelling:
 fourteen.labelling.shape <- suppressMessages(
