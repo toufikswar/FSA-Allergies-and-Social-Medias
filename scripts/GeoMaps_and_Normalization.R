@@ -37,35 +37,34 @@ clean_UK_local_authorities_names <- function(text)
 }
 #================================================================
 
-# number of restaurants per local authority from FSA
-# https://data.food.gov.uk/catalog/datasets/069c7353-4fdd-4b4f-9c13-ec525753fb2c
+# Name of the csv files containing the number of food establishments per local authority from FSA
+# Original information can be found in: https://data.food.gov.uk/catalog/datasets/069c7353-4fdd-4b4f-9c13-ec525753fb2c
 restaurants_per_local_authority_file <- "resources/2016-17-enforcement-data-food-hygiene.csv" # 2016/2017 Enforcement Data - Food Hygiene
-# restaurants_per_local_authority_file <- "resources/2017-18-enforcement-data-food-hygiene.csv" # 2017/2018 Enforcement Data - Food Hygiene
 
-# data,frame with local authorities information
+# Create data.frame with information number of establishments per local authorities
 restaurants_per_local_authority.df <- read.csv(file = restaurants_per_local_authority_file, header = TRUE, sep=",")
 
-# select only the Local authority name and TotalEstablishments.IncludingNotYetRated.Outside.
+# Select only the Local authority name and TotalEstablishments.IncludingNotYetRated.Outside.
 original_list_of_variables <- c("LAName","TotalEstablishments.IncludingNotYetRated.Outside.")
 restaurants_per_local_authority.df <- subset(restaurants_per_local_authority.df, select = original_list_of_variables)
 
-# rename column names
+# Rename column names
 list_of_variables  <- c("LAName","TotalEstablishments")
 names(restaurants_per_local_authority.df) <- list_of_variables
 
-# The geographical differences plots will be normalized with the TotalEstablishments variable
-# create a new column with the LAName cleaned
+# Create a new column with the "cleaned version" (see function at the top of this script) of the local authority name (LAName)
 restaurants_per_local_authority.df$District <- as.character(clean_UK_local_authorities_names(restaurants_per_local_authority.df$LAName))
 
-# Population per local authority
-# https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/populationestimatesforukenglandandwalesscotlandandnorthernireland
+# Name of the csv file containing the population estimated by mid 2016 per local authority
+# Originl info from: https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/populationestimatesforukenglandandwalesscotlandandnorthernireland
 population_per_local_authority_file <- "resources/ukmidyearestimates20122016.csv" # 2012 -> 2016 population estimate
-# data,frame with local authorities information
+# Create data.frame with local authorities information
 population_per_local_authority.df <- read.csv(file = population_per_local_authority_file, header = TRUE, sep=",")
 
 # Now load the UK map of local authorities
-# https://blog.exploratory.io/making-maps-for-uk-countries-and-local-authorities-areas-in-r-b7d222939597
+# Original infor from: https://blog.exploratory.io/making-maps-for-uk-countries-and-local-authorities-areas-in-r-b7d222939597
 
+# local map related libraries
 library(ggmap)
 library(rgdal)
 library(rgeos)
@@ -77,7 +76,9 @@ uk_county_shapefiles   <- readOGR(dsn = "resources/UK_Local_Authority_2016", lay
 wgs.84                 <- "+proj=longlat +datum=WGS84"
 uk_county_shapefiles   <- spTransform(uk_county_shapefiles, CRS(wgs.84)) # Convert to WGS84 format
 
+# Convert map boundaries to a data.frame format
 shape.df               <- fortify(uk_county_shapefiles, region="lad16nm")
+# Create a new column with the "cleaned version" (see function at the top of this script) of the local authority name (lad16nm)
 shape.df$District <- clean_UK_local_authorities_names(shape.df$id)
 
 library(dplyr)
@@ -86,7 +87,7 @@ library(dplyr)
 labelled.df.geo <- labelled.df[!is.na(labelled.df$latitude),]
 
 # Some entries without original longitude and latitude are assigned the generic "UK"
-# longitude and latitude of 55.37805 and -3.435973, respectively. These supriously inflate
+# longitude and latitude of 55.37805 and -3.435973, respectively. These spuriously inflate
 # measurements in Dumfries and Galloway, so these are removed:
 lat_UKcentre  <- 55.378050
 long_UKcentre <- -3.435973
@@ -100,12 +101,13 @@ proj4string(sp) <- "+proj=longlat +datum=WGS84"
 
 # Match coordinates to each uk region in uk shapefile
 local_authority <- over(sp, uk_county_shapefiles)
+# Add local authority information to the data
 labelled.df.geo <- cbind(labelled.df.geo, local_authority)
 
 # Some rows don't have local authority name. Drop them
 labelled.df.geo <- labelled.df.geo[!is.na(labelled.df.geo$lad16nm),]
 
-# create a new column with the lad16nm cleaned
+# Create a new column with the "cleaned version" (see function at the top of this script) of the local authority name (lad16nm)
 labelled.df.geo$District <- clean_UK_local_authorities_names(labelled.df.geo$lad16nm)
 
 #

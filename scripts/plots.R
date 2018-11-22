@@ -1,8 +1,9 @@
-### Static plots script
+### Script with static summary plots (i.e. not map-based)
 
 cat("\n\n")
 cat(paste("Start static plots script","\n",sep=""))
 
+# load labelled data
 load(image_analysis)
 options(warn=-1) # to stop receiving warnings from coercion and from reseting x and y axis during plotting
 
@@ -12,10 +13,6 @@ out.dir <- file.path(plots_output_dir)
 # Removal of News as a datasource from our data
 labelled.df <- subset(labelled.df, source != "News")
 
-# Creation of 2 columns in labelled.df called <severe_reaction>, <mild_reaction> for plotting purposes
-labelled.df$severe_reaction <- ifelse(labelled.df$reactions_report == "Severe-reaction", 1, 0)
-labelled.df$mild_reaction <- ifelse(labelled.df$reactions_report == "Mild-reaction", 1, 0)
-
 library(tidyr)
 library(magrittr)
 library(dplyr)
@@ -23,6 +20,7 @@ library(dplyr)
 # Long Dataframe needed for certain types of plots.
 labelled.df.long <- gather(labelled.df, Allergen, "Mentions", c(fourteen.allergen.names,other.allergen.names), factor_key = TRUE)
 
+# data.frame with the number of mentions grouped by source and Allergen
 allergen.bysource.df <- labelled.df.long %>%
   group_by(source, Allergen) %>%
   summarise(count=sum(Mentions))
@@ -30,6 +28,7 @@ allergen.bysource.df <- labelled.df.long %>%
 library(ggplot2)
 library(forcats)
 
+# Plot with the 14 allergen mentions by source
 #  Use of reorder() to order allergens by count DESC
 #  Use of gsub() to replace "_" by spaces in the axis labels
 fourteen.bysource <- ggplot(subset(allergen.bysource.df, Allergen %in% fourteen.allergen.names),
@@ -48,6 +47,7 @@ ggsave(paste("14_allergens_bysource.",output_format,sep = ""), plot = last_plot(
        dpi = 300)
 
 
+# Plot with the other allergen mentions by source
 other.bysource <- ggplot(subset(allergen.bysource.df,
                                 Allergen %in% other.allergen.names),
                                 aes(x = reorder(gsub("_"," ", Allergen),count), y = count, fill = source)) +
@@ -67,10 +67,12 @@ ggsave(paste("other_allergens_bysource.",output_format,sep = ""), plot = last_pl
 
 
 #### TOP 10 ALL Allergens Histograme
+# Get the top-10 allergens mentioned in our data
 total_count_per_allergen <- labelled.df %>% subset(select = c(fourteen.allergen.names,other.allergen.names)) %>% colSums(na.rm=T) %>% sort(decreasing=T)
-top_10_names <- names(total_count_per_allergen)[1:10]
-top_4_names <- top_10_names[1:4]
+top_10_names <- names(total_count_per_allergen)[1:10] # top-10 name list
+top_4_names  <- top_10_names[1:4]                     # top-4  name list
 
+# top-10 allergens mentions by source
 top10.bysource <- ggplot(subset(allergen.bysource.df, Allergen %in% top_10_names),
                             aes(x = reorder(gsub("_"," ",Allergen), count), y = count, fill = source)) +
   geom_bar(stat = "identity") +
@@ -82,7 +84,6 @@ top10.bysource <- ggplot(subset(allergen.bysource.df, Allergen %in% top_10_names
   coord_flip()
 top10.bysource
 
-
 ggsave(paste("top10_allergens.",output_format,sep = ""), plot = last_plot(), device = NULL, path = out.dir,
        width = 15, height = 15, units = "cm",
        dpi = 300)
@@ -92,15 +93,17 @@ ggsave(paste("top10_allergens.",output_format,sep = ""), plot = last_plot(), dev
 library(scales)
 library(ggrepel)
 
+# get the 14 allergens mentions only for Twitter
 all_allergens.norm.df.t14 <- subset(labelled.df.long,
                                     source == "Twitter" &
-                                      Allergen %in% fourteen.allergen.names)
+                                    Allergen %in% fourteen.allergen.names)
 # Remove "_" from allergens name
 all_allergens.norm.df.t14$Allergen <- gsub("_"," ",all_allergens.norm.df.t14$Allergen)
 
+# Plot with the 14 allergens mentions on Twitter over time (month)
 by.month.twitter.14 <- ggplot(all_allergens.norm.df.t14,
-                                   aes(x = Month, y = Mentions, colour = Allergen),
-                                   group = Allergen) +
+                              aes(x = Month, y = Mentions, colour = Allergen),
+                              group = Allergen) +
   stat_summary(fun.y = sum, # adds up all observations for the month
                geom = "line") +
   theme_minimal()+
@@ -108,9 +111,14 @@ by.month.twitter.14 <- ggplot(all_allergens.norm.df.t14,
   facet_grid(sentiment_class~.)
 by.month.twitter.14
 
+ggsave(paste("14_allergens_bymonth.",output_format,sep =""), plot = last_plot(), device = NULL, path = out.dir,
+       width = 30, height = 20, units = "cm",
+       dpi = 300)
+
+# Plot with the 14 allergens mentions on Twitter over time (week)
 by.week.twitter.14 <- ggplot(all_allergens.norm.df.t14,
-                                  aes(x = Week, y = Mentions, colour = Allergen),
-                                  group = Allergen) +
+                             aes(x = Week, y = Mentions, colour = Allergen),
+                             group = Allergen) +
   stat_summary(fun.y = sum, # adds up all observations for the week
                geom = "line") +
   theme_minimal() +
@@ -124,10 +132,12 @@ ggsave(paste("14_allergens_byweek.",output_format,sep =""), plot = last_plot(), 
        width = 30, height = 20, units = "cm",
        dpi = 300)
 
+# get the other allergens mentions only for Twitter
 all_allergens.norm.df.t.other <- subset(labelled.df.long, source == "Twitter" & Allergen %in% other.allergen.names)
 # Remove "_" from allergens name
 all_allergens.norm.df.t.other$Allergen <- gsub("_"," ",all_allergens.norm.df.t.other$Allergen)
 
+# Plot with the other allergens mentions on Twitter over time (month)
 by.month.twitter.other <- ggplot(all_allergens.norm.df.t.other, aes(x = Month, y = Mentions, colour = Allergen), group = Allergen)+
   stat_summary(fun.y = sum, # adds up all observations for the month
                geom = "line") +
@@ -137,6 +147,11 @@ by.month.twitter.other <- ggplot(all_allergens.norm.df.t.other, aes(x = Month, y
   theme(strip.text.y = element_text(angle = 0))
 by.month.twitter.other
 
+ggsave(paste("other_allergens_bymonth.", output_format, sep = ""), plot = last_plot(), device = NULL, path = out.dir,
+       width = 30, height = 20, units = "cm",
+       dpi = 300)
+
+# Plot with the other allergens mentions on Twitter over time (week)
 by.week.twitter.other <- ggplot(all_allergens.norm.df.t.other, aes(x = Week, y = Mentions, colour = Allergen), group = Allergen)+
   stat_summary(fun.y = sum, # adds up all observations for the month
                geom = "line") +
@@ -152,11 +167,14 @@ ggsave(paste("other_allergens_byweek.", output_format, sep = ""), plot = last_pl
        dpi = 300)
 
 
-## Intersections
+#################################################################################
+## Intersections of the common allergens labels and contextual issues labelling #
+#################################################################################
 
+# Plot with the allergen enquiries separated by source and sentiment
 enquiries_source_react.bar <- ggplot(labelled.df %>%
-                                       group_by(source, sentiment_class) %>%
-                                       summarise(count = sum(allergy_enquiries)),
+                                     group_by(source, sentiment_class) %>%
+                                     summarise(count = sum(allergy_enquiries)),
                                      aes(x = source, y = count, fill = sentiment_class)) +
   geom_bar(stat = "identity") +
   theme_minimal() +
@@ -169,9 +187,10 @@ ggsave(paste("food_enquiries_bysource.",output_format,sep = ""), plot = last_plo
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
+# Plot with the food labelling separated by source and sentiment
 labelling_source_react.bar <- ggplot(labelled.df %>%
-                                       group_by(sentiment_class, source) %>%
-                                       summarise(count = sum(food_labelling)), 
+                                     group_by(sentiment_class, source) %>%
+                                     summarise(count = sum(food_labelling)),
                                      aes(x = source, y = count, fill = sentiment_class))+
   geom_bar(stat = "identity") +
   theme_minimal() +
@@ -186,17 +205,17 @@ ggsave(paste("labelling_by_source_and_reaction.", output_format, sep = ""), plot
 
 
 
-### Stream 1 issues combined in a single plot by sentiment class
-
-stream1.issues.names <- c("allergy_enquiries","food_labelling","mild_reaction","severe_reaction")
-stream1.issues.df <- subset(labelled.df, select = c(stream1.issues.names,"sentiment_class"))
-
+### Contextual meaning issues combined in a single plot by sentiment class
+stream1.issues.names   <- c("allergy_enquiries","food_labelling","mild_reaction","severe_reaction")
+stream1.issues.df      <- subset(labelled.df, select = c(stream1.issues.names,"sentiment_class"))
 stream1.issues.df.long <- gather(stream1.issues.df, Issue, "Mentions", stream1.issues.names, factor_key = TRUE)
 
+# Contextual meaning issues grouped by Issue and sentiment_class
 stream1.issues.sentiment.groupedby <-stream1.issues.df.long %>%
   group_by(Issue, sentiment_class) %>%
   summarise(counts = sum(Mentions))
 
+# Plot with the contextual issues separated by sentiment
 stream1.issues.bar <- ggplot(stream1.issues.sentiment.groupedby,
                              aes(x = gsub("_", " ", Issue), y = counts, fill = sentiment_class)) +
   geom_bar(stat = "identity") +
@@ -212,25 +231,22 @@ ggsave(paste("Summary_of_Contextual_info_bar.", output_format, sep = ""), plot =
        dpi = 300)
 
 
-
-
 ### Percentage of 14 allergens mentions for which we have a mild/severe reaction
-
-fourteen.allergen.mild <- colSums(labelled.df[labelled.df$mild_reaction == 1,fourteen.allergen.names])
-fourteen.allergen.severe <- colSums(labelled.df[labelled.df$severe_reaction == 1,fourteen.allergen.names])
-fourteen.allergen.total <- colSums(labelled.df[,fourteen.allergen.names])
+fourteen.allergen.mild   <- colSums(labelled.df[labelled.df$mild_reaction == 1,   fourteen.allergen.names])
+fourteen.allergen.severe <- colSums(labelled.df[labelled.df$severe_reaction == 1, fourteen.allergen.names])
+fourteen.allergen.total  <- colSums(labelled.df[,fourteen.allergen.names])
 
 fourteen.allergens.total.df <- data.frame(fourteen.allergen.mild,fourteen.allergen.severe,fourteen.allergen.total)
 
 colnames(fourteen.allergens.total.df) <- c("mild","severe","total")
 
-fourteen.allergens.total.df$perc_mild <- round((fourteen.allergens.total.df$mild/fourteen.allergens.total.df$total)*100,1)
+fourteen.allergens.total.df$perc_mild   <- round((fourteen.allergens.total.df$mild/fourteen.allergens.total.df$total)*100,1)
 fourteen.allergens.total.df$perc_severe <- round((fourteen.allergens.total.df$severe/fourteen.allergens.total.df$total)*100,1)
-fourteen.allergens.total.df$allergen <- rownames(fourteen.allergens.total.df)
+fourteen.allergens.total.df$allergen    <- rownames(fourteen.allergens.total.df)
 
 fourteen.allergen.total.long <- gather(fourteen.allergens.total.df, severity, "percentage", c("perc_mild","perc_severe"), factor_key = TRUE)
 
-
+# Plot with the fraction of mild/severe adverse reactions for each of the official 14 list allergens
 fourteen.allergen.mentions <- ggplot(fourteen.allergen.total.long,
                                      aes(x = gsub("_"," ", allergen),
                                          y = percentage, fill = severity)) +
@@ -250,10 +266,11 @@ ggsave(paste("Percentage_14_allergens_mentions_mild_severe.", output_format, sep
 
 
 #######
-## Subsetting to remove "_' from the Allergy names
-int_14allergen_react.df <- subset(labelled.df.long, Mentions > 0 & Allergen %in% fourteen.allergen.names)
+## Subsetting to remove "_" from the Allergy names
+int_14allergen_react.df          <- subset(labelled.df.long, Mentions > 0 & Allergen %in% fourteen.allergen.names)
 int_14allergen_react.df$Allergen <- gsub("_"," ", int_14allergen_react.df$Allergen)
 
+# Plot with the Adverse reactions reports over time for each of the 14 allergens list in "bar format"
 int_14allergen_react <- ggplot(int_14allergen_react.df,
                                aes(x = Week, y = reactions_report, fill = reactions_report))+
   stat_summary(fun.y = sum, # adds up all observations for the month
@@ -277,7 +294,7 @@ ggsave(paste("14_allergens_reactions.",output_format, sep = ""), plot = last_plo
        dpi = 300)
 
 
-#####
+# Plot with the Adverse reactions reports over time for each of the 14 allergens list in "bubble format"
 allergen.react.df <- subset(labelled.df.long, Allergen %in% fourteen.allergen.names) %>%
   group_by(Allergen, Month, sentiment_class, reactions_report) %>%
   summarise(Count= sum(Mentions))
@@ -306,6 +323,7 @@ ggsave(paste("14_allergens_reactions_bubble.", output_format, sep = ""), plot = 
        width = 30, height = 25, units = "cm",
        dpi = 300)
 
+# Plot with the food labelling issues over time for each of the 14 allergens list in "bubble format"
 allergen.react.labelling.df <- subset(labelled.df.long, Allergen %in% fourteen.allergen.names & food_labelling > 0) %>%
   group_by(Allergen, Month, sentiment_class, reactions_report) %>%
   summarise(Count= sum(Mentions))
@@ -335,6 +353,7 @@ ggsave(paste("14_allergens_labelling_bubble.", output_format, sep = ""), plot = 
        width = 30, height = 25, units = "cm",
        dpi = 300)
 
+# Plot with the allergen enquiries over time for each of the 14 allergens list in "bar format"
 allergen.react.enquiries.df <- subset(labelled.df.long, Allergen %in% fourteen.allergen.names & allergy_enquiries > 0) %>%
   group_by(Allergen, Month, sentiment_class, reactions_report) %>%
   summarise(Count= sum(Mentions))
@@ -363,6 +382,7 @@ ggsave(paste("14_allergens_enquiries_bubble.", output_format, sep = ""), plot = 
 
 
 #####
+# Plot with the Adverse reactions reports over time for each of the other allergens list in "bar format"
 # Subseting to remove "_" from allergen names
 int_otherallergen_react.df <- subset(labelled.df.long, Mentions > 0 & Allergen %in% other.allergen.names)
 int_otherallergen_react.df$Allergen <- gsub("_", " ", int_otherallergen_react.df$Allergen)
@@ -388,8 +408,7 @@ ggsave(paste("other_allergens_reactions.", output_format, sep = ""), plot = last
        width = 30, height = 30, units = "cm",
        dpi = 300)
 
-
-
+# Plot with the allergen enquiries over time for each of the other allergens list in "bar format"
 Int_enquiry_reaction <- ggplot(subset(labelled.df, allergy_enquiries > 0 ), aes(x = Week, y = allergy_enquiries, fill = reactions_report))+
   stat_summary(fun.y = sum, # adds up all observations for the week
                geom = "bar") +
@@ -410,7 +429,7 @@ ggsave(paste("enquiries_reactions.", output_format, sep = ""), plot = last_plot(
        width = 30, height = 15, units = "cm",
        dpi = 300)
 
-
+# Plot with the food labelling issues over time for each of the other allergens list in "bar format"
 labelling_reaction <- ggplot(subset(labelled.df, food_labelling > 0 ), aes(x = Week, y = food_labelling, fill = reactions_report))+
   stat_summary(fun.y = sum, # adds up all observations for the month
                geom = "bar") +
@@ -433,44 +452,43 @@ ggsave(paste("labelling_reactions.", output_format, sep = ""), plot = last_plot(
 
 #######################################
 
-#Creating Percentage Heatmap for Allergens with Co-occurances
+#Co-occurrence Heatmap for among Allergens
 
 # to create subset for 14 allergens and other allergens
 fourteen_allergens.df.norm.subset <- labelled.df[,fourteen.allergen.names]
-other_allergens.df.norm.subset <- labelled.df[,other.allergen.names]
-
+other_allergens.df.norm.subset    <- labelled.df[,other.allergen.names]
 
 # creating percentage matrix for heatmap 1 for fourteen allergens
+column_names   <- colnames(fourteen_allergens.df.norm.subset)
+number_of_rows <- nrow(fourteen_allergens.df.norm.subset)
+number_of_cols <- ncol(fourteen_allergens.df.norm.subset)
+mat            <- matrix(list(), nrow=number_of_cols, ncol=number_of_cols)
 
-column_names = colnames(fourteen_allergens.df.norm.subset)
-number_of_rows = nrow(fourteen_allergens.df.norm.subset)
-number_of_cols = ncol(fourteen_allergens.df.norm.subset)
-mat = matrix(list(), nrow=number_of_cols, ncol=number_of_cols)
+for(i in 1:number_of_cols) {
+  for(j in 1:number_of_cols) {
+    temp <- table(fourteen_allergens.df.norm.subset[,i] + fourteen_allergens.df.norm.subset[,j])
 
-for (i in 1:(number_of_cols)){
-  for (j in 1:number_of_cols){
-    temp = table(fourteen_allergens.df.norm.subset[,i] + fourteen_allergens.df.norm.subset[,j])
-    count_one = table(fourteen_allergens.df.norm.subset[,i])
-    number_of_positive = as.vector(count_one[names(count_one) ==1])
-    count_of_both_present = as.vector(temp[names(temp) ==2]) # 1,1 - are cases where both are present
-    if (length(count_of_both_present) == 0){
-      count_of_both_present = 0
+    count_one <- table(fourteen_allergens.df.norm.subset[,i])
+    number_of_positive    <- as.vector(count_one[names(count_one) ==1])
+    count_of_both_present <- as.vector(temp[names(temp) ==2]) # 1,1 - are cases where both are present
+    if (length(count_of_both_present) == 0) {
+      count_of_both_present <- 0
     }
-    percentage_of_2 = 100*count_of_both_present/number_of_positive
-    #print(c(column_names[i],column_names[j], percentage_of_2))
-    mat[i, j] = percentage_of_2
+    percentage_of_2 <- 100*count_of_both_present/number_of_positive
+    mat[i,j] <- percentage_of_2
   }
 }
 
-percentage_mat = data.frame(mat)
-colnames(percentage_mat) = column_names
-rownames(percentage_mat) = column_names
-percentage_mat <- data.matrix(percentage_mat, rownames.force = NA)
+percentage_mat           <- data.frame(mat)
+colnames(percentage_mat) <- column_names
+rownames(percentage_mat) <- column_names
+percentage_mat           <- data.matrix(percentage_mat, rownames.force = NA)
 
 library(reshape2)
 library(ggplot2)
-melted_percentage_mat = melt(percentage_mat)
+melted_percentage_mat <- melt(percentage_mat)
 
+# plot with the co-occurrence matrix for the 14 allergen list
 g2  <- ggplot(data = melted_percentage_mat, aes(Var1, Var2, fill = value))+  # plot heatmap 2 for 14 Allergens
   geom_tile(color = "white", aes(fill = value))+
   geom_text(aes(label = round(value, 1)))+
@@ -484,50 +502,44 @@ g2  <- ggplot(data = melted_percentage_mat, aes(Var1, Var2, fill = value))+  # p
 
 g2 <-g2 + ggtitle("Co-occurance Heatmap for 14 Allergens") +
   xlab("Allergens") + ylab("Co-occurance with")
-
 g2
-# plot(p2)
 
-# ggsave("percentage_14_allergens.png", plot = p2, device = NULL, path = out.dir,
 ggsave(paste("percentage_14_allergens.", output_format, sep = ""), plot = last_plot(), device = NULL, path = out.dir,
        width = 30, height = 30, units = "cm",
        dpi = 300)
 
 
 # creating percentage matrix for heatmap for other allergens
-
 drops <- c("kidney_beans")
-other_allergens.df.norm.subset <- other_allergens.df.norm.subset[ , !(names(other_allergens.df.norm.subset) %in% drops)]
+other_allergens.df.norm.subset <- other_allergens.df.norm.subset[,!(names(other_allergens.df.norm.subset) %in% drops)]
 
-column_names = colnames(other_allergens.df.norm.subset)
-number_of_rows = nrow(other_allergens.df.norm.subset)
-number_of_cols = ncol(other_allergens.df.norm.subset)
-mat = matrix(list(), nrow=number_of_cols, ncol=number_of_cols)
+column_names   <- colnames(other_allergens.df.norm.subset)
+number_of_rows <- nrow(other_allergens.df.norm.subset)
+number_of_cols <- ncol(other_allergens.df.norm.subset)
+mat            <- matrix(list(), nrow=number_of_cols, ncol=number_of_cols)
 
 for (i in 1:(number_of_cols)){
   for (j in 1:number_of_cols){
-    temp = table(other_allergens.df.norm.subset[,i] + other_allergens.df.norm.subset[,j])
-    count_one = table(other_allergens.df.norm.subset[,i])
-    number_of_positive = as.vector(count_one[names(count_one) ==1])
-    count_of_both_present = as.vector(temp[names(temp) ==2]) # 1,1 - are cases where both are present
-    if (length(count_of_both_present) == 0){
-      count_of_both_present = 0
+    temp      <- table(other_allergens.df.norm.subset[,i] + other_allergens.df.norm.subset[,j])
+    count_one <- table(other_allergens.df.norm.subset[,i])
+
+    number_of_positive    <- as.vector(count_one[names(count_one) ==1])
+    count_of_both_present <- as.vector(temp[names(temp) ==2]) # 1,1 - are cases where both are present
+    if (length(count_of_both_present) == 0) {
+      count_of_both_present <- 0
     }
-    # print(c(column_names[i],column_names[j], count_of_both_present))
     percentage_of_2 = 100*count_of_both_present/number_of_positive
-    #print(c(column_names[j],column_names[i], percentage_of_2))
     mat[i, j] = percentage_of_2
   }
 }
 
-percentage_mat = data.frame(mat)
-colnames(percentage_mat) = column_names
-rownames(percentage_mat) = column_names
-percentage_mat <- data.matrix(percentage_mat, rownames.force = NA)
-melted_percentage_mat_other = melt(percentage_mat)
+percentage_mat              <- data.frame(mat)
+colnames(percentage_mat)    <- column_names
+rownames(percentage_mat)    <- column_names
+percentage_mat              <- data.matrix(percentage_mat, rownames.force = NA)
+melted_percentage_mat_other <- melt(percentage_mat)
 
-# plot heatmap for other allergens
-
+# plot with the co-occurrence matrix for the other allergen list
 g2  <- ggplot(data = melted_percentage_mat_other, aes(Var1, Var2, fill = value))+  # plot heatmap 2 for 14 Allergens
   geom_tile(color = "white", aes(fill = value))+
   geom_text(aes(label = round(value, 1)))+
@@ -543,9 +555,6 @@ g2 <-g2 + ggtitle("Co-occurance Heatmap for Other Allergens") +
   xlab("Allergens") + ylab("Co-occurance with")
 g2
 
-# plot(p2)
-
-# ggsave("percentage_other_allergens.png", plot = p2, device = NULL, path = out.dir,
 ggsave(paste("percentage_other_allergens.", output_format, sep = ""), plot = last_plot(), device = NULL, path = out.dir,
        width = 40, height = 40, units = "cm",
        dpi = 300)

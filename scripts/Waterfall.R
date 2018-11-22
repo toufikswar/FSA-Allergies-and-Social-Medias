@@ -1,11 +1,23 @@
 ### Data labelling script
 
+# load the previous preprocessed data
 load(image_preprocessing)
+
+# load needed libraries
 library(quanteda)
 library(tidyr)
 
-## columns names from the original data to be merged with the streams labellings
-retained_metadata <- c("id", "latitude", "longitude","date","sentiment","sentiment class","topics","user name","user screen name","user source id")
+## columns names from the original data to be merged with the labels produced in this part of the pipeline
+retained_metadata <- c("id",
+                       "latitude",
+                       "longitude",
+                       "date",
+                       "sentiment",
+                       "sentiment class",
+                       "topics",
+                       "user name",
+                       "user screen name",
+                       "user source id")
 
 ### =============LOAD DICTIONARIES================= ###
 # (will only create if library(quanteda) is loaded correctly)
@@ -14,17 +26,21 @@ cat("\n\n")
 cat(paste("Start loading dictionaries","\n",sep=""))
 
 start_time1 <- Sys.time()
-# Stream 1: Supporting local authorities
+# Supporting local authorities dictionaries
+# dictionary file name
 supporting_local_authorities_dict_filename <- "dictionaries/supporting_local_authorities_dictionary.csv"
+# Load dictionary and preprocessed => lowercasing and stemming as with the data
 supporting_local_authorities.dict <- get_dictionary_from_file(supporting_local_authorities_dict_filename)
 cat("\n\n")
 cat(paste("Supporting local authorities dictionary","\n",sep=""))
 print(supporting_local_authorities.dict)
 cat("\n\n")
 
-# Stream 2: 14 allergen list:
+# Common allergens
 # 14 allergen dictionary:
+# dictionary file name
 fourteen_allergens_dict_filename <- "dictionaries/fourteen_allergens_dictionary.csv"
+# Load dictionary and preprocessed => lowercasing and stemming as with the data
 fourteen_allergens.dict <- get_dictionary_from_file(fourteen_allergens_dict_filename)
 cat("\n\n")
 cat(paste("14 allergens dictionary","\n",sep=""))
@@ -32,7 +48,9 @@ print(fourteen_allergens.dict)
 cat("\n\n")
 
 # Other allergen dictionary:
+# dictionary file name
 other_allergens_dict_filename <- "dictionaries/other_allergens_dictionary.csv"
+# Load dictionary and preprocessed => lowercasing and stemming as with the data
 other_allergens.dict <- get_dictionary_from_file(other_allergens_dict_filename)
 cat("\n\n")
 cat(paste("other allergens dictionary","\n",sep=""))
@@ -53,7 +71,7 @@ labelled.df <- content.df
 # Gobal Execution time:
 start_time  <- Sys.time()
 
-# Create a corpus including id for identifier
+# Create a corpus including id as a record identifier
 content.corpus <- corpus(content.df, docid_field = "id", text_field = "content") # Username and Hashtag metadata is retained
 
 ### Stream 1: Supporting Local Authorities
@@ -101,17 +119,21 @@ mild_reaction   <- ifelse(labelled.df[,"allergy"] & labelled.df[,"symptoms"] & l
 severe_reaction <- ifelse(labelled.df[,"allergy"] & labelled.df[,"symptoms"] & labelled.df[,"ingestion"] &
                           labelled.df[,"severe"]
                           ,1,0)
+# If no adverse reaction found in text will label it as No-report
 labelled.df$reactions_report <- rep("No-report",nrow(labelled.df))
+# will label it as either Mild-rection or Severe-reactions
 labelled.df$reactions_report[mild_reaction == 1 & severe_reaction == 0] <- "Mild-reaction"
 labelled.df$reactions_report[mild_reaction == 0 & severe_reaction == 1] <- "Severe-reaction"
 labelled.df$reactions_report <- factor(labelled.df$reactions_report, levels = c("No-report","Mild-reaction", "Severe-reaction"))
+labelled.df$severe_reaction  <- ifelse(labelled.df$reactions_report == "Severe-reaction", 1, 0)
+labelled.df$mild_reaction    <- ifelse(labelled.df$reactions_report == "Mild-reaction",   1, 0)
 reaction.report.names <- c("reactions_report")
 
 end_time1 <- Sys.time()
 supporting_local_authorities_time <- as.difftime(end_time1 - start_time1, units = "secs")
 
 ### Stream 2: 14 allergens
-# 14 allergens
+# 14 allergens labelling
 start_time1 <- Sys.time()
 fourteen_allergens.df.norm <- from_corpus_to_lookup_dataframe(content.corpus, fourteen_allergens.dict)
 fourteen.allergen.names    <- colnames(fourteen_allergens.df.norm)[-1]
@@ -119,34 +141,43 @@ labelled.df                <- cbind(labelled.df,fourteen_allergens.df.norm[,four
 end_time1 <- Sys.time()
 fourteen_allergens_time <- as.difftime(end_time1 - start_time1, units = "secs")
 
-# other allergens
+# other allergens labelling
 start_time1 <- Sys.time()
 other_allergens.df.norm <- from_corpus_to_lookup_dataframe(content.corpus, other_allergens.dict)
 other.allergen.names    <- colnames(other_allergens.df.norm)[-1]
 labelled.df             <- cbind(labelled.df,other_allergens.df.norm[,other.allergen.names])
-# Disambiguate Nuts and Seeds categories
-labelled.df$nuts  <- ifelse(labelled.df$nuts  == 1 & labelled.df$tree_nuts    == 0,1,0)
-labelled.df$seeds <- ifelse(labelled.df$seeds == 1 & labelled.df$sesame_seeds == 0,1,0)
+
+# If nuts and tree_nut exist, Disambiguate Nuts and Seeds categories
+if( ("nuts"      %in% names(labelled.df)) &
+    ("tree_nuts" %in% names(labelled.df))
+  ) {
+  labelled.df$nuts  <- ifelse(labelled.df$nuts  == 1 & labelled.df$tree_nuts    == 0,1,0)
+  labelled.df$seeds <- ifelse(labelled.df$seeds == 1 & labelled.df$sesame_seeds == 0,1,0)
+}
 end_time1 <- Sys.time()
 other_allergens_time <- as.difftime(end_time1 - start_time1, units = "secs")
 
 # Merge labelled tweets with other features from the original data.frame (data.df)
 library(dplyr)
 
+# Add the useful metadate to the labelled data
 labelled.df       <- left_join(labelled.df, data.df[,retained_metadata], "id")
-labelled.df$date  <- as.Date(labelled.df$date, format= "%Y-%m-%d")
-labelled.df$Month <- as.Date(cut(labelled.df$date, breaks = "month"))
-labelled.df$Week  <- as.Date(cut(labelled.df$date, breaks = "week"))
-names(labelled.df)[names(labelled.df) == "sentiment class"] <- "sentiment_class" #rename sentiment class to a single string
-labelled.df$sentiment_class[labelled.df$sentiment_class %in% c("not_evaluable", "processing")] <- "neutral" # collapse not evaluable and procesing into neutral
 
-labelled.df$severe_reaction <- ifelse(labelled.df$reactions_report == "Severe-reaction", 1, 0)
-labelled.df$mild_reaction   <- ifelse(labelled.df$reactions_report == "Mild-reaction",   1, 0)
+# Add time informations in specific formats
+# Convert data to datatime format
+labelled.df$date  <- as.Date(labelled.df$date, format= "%Y-%m-%d")
+labelled.df$Month <- as.Date(cut(labelled.df$date, breaks = "month")) # add date columns in month format
+labelled.df$Week  <- as.Date(cut(labelled.df$date, breaks = "week"))  # add date columns in week  format
+
+#rename sentiment class to a single string ==> remove spaces by "_"
+names(labelled.df)[names(labelled.df) == "sentiment class"] <- "sentiment_class"
+# redefine sentiment class values not_evaluable and processing as neutral
+labelled.df$sentiment_class[labelled.df$sentiment_class %in% c("not_evaluable", "processing")] <- "neutral" # collapse not evaluable and procesing into neutral
 
 # get the UK local authorities map and normalization data
 source("scripts/GeoMaps_and_Normalization.R")
 
-# save image file for data-labelling
+# save labelled data to an image file
 cat("\n\n")
 cat(paste("Saving image of RData to ", image_analysis,"...", "\n",sep=""))
 save.image(file = image_analysis)

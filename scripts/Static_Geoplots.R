@@ -1,14 +1,18 @@
+### Script with static summary plots (i.e. map-based)
+
+# load labelled data
 load(image_analysis)
 
 # output file where the plots are saved
 out.dir <- file.path(plots_output_dir)
 
+# Removal of News as a datasource from our data
 labelled.df.geo <- subset(labelled.df.geo, source != "News")
 
 # putting the data in a format for choropleth map plotting
 library(dplyr)
 
-# All isues of stream 1
+# All contextaul issues put in a single data.frame grouped by local authority names, long and lat
 labelled.df.geo.stream1_summary <- labelled.df.geo %>%
   group_by(objectid, long, lat, District, lad16nm) %>%
   summarise(count_allergy_enquiries     = sum(allergy_enquiries),
@@ -23,11 +27,11 @@ labelled.df.geo.stream1_summary <- labelled.df.geo %>%
 
 options(warn=-1) # to stop receiving warnings from coercion and from reseting x and y axis during plotting
 
-# join the normalization information (nuber of businesses)
+# add the number of businesses info per local authority
 labelled.df.geo.stream1_summary <- left_join(labelled.df.geo.stream1_summary,
                                              restaurants_per_local_authority.df[,c("District","TotalEstablishments")], "District")
 
-# add another normalization information: population and demographics
+# add the population info per local authority
 labelled.df.geo.stream1_summary <- left_join(labelled.df.geo.stream1_summary,
                                              population_per_local_authority.df[,c("District","all_ages")], "District")
 
@@ -68,7 +72,7 @@ scale_lat <- c(0.05,0.05)
 delta     <- lat_range[2] - lat_range[1]
 for(i in 1:2) lat_range[i] <- lat_range[i] + (-1)^i*delta*scale_lat[i]
 
-# Number of businesses per local authority
+# Plot with the number of businesses per local authority
 number_of_businesses.geo <- suppressMessages(
   ggmap(UKrefmap, extent='device', legend="bottomleft") +
   geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
@@ -85,7 +89,7 @@ ggsave(paste("number_of_businesses_map.",output_format,sep=""), plot = last_plot
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
-# Population per local authority
+# Plot with the population per local authority
 population.geo <- suppressMessages(
   ggmap(UKrefmap, extent='device', legend="bottomleft") +
   geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
@@ -103,7 +107,7 @@ ggsave(paste("population_map.",output_format,sep=""), plot = last_plot(), device
        dpi = 300)
 
 
-# Allergy enquiries plots
+# Plot with the Allergy enquiries raw mentions per local authority
 selection_allergy_enquiries <- shape.df.stream1$count_allergy_enquiries > 0
 allergy_enquiries.summary.geo.raw <- suppressMessages(
   ggmap(UKrefmap, extent='device', legend="bottomleft") +
@@ -121,6 +125,7 @@ ggsave(paste("allergy_enquiries_map_raw.",output_format,sep=""), plot = last_plo
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
+# Plot with the Allergy enquiries mentions normalized by number of establishments per local authority
 allergy_enquiries.summary.geo.norm <- suppressMessages(
   ggmap(UKrefmap, extent='device', legend="bottomleft") +
   geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
@@ -140,6 +145,7 @@ ggsave(paste("allergy_enquiries_map_rest_norm.",output_format,sep=""), plot = la
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
+# Plot with the Allergy enquiries mentions normalized by population per local authority
 allergy_enquiries.summary.geo.norm.pop <- suppressMessages(
   ggmap(UKrefmap, extent='device', legend="bottomleft") +
   geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
@@ -159,7 +165,7 @@ ggsave(paste("allergy_enquiries_map_pop_norm.",output_format,sep=""), plot = las
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
-# Allergy enquiries with positive sentiment plots
+# Plot with the Allergy enquiries raw mentions with positive sentiment per local authority
 selection_allergy_enquiries <- shape.df.stream1$count_pos_allergy_enquiries > 0
 allergy_enquiries.summary.geo.pos.raw <- suppressMessages(
   ggmap(UKrefmap, extent='device', legend="bottomleft") +
@@ -177,6 +183,7 @@ ggsave(paste("allergy_enquiries_positive_map_raw.",output_format,sep=""), plot =
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
+# Plot with the Allergy enquiries mentions normalized by number of establishments with positive sentiment per local authority
 allergy_enquiries.summary.geo.pos.norm <- suppressMessages(
   ggmap(UKrefmap, extent='device', legend="bottomleft") +
   geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
@@ -196,6 +203,7 @@ ggsave(paste("allergy_enquiries_positive_map_rest_norm.",output_format,sep=""), 
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
+# Plot with the Allergy enquiries mentions normalized by population with positive sentiment per local authority
 allergy_enquiries.summary.geo.norm.pos.pop <- suppressMessages(
   ggmap(UKrefmap, extent='device', legend="bottomleft") +
   geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
@@ -215,7 +223,7 @@ ggsave(paste("allergy_enquiries_positive_map_pop_norm.",output_format,sep=""), p
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
-# Allergy enquiries with negative sentiment plots
+# Plot with the Allergy enquiries raw mentions with negative sentiment per local authority
 selection_allergy_enquiries <- shape.df.stream1$count_neg_allergy_enquiries > 0
 allergy_enquiries.summary.geo.neg.raw <- suppressMessages(
   ggmap(UKrefmap, extent='device', legend="bottomleft") +
@@ -233,6 +241,7 @@ ggsave(paste("allergy_enquiries_negative_map_raw.",output_format,sep=""), plot =
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
+# Plot with the Allergy enquiries mentions normalized by number of establishments with negative sentiment per local authority
 allergy_enquiries.summary.geo.neg.norm <- suppressMessages(
   ggmap(UKrefmap, extent='device', legend="bottomleft") +
   geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
@@ -252,6 +261,7 @@ ggsave(paste("allergy_enquiries_negative_map_rest_norm.",output_format,sep=""), 
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
+# Plot with the Allergy enquiries mentions normalized by population with negative sentiment per local authority
 allergy_enquiries.summary.geo.norm.neg.pop <- suppressMessages(
   ggmap(UKrefmap, extent='device', legend="bottomleft") +
   geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
@@ -271,7 +281,7 @@ ggsave(paste("allergy_enquiries_negative_map_pop_norm.",output_format,sep=""), p
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
-# Food labelling plots
+# Plot with the food labelling raw mentions per local authority
 selection_food_labelling <- shape.df.stream1$count_food_labelling > 0
 food_labelling.summary.geo.raw <- suppressMessages(
   ggmap(UKrefmap, extent='device', legend="bottomleft") +
@@ -289,6 +299,7 @@ ggsave(paste("food_labelling_map_raw.",output_format,sep=""), plot = last_plot()
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
+# Plot with the food labelling mentions normalized by number of establishments local authority
 food_labelling.summary.geo.norm <- suppressMessages(
   ggmap(UKrefmap, extent='device', legend="bottomleft") +
   geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
@@ -308,6 +319,7 @@ ggsave(paste("food_labelling_map_rest_norm.",output_format,sep=""), plot = last_
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
+# Plot with the food labelling mentions normalized by population local authority
 food_labelling.summary.geo.norm.pop <- suppressMessages(
   ggmap(UKrefmap, extent='device', legend="bottomleft") +
   geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
@@ -327,7 +339,7 @@ ggsave(paste("food_labelling_map_pop_norm.",output_format,sep=""), plot = last_p
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
-# Food labelling positive plots
+# Plot with the food labelling raw mentions with positive sentiment per local authority
 selection_food_labelling <- shape.df.stream1$count_pos_food_labelling > 0
 food_labelling.summary.geo.pos.raw <- suppressMessages(
   ggmap(UKrefmap, extent='device', legend="bottomleft") +
@@ -345,6 +357,7 @@ ggsave(paste("food_labelling_positive_map_raw.",output_format,sep=""), plot = la
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
+# Plot with the food labelling mentions normalized by number of establishments with positive sentiment per local authority
 food_labelling.summary.geo.pos.norm <- suppressMessages(
   ggmap(UKrefmap, extent='device', legend="bottomleft") +
   geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
@@ -364,6 +377,7 @@ ggsave(paste("food_labelling_positive_map_rest_norm.",output_format,sep=""), plo
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
+# Plot with the food labelling mentions normalized by population with positive sentiment per local authority
 food_labelling.summary.geo.pos.norm.pop <- suppressMessages(
   ggmap(UKrefmap, extent='device', legend="bottomleft") +
   geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
@@ -383,7 +397,7 @@ ggsave(paste("food_labelling_positive_map_pop_norm.",output_format,sep=""), plot
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
-# Food labelling negative plots
+# Plot with the food labelling raw mentions with negative sentiment per local authority
 selection_food_labelling <- shape.df.stream1$count_neg_food_labelling > 0
 food_labelling.summary.geo.neg.raw <- suppressMessages(
   ggmap(UKrefmap, extent='device', legend="bottomleft") +
@@ -401,6 +415,7 @@ ggsave(paste("food_labelling_negative_map_raw.",output_format,sep=""), plot = la
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
+# Plot with the food labelling mentions normalized by number of establishments with negative sentiment per local authority
 food_labelling.summary.geo.neg.norm <- suppressMessages(
   ggmap(UKrefmap, extent='device', legend="bottomleft") +
   geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
@@ -420,6 +435,7 @@ ggsave(paste("food_labelling_negative_map_rest_norm.",output_format,sep=""), plo
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
+# Plot with the food labelling mentions normalized by population with negative sentiment per local authority
 food_labelling.summary.geo.neg.norm.pop <- suppressMessages(
   ggmap(UKrefmap, extent='device', legend="bottomleft") +
   geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
@@ -439,7 +455,7 @@ ggsave(paste("food_labelling_negative_map_pop_norm.",output_format,sep=""), plot
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
-# Mild reactions plots
+# Mild reactions raw mentions per local authority
 selection_mild_reaction <- shape.df.stream1$count_mild_reaction > 0
 mild_reaction.summary.geo.raw <- suppressMessages(
   ggmap(UKrefmap, extent='device', legend="bottomleft") +
@@ -457,6 +473,7 @@ ggsave(paste("mild_reaction_map_raw.",output_format,sep=""), plot = last_plot(),
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
+# Mild reactions mentions normalized by number of establishments per local authority
 mild_reaction.summary.geo.norm <- suppressMessages(
   ggmap(UKrefmap, extent='device', legend="bottomleft") +
   geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
@@ -476,6 +493,7 @@ ggsave(paste("mild_reaction_map_rest_norm.",output_format,sep=""), plot = last_p
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
+# Mild reactions mentions normalized by population per local authority
 mild_reaction.summary.geo.norm.pop <- suppressMessages(
   ggmap(UKrefmap, extent='device', legend="bottomleft") +
   geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
@@ -495,7 +513,7 @@ ggsave(paste("mild_reaction_map_pop_norm.",output_format,sep=""), plot = last_pl
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
-# Severe reactions plots
+# Severe reactions raw mentions per local authority
 selection_severe_reaction <- shape.df.stream1$count_severe_reaction > 0
 severe_reaction.summary.geo.raw <- suppressMessages(
   ggmap(UKrefmap, extent='device', legend="bottomleft") +
@@ -513,6 +531,7 @@ ggsave(paste("severe_reaction_map_raw.",output_format,sep=""), plot = last_plot(
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
+# Severe reactions mentions normalized by number of establishments per local authority
 severe_reaction.summary.geo.norm <- suppressMessages(
   ggmap(UKrefmap, extent='device', legend="bottomleft") +
   geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
@@ -532,6 +551,7 @@ ggsave(paste("severe_reaction_map_rest_norm.",output_format,sep=""), plot = last
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
+# Severe reactions mentions normalized by population per local authority
 severe_reaction.summary.geo.norm.pop <- suppressMessages(
   ggmap(UKrefmap, extent='device', legend="bottomleft") +
   geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
@@ -551,7 +571,7 @@ ggsave(paste("severe_reaction_map_pop_norm.",output_format,sep=""), plot = last_
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
-# All adverse reactions  plots
+# Mild+Severe reactions raw mentions per local authority
 selection_adverse_reaction <- shape.df.stream1$count_adverse_reaction > 0
 adverse_reaction.summary.geo.raw <- suppressMessages(
   ggmap(UKrefmap, extent='device', legend="bottomleft") +
@@ -569,6 +589,7 @@ ggsave(paste("adverse_reaction_map_raw.",output_format,sep=""), plot = last_plot
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
+# Mild+Severe reactions mentions normalized by number of establishments per local authority
 adverse_reaction.summary.geo.norm <- suppressMessages(
   ggmap(UKrefmap, extent='device', legend="bottomleft") +
   geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
@@ -588,6 +609,7 @@ ggsave(paste("adverse_reaction_map_rest_norm.",output_format,sep=""), plot = las
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
+# Mild+Severe reactions mentions normalized by population per local authority
 adverse_reaction.summary.geo.norm.pop <- suppressMessages(
   ggmap(UKrefmap, extent='device', legend="bottomleft") +
   geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
