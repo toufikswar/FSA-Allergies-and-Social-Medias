@@ -6,7 +6,8 @@
 # quanteda library must loaded before 'utils.R' is
 # sourced to ensure allergen dictionaries are created properly
 
-## for testing
+## get the times at this point to estimate the execution time of the
+## preprocessing pipeline
 start_time  <- Sys.time()
 start_time1 <- Sys.time()
 
@@ -14,21 +15,25 @@ library(stringi)
 library(quanteda)
 library(magrittr)
 
-# Read in Functions stored in utils.R
+# Read in utility functions stored in utils.R
 source("scripts/utils.R")
 
+# Data is in an excel format
+# getting the sheet name specified in the config file
 sheet_name <- configuration$sheet_name
+
+# getting the list of files specified in the config file
 filenames  <- paste(configuration$input_dir,"/",configuration$input_file_list,sep="")
 
 cat("\n\n")
 cat(paste("Start loading the data","\n",sep=""))
-# verbose variable
-verbose <- TRUE
+
+# Loading the data
+verbose <- TRUE # verbosity variable
+# read the input files and produce a data.frame
 data.df <- load_list_of_xlsx_files(filenames,sheet_name,verbose)
 cat(paste("Total number of records in the data = ",nrow(data.df),"\n",sep=""))
 
-# flag to run preprocessing test
-do_test_preprocessing <- FALSE
 
 end_time1 <- Sys.time()
 cat("\n\n")
@@ -47,7 +52,8 @@ cat(paste("Start 1st data preprocessing","\n",sep=""))
 
 start_time1 <- Sys.time()
 
-# List of spurious columns to drop
+# Exclude from the data some fautures that we considered of
+# no utility
 columns_to_drop <- c("search",
                      "language",
                      "main emotion",
@@ -71,9 +77,9 @@ data.df <- data.df[order(as.Date(data.df$date, format=c("%Y/%m/%d","h:m:s"))),]
 
 # Subset dataframe with only 'id', 'content' and source columns : content.df
 content.df <- subset(data.df, select=c("id", "content","source"))
-# copy copy original content previous to pre-processing
+
+# Copy original content
 content.df$original_content <- content.df$content
-# content.df <- content.df[1:1000,]
 
 #Convert content text to lowercase
 content.df$content <- stri_trans_tolower(content.df$content)
@@ -84,7 +90,7 @@ content.df <- content.df[-grep("^rt", content.df$content),]
 # Remove duplicated records
 content.df <- content.df[!duplicated(content.df$content),]
 
-# Convert content text from latin1 to ascii format
+# Convert content text from latin1 to ascii format. This allows to remove the emojis
 content.df$content <- iconv(content.df$content, from = "latin1", to = "ascii", sub = "byte")
 
 # Extract usernames (words starting with @) and put them into a new column: users column
@@ -98,23 +104,24 @@ content.df$content <- gsub("@\\w+|<\\w+>|&.*;","", content.df$content)
 
 #Replace % symbol by the word percent
 content.df$content <- stri_replace_all_fixed(content.df$content, "%", " percent ")
+
 #Replace ~ symbol by a white-space
 content.df$content <- stri_replace_all_fixed(content.df$content, "~", " ")
 
-# expand acronyms
-# uses a dictionary with several acronyms and expand them (e.g. asap ==> as soon as possible)
+# Expand acronyms
+# Use a dictionary with several acronyms and expand them (e.g. asap ==> as soon as possible)
 acronym_key        <- read.csv("resources/acronyms.csv", header=FALSE,col.names = c("abv","repl"))  # acronyms map
-abv  <- paste("\\b",acronym_key$abv,"\\b",sep="")
-repl <- paste(acronym_key$repl,sep="")
-content.df$content <- stri_replace_all_regex(content.df$content, abv, repl, vectorize_all=FALSE)
+abv  <- paste("\\b",acronym_key$abv,"\\b",sep="")  # abbrevations
+repl <- paste(acronym_key$repl,sep="")             # expeanded version of abbrevation
+content.df$content <- stri_replace_all_regex(content.df$content, abv, repl, vectorize_all=FALSE) # replace abbrevations by expanded version
 
 #Remove all punctuation
 content.df$content <- stri_replace_all(content.df$content, "", regex = "[[:punct:]]")
 
 # Expand the english contractions (e.g. he's ==> he is)
 english_contraction_key  <- read.csv("resources/english_contractions.csv", header=FALSE,col.names = c("contraction","expansion"))  # acronyms map
-contraction <- paste("\\b",english_contraction_key$contraction,"\\b",sep="")
-expansion   <- paste(" ",english_contraction_key$expansion," ",sep="")
+contraction <- paste("\\b",english_contraction_key$contraction,"\\b",sep="")  # english contraction
+expansion   <- paste(" ",english_contraction_key$expansion," ",sep="")        # expended version of english abbrevation
 content.df$content <- stri_replace_all_regex(content.df$content, contraction, expansion, vectorize_all=FALSE)
 
 # Remove http, url links that have been collapsed into words
@@ -137,8 +144,8 @@ cat("\n\n")
 start_time1 <- Sys.time()
 
 # In this 2nd part of the data two operations will be applied
-# - stop word removal: will remove a set of stop words from the english language (e.g. is, a, you, ...)
-# - word stemming: a rule-based algorithm that converts inflected forms of words into their base forms (stems)
+# - Stop word removal: will remove a set of stop words from the english language (e.g. is, a, you, ...)
+# - Word stemming:     a rule-based algorithm that converts inflected forms of words into their base forms (stems)
 #
 # This part of pre-processing is a bit computationally intensive. Will run this steps in parallel
 # using the cores available.
@@ -148,23 +155,21 @@ cat("\n\n")
 cat(paste("Start Stopword Removal & Stemming","\n",sep=""))
 cat("Depending on the size of the Data this step can take 5-10 minutes. Be patient please.")
 cat(" Distributing jobs to ",Ncores," available CPU cores ...\n")
-# Emojis emoji_dictionary from (https://raw.githubusercontent.com/lyons7/emojidictionary/master/emoji_dictionary.csv)
-#emoticons         <- read.csv("resources/emoji_dictionary.csv", header = TRUE) # emojis emoji_dictionary
 
 # Start a local cluster with the cores available
 instance <- makeCluster(Ncores)
 clusterEvalQ(instance, {
-  library(quanteda)
+  library(quanteda) #include the needed libraries
 })
 
-# parallelized application of stop-word removal and stemming
+# Parallelized application of stop-word removal and stemming
 content.df$content <- parLapply(instance, content.df$content,
   function(i) {
-    i %>%
-    tokens() %>%
-    tokens_remove(stopwords("english")) %>%
-    tokens_wordstem() %>%
-    paste(collapse = " ")
+    i %>%         # take content data
+    tokens() %>%  # get list of tokens or words
+    tokens_remove(stopwords("english")) %>%  # remove english stop words
+    tokens_wordstem() %>%                    # apply stemming
+    paste(collapse = " ") # recreated the message with the list of stemmed words in the original order
   }
 )
 # Stop the local cluster instance
@@ -185,6 +190,9 @@ content.df <- content.df[!duplicated(content.df$content),]
 content.df$content <- as.character(content.df$content)  # This may interfere with tokenization for stream 1 - be aware
 
 # Testing structure
+# set below flag to true to print a subsample of the data
+# to compare the origina content with the preprocessed one
+do_test_preprocessing <- FALSE
 if(do_test_preprocessing) {
   # Run a comparison between the oirignal and preprocessed texts
   # for a randomly selected set of records
@@ -193,7 +201,8 @@ if(do_test_preprocessing) {
   test_text_preprocessing(content.df,n.test.records)
 }
 
-# Save the environment into an image file
+# Save the environment into an image file. This is important, as the
+# preprocessing can be runned just once if needed.
 file_out <- image_preprocessing
 cat("\n\n")
 cat(paste("Saving image of RData to ", file_out,"...", "\n",sep=""))
