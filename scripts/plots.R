@@ -246,6 +246,12 @@ fourteen.allergens.total.df$allergen    <- rownames(fourteen.allergens.total.df)
 
 fourteen.allergen.total.long <- gather(fourteen.allergens.total.df, severity, "percentage", c("perc_mild","perc_severe"), factor_key = TRUE)
 
+fourteen.allergen.mild   <- colSums(labelled.df[labelled.df$mild_reaction == 1,   fourteen.allergen.names])
+
+
+
+
+
 # Plot with the fraction of mild/severe adverse reactions for each of the official 14 list allergens
 fourteen.allergen.mentions <- ggplot(fourteen.allergen.total.long,
                                      aes(x = gsub("_"," ", allergen),
@@ -258,11 +264,62 @@ fourteen.allergen.mentions <- ggplot(fourteen.allergen.total.long,
   labs(x= "Allergens", y="Percentage", fill = "Severity") +
   ggtitle("Percentage of Mild/Severe reactions over 14 allergens mentions") +
   coord_flip()
-fourteen.allergen.mentions
+fourteen.allergen.total.long
 
 ggsave(paste("Percentage_14_allergens_mentions_mild_severe.", output_format, sep = ""), plot = last_plot(), device = NULL, path = out.dir,
        width = 20, height = 15, units = "cm",
        dpi = 300)
+
+
+
+fourteen.allergen.mentions
+
+
+# Plot with the fraction of mild/severe adverse reactions for each of the other list allergens
+
+other.allergen.mild   <- colSums(labelled.df[labelled.df$mild_reaction == 1,   other.allergen.names])
+other.allergen.severe <- colSums(labelled.df[labelled.df$severe_reaction == 1, other.allergen.names])
+other.allergen.total  <- colSums(labelled.df[,other.allergen.names])
+
+other.allergens.total.df <- data.frame(other.allergen.mild,other.allergen.severe,other.allergen.total)
+
+
+colnames(other.allergens.total.df) <- c("mild","severe","total")
+
+other.allergens.total.df$perc_mild   <- round((other.allergens.total.df$mild/other.allergens.total.df$total)*100,1)
+other.allergens.total.df$perc_severe <- round((other.allergens.total.df$severe/other.allergens.total.df$total)*100,1)
+other.allergens.total.df$allergen    <- rownames(other.allergens.total.df)
+
+other.allergen.total.long <- gather(other.allergens.total.df, severity, "percentage", c("perc_mild","perc_severe"), factor_key = TRUE)
+
+other.allergen.mild   <- colSums(labelled.df[labelled.df$mild_reaction == 1,   other.allergen.names])
+
+#choose top 5 other allergens 
+other.allergen.total.long_subset <- subset(other.allergen.total.long, allergen=="coconut" | allergen=="fungus" | allergen=="banana" 
+                                           | allergen=="seeds" | allergen=="vegetable")
+
+
+# Plot with the fraction of mild/severe adverse reactions for each of the other allergens
+other.allergen.mentions <- ggplot(other.allergen.total.long_subset,
+                                  aes(x = gsub("_"," ", allergen),
+                                      y = percentage, fill = severity)) +
+  geom_bar(width = 0.4 ,position = "dodge", stat="identity") +
+  theme_minimal() +
+  scale_fill_manual(values=c("#ffa64d", "#cc0000"),
+                    breaks=c("perc_mild", "perc_severe"),
+                    labels=c("% Mild", "% Severe")) +
+  labs(x= "Other Allergens", y="Percentage", fill = "Severity") +
+  ggtitle("Percentage of Mild/Severe reactions over other allergens mentions") +
+  coord_flip() + theme_bw()
+
+
+ggsave(paste("Percentage_other_allergens_mentions_mild_severe.", output_format, sep = ""), plot = last_plot(), device = NULL, path = out.dir,
+       width = 20, height = 15, units = "cm",
+       dpi = 300)
+
+other.allergen.mentions
+
+
 
 
 #######
