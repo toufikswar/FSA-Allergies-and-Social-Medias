@@ -11,10 +11,15 @@ library(dplyr)
 # All isues of stream 1
 labelled.df.geo.stream1_summary <- labelled.df.geo %>%
   group_by(objectid, long, lat, District, lad16nm) %>%
-  summarise(count_allergy_enquiries = sum(allergy_enquiries),
-            count_food_labelling    = sum(food_labelling),
-            count_mild_reaction     = sum(mild_reaction),
-            count_severe_reaction   = sum(severe_reaction))
+  summarise(count_allergy_enquiries     = sum(allergy_enquiries),
+            count_neg_allergy_enquiries = sum(allergy_enquiries & sentiment_class == "negative"),
+            count_pos_allergy_enquiries = sum(allergy_enquiries & sentiment_class == "positive"),
+            count_food_labelling        = sum(food_labelling),
+            count_neg_food_labelling    = sum(food_labelling & sentiment_class == "negative"),
+            count_pos_food_labelling    = sum(food_labelling & sentiment_class == "positive"),
+            count_mild_reaction         = sum(mild_reaction),
+            count_severe_reaction       = sum(severe_reaction),
+            count_adverse_reaction      = sum(severe_reaction | mild_reaction))
 
 options(warn=-1) # to stop receiving warnings from coercion and from reseting x and y axis during plotting
 
@@ -34,9 +39,14 @@ shape.df.population  <- left_join(shape.df,population_per_local_authority.df[,c(
 # Joing stream 1 issues with map polygons
 names_to_join    <- c("District","TotalEstablishments","all_ages",
                       "count_allergy_enquiries",
+                      "count_neg_allergy_enquiries",
+                      "count_pos_allergy_enquiries",
                       "count_food_labelling",
+                      "count_neg_food_labelling",
+                      "count_pos_food_labelling",
                       "count_mild_reaction",
-                      "count_severe_reaction")
+                      "count_severe_reaction",
+                      "count_adverse_reaction")
 shape.df.stream1 <- left_join(shape.df,labelled.df.geo.stream1_summary[,names_to_join],by = "District")
 
 library(ggmap)
@@ -120,8 +130,8 @@ allergy_enquiries.summary.geo.norm <- suppressMessages(
   xlim(lon_range) +
   ylim(lat_range) +
   theme_nothing(legend=TRUE) +
-  labs(title=paste("Allergy enquiries mentions \n(Per ", 
-                   norm_factor_businesses, " Establishments)"), 
+  labs(title=paste("Allergy enquiries mentions \n(Per ",
+                   norm_factor_businesses, " Establishments)"),
        fill="")
 )
 allergy_enquiries.summary.geo.norm
@@ -139,13 +149,125 @@ allergy_enquiries.summary.geo.norm.pop <- suppressMessages(
   xlim(lon_range) +
   ylim(lat_range) +
   theme_nothing(legend=TRUE) +
-  labs(title=paste("Allergy enquiries mentions \n(Per ", 
-                   norm_factor_population/1000, 
+  labs(title=paste("Allergy enquiries mentions \n(Per ",
+                   norm_factor_population/1000,
                    "k people)"), fill="")
 )
 allergy_enquiries.summary.geo.norm.pop
 
 ggsave(paste("allergy_enquiries_map_pop_norm.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
+       width = 15, height = 15, units = "cm",
+       dpi = 300)
+
+# Allergy enquiries with positive sentiment plots
+selection_allergy_enquiries <- shape.df.stream1$count_pos_allergy_enquiries > 0
+allergy_enquiries.summary.geo.pos.raw <- suppressMessages(
+  ggmap(UKrefmap, extent='device', legend="bottomleft") +
+  geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
+  geom_polygon(data = shape.df.stream1[selection_allergy_enquiries,], aes(x=long, y=lat, group=group, fill=count_pos_allergy_enquiries), color = "black", size=0.2) +
+  scale_fill_distiller(name = "raw mentions",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5)) +
+  xlim(lon_range) +
+  ylim(lat_range) +
+  theme_nothing(legend=TRUE) +
+  labs(title="Positive allergy enquiries raw mentions", fill="")
+)
+allergy_enquiries.summary.geo.pos.raw
+
+ggsave(paste("allergy_enquiries_positive_map_raw.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
+       width = 15, height = 15, units = "cm",
+       dpi = 300)
+
+allergy_enquiries.summary.geo.pos.norm <- suppressMessages(
+  ggmap(UKrefmap, extent='device', legend="bottomleft") +
+  geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
+  geom_polygon(data = shape.df.stream1[selection_allergy_enquiries,], aes(x=long, y=lat, group=group, fill=norm_factor_businesses*count_pos_allergy_enquiries/TotalEstablishments),
+               color = "black", size=0.2) +
+  scale_fill_distiller(name = "norm. mentions",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5)) +
+  xlim(lon_range) +
+  ylim(lat_range) +
+  theme_nothing(legend=TRUE) +
+  labs(title=paste("Positive allergy enquiries mentions \n(Per ",
+                   norm_factor_businesses, " Establishments)"),
+       fill="")
+)
+allergy_enquiries.summary.geo.pos.norm
+
+ggsave(paste("allergy_enquiries_positive_map_rest_norm.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
+       width = 15, height = 15, units = "cm",
+       dpi = 300)
+
+allergy_enquiries.summary.geo.norm.pos.pop <- suppressMessages(
+  ggmap(UKrefmap, extent='device', legend="bottomleft") +
+  geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
+  geom_polygon(data = shape.df.stream1[selection_allergy_enquiries,], aes(x=long, y=lat, group=group, fill=norm_factor_population*count_pos_allergy_enquiries/all_ages),
+               color = "black", size=0.2) +
+  scale_fill_distiller(name = "norm. mentions",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5)) +
+  xlim(lon_range) +
+  ylim(lat_range) +
+  theme_nothing(legend=TRUE) +
+  labs(title=paste("Posotive allergy enquiries mentions \n(Per ",
+                   norm_factor_population/1000,
+                   "k people)"), fill="")
+)
+allergy_enquiries.summary.geo.norm.pos.pop
+
+ggsave(paste("allergy_enquiries_positive_map_pop_norm.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
+       width = 15, height = 15, units = "cm",
+       dpi = 300)
+
+# Allergy enquiries with negative sentiment plots
+selection_allergy_enquiries <- shape.df.stream1$count_neg_allergy_enquiries > 0
+allergy_enquiries.summary.geo.neg.raw <- suppressMessages(
+  ggmap(UKrefmap, extent='device', legend="bottomleft") +
+  geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
+  geom_polygon(data = shape.df.stream1[selection_allergy_enquiries,], aes(x=long, y=lat, group=group, fill=count_neg_allergy_enquiries), color = "black", size=0.2) +
+  scale_fill_distiller(name = "raw mentions",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5)) +
+  xlim(lon_range) +
+  ylim(lat_range) +
+  theme_nothing(legend=TRUE) +
+  labs(title="Negative allergy enquiries raw mentions", fill="")
+)
+allergy_enquiries.summary.geo.neg.raw
+
+ggsave(paste("allergy_enquiries_negative_map_raw.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
+       width = 15, height = 15, units = "cm",
+       dpi = 300)
+
+allergy_enquiries.summary.geo.neg.norm <- suppressMessages(
+  ggmap(UKrefmap, extent='device', legend="bottomleft") +
+  geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
+  geom_polygon(data = shape.df.stream1[selection_allergy_enquiries,], aes(x=long, y=lat, group=group, fill=norm_factor_businesses*count_neg_allergy_enquiries/TotalEstablishments),
+               color = "black", size=0.2) +
+  scale_fill_distiller(name = "norm. mentions",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5)) +
+  xlim(lon_range) +
+  ylim(lat_range) +
+  theme_nothing(legend=TRUE) +
+  labs(title=paste("Negative allergy enquiries mentions \n(Per ",
+                   norm_factor_businesses, " Establishments)"),
+       fill="")
+)
+allergy_enquiries.summary.geo.neg.norm
+
+ggsave(paste("allergy_enquiries_negative_map_rest_norm.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
+       width = 15, height = 15, units = "cm",
+       dpi = 300)
+
+allergy_enquiries.summary.geo.norm.neg.pop <- suppressMessages(
+  ggmap(UKrefmap, extent='device', legend="bottomleft") +
+  geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
+  geom_polygon(data = shape.df.stream1[selection_allergy_enquiries,], aes(x=long, y=lat, group=group, fill=norm_factor_population*count_neg_allergy_enquiries/all_ages),
+               color = "black", size=0.2) +
+  scale_fill_distiller(name = "norm. mentions",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5)) +
+  xlim(lon_range) +
+  ylim(lat_range) +
+  theme_nothing(legend=TRUE) +
+  labs(title=paste("Negative allergy enquiries mentions \n(Per ",
+                   norm_factor_population/1000,
+                   "k people)"), fill="")
+)
+allergy_enquiries.summary.geo.norm.neg.pop
+
+ggsave(paste("allergy_enquiries_negative_map_pop_norm.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
@@ -176,8 +298,8 @@ food_labelling.summary.geo.norm <- suppressMessages(
   xlim(lon_range) +
   ylim(lat_range) +
   theme_nothing(legend=TRUE) +
-  labs(title=paste("Food labelling mentions \n(Per ", 
-                   norm_factor_businesses, 
+  labs(title=paste("Food labelling mentions \n(Per ",
+                   norm_factor_businesses,
                    " Establishments)"), fill="")
 )
 food_labelling.summary.geo.norm
@@ -195,13 +317,125 @@ food_labelling.summary.geo.norm.pop <- suppressMessages(
   xlim(lon_range) +
   ylim(lat_range) +
   theme_nothing(legend=TRUE) +
-  labs(title=paste("Food labelling mentions \n(Per ", 
-                   norm_factor_population/1000, 
+  labs(title=paste("Food labelling mentions \n(Per ",
+                   norm_factor_population/1000,
                    "k people)"), fill="")
 )
 food_labelling.summary.geo.norm.pop
 
 ggsave(paste("food_labelling_map_pop_norm.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
+       width = 15, height = 15, units = "cm",
+       dpi = 300)
+
+# Food labelling positive plots
+selection_food_labelling <- shape.df.stream1$count_pos_food_labelling > 0
+food_labelling.summary.geo.pos.raw <- suppressMessages(
+  ggmap(UKrefmap, extent='device', legend="bottomleft") +
+  geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
+  geom_polygon(data = shape.df.stream1[selection_food_labelling,], aes(x=long, y=lat, group=group, fill=count_pos_food_labelling), color = "black", size=0.2) +
+  scale_fill_distiller(name = "raw mentions",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5)) +
+  xlim(lon_range) +
+  ylim(lat_range) +
+  theme_nothing(legend=TRUE) +
+  labs(title="Positive food labelling raw mentions", fill="")
+)
+food_labelling.summary.geo.pos.raw
+
+ggsave(paste("food_labelling_positive_map_raw.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
+       width = 15, height = 15, units = "cm",
+       dpi = 300)
+
+food_labelling.summary.geo.pos.norm <- suppressMessages(
+  ggmap(UKrefmap, extent='device', legend="bottomleft") +
+  geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
+  geom_polygon(data = shape.df.stream1[selection_food_labelling,], aes(x=long, y=lat, group=group, fill=norm_factor_businesses*count_pos_food_labelling/TotalEstablishments),
+               color = "black", size=0.2) +
+  scale_fill_distiller(name = "norm. mentions",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5)) +
+  xlim(lon_range) +
+  ylim(lat_range) +
+  theme_nothing(legend=TRUE) +
+  labs(title=paste("Positive food labelling mentions \n(Per ",
+                   norm_factor_businesses,
+                   " Establishments)"), fill="")
+)
+food_labelling.summary.geo.pos.norm
+
+ggsave(paste("food_labelling_positive_map_rest_norm.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
+       width = 15, height = 15, units = "cm",
+       dpi = 300)
+
+food_labelling.summary.geo.pos.norm.pop <- suppressMessages(
+  ggmap(UKrefmap, extent='device', legend="bottomleft") +
+  geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
+  geom_polygon(data = shape.df.stream1[selection_food_labelling,], aes(x=long, y=lat, group=group, fill=norm_factor_population*count_pos_food_labelling/all_ages),
+               color = "black", size=0.2) +
+  scale_fill_distiller(name = "norm. mentions",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5)) +
+  xlim(lon_range) +
+  ylim(lat_range) +
+  theme_nothing(legend=TRUE) +
+  labs(title=paste("Positive food labelling mentions \n(Per ",
+                   norm_factor_population/1000,
+                   "k people)"), fill="")
+)
+food_labelling.summary.geo.pos.norm.pop
+
+ggsave(paste("food_labelling_positive_map_pop_norm.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
+       width = 15, height = 15, units = "cm",
+       dpi = 300)
+
+# Food labelling negative plots
+selection_food_labelling <- shape.df.stream1$count_neg_food_labelling > 0
+food_labelling.summary.geo.neg.raw <- suppressMessages(
+  ggmap(UKrefmap, extent='device', legend="bottomleft") +
+  geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
+  geom_polygon(data = shape.df.stream1[selection_food_labelling,], aes(x=long, y=lat, group=group, fill=count_neg_food_labelling), color = "black", size=0.2) +
+  scale_fill_distiller(name = "raw mentions",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5)) +
+  xlim(lon_range) +
+  ylim(lat_range) +
+  theme_nothing(legend=TRUE) +
+  labs(title="Negative food labelling raw mentions", fill="")
+)
+food_labelling.summary.geo.neg.raw
+
+ggsave(paste("food_labelling_negative_map_raw.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
+       width = 15, height = 15, units = "cm",
+       dpi = 300)
+
+food_labelling.summary.geo.neg.norm <- suppressMessages(
+  ggmap(UKrefmap, extent='device', legend="bottomleft") +
+  geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
+  geom_polygon(data = shape.df.stream1[selection_food_labelling,], aes(x=long, y=lat, group=group, fill=norm_factor_businesses*count_neg_food_labelling/TotalEstablishments),
+               color = "black", size=0.2) +
+  scale_fill_distiller(name = "norm. mentions",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5)) +
+  xlim(lon_range) +
+  ylim(lat_range) +
+  theme_nothing(legend=TRUE) +
+  labs(title=paste("Negative food labelling mentions \n(Per ",
+                   norm_factor_businesses,
+                   " Establishments)"), fill="")
+)
+food_labelling.summary.geo.neg.norm
+
+ggsave(paste("food_labelling_negative_map_rest_norm.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
+       width = 15, height = 15, units = "cm",
+       dpi = 300)
+
+food_labelling.summary.geo.neg.norm.pop <- suppressMessages(
+  ggmap(UKrefmap, extent='device', legend="bottomleft") +
+  geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
+  geom_polygon(data = shape.df.stream1[selection_food_labelling,], aes(x=long, y=lat, group=group, fill=norm_factor_population*count_neg_food_labelling/all_ages),
+               color = "black", size=0.2) +
+  scale_fill_distiller(name = "norm. mentions",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5)) +
+  xlim(lon_range) +
+  ylim(lat_range) +
+  theme_nothing(legend=TRUE) +
+  labs(title=paste("Negative food labelling mentions \n(Per ",
+                   norm_factor_population/1000,
+                   "k people)"), fill="")
+)
+food_labelling.summary.geo.neg.norm.pop
+
+ggsave(paste("food_labelling_negative_map_pop_norm.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
@@ -232,8 +466,8 @@ mild_reaction.summary.geo.norm <- suppressMessages(
   xlim(lon_range) +
   ylim(lat_range) +
   theme_nothing(legend=TRUE) +
-  labs(title=paste("Mild reaction mentions \n(Per ", 
-                   norm_factor_businesses, 
+  labs(title=paste("Mild reaction mentions \n(Per ",
+                   norm_factor_businesses,
                    " Establishments)"), fill="")
 )
 mild_reaction.summary.geo.norm
@@ -251,8 +485,8 @@ mild_reaction.summary.geo.norm.pop <- suppressMessages(
   xlim(lon_range) +
   ylim(lat_range) +
   theme_nothing(legend=TRUE) +
-  labs(title=paste("Mild reaction mentions \n(Per ", 
-                   norm_factor_population/1000, 
+  labs(title=paste("Mild reaction mentions \n(Per ",
+                   norm_factor_population/1000,
                    "k people)"), fill="")
 )
 mild_reaction.summary.geo.norm.pop
@@ -288,8 +522,8 @@ severe_reaction.summary.geo.norm <- suppressMessages(
   xlim(lon_range) +
   ylim(lat_range) +
   theme_nothing(legend=TRUE) +
-  labs(title=paste("Severe reaction mentions \n(Per ", 
-                   norm_factor_businesses, 
+  labs(title=paste("Severe reaction mentions \n(Per ",
+                   norm_factor_businesses,
                    " Establishments)"), fill="")
 )
 severe_reaction.summary.geo.norm
@@ -307,8 +541,8 @@ severe_reaction.summary.geo.norm.pop <- suppressMessages(
   xlim(lon_range) +
   ylim(lat_range) +
   theme_nothing(legend=TRUE) +
-  labs(title=paste("Severe reaction mentions \n(Per ", 
-                   norm_factor_population/1000, 
+  labs(title=paste("Severe reaction mentions \n(Per ",
+                   norm_factor_population/1000,
                    "k people)"), fill="")
 )
 severe_reaction.summary.geo.norm
@@ -317,6 +551,61 @@ ggsave(paste("severe_reaction_map_pop_norm.",output_format,sep=""), plot = last_
        width = 15, height = 15, units = "cm",
        dpi = 300)
 
+# All adverse reactions  plots
+selection_adverse_reaction <- shape.df.stream1$count_adverse_reaction > 0
+adverse_reaction.summary.geo.raw <- suppressMessages(
+  ggmap(UKrefmap, extent='device', legend="bottomleft") +
+  geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
+  geom_polygon(data = shape.df.stream1[selection_adverse_reaction,], aes(x=long, y=lat, group=group, fill=count_adverse_reaction), color = "black", size=0.2) +
+  scale_fill_distiller(name = "raw mentions",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5)) +
+  xlim(lon_range) +
+  ylim(lat_range) +
+  theme_nothing(legend=TRUE) +
+  labs(title="Adverse reaction raw mentions", fill="")
+)
+adverse_reaction.summary.geo.raw
+
+ggsave(paste("adverse_reaction_map_raw.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
+       width = 15, height = 15, units = "cm",
+       dpi = 300)
+
+adverse_reaction.summary.geo.norm <- suppressMessages(
+  ggmap(UKrefmap, extent='device', legend="bottomleft") +
+  geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
+  geom_polygon(data = shape.df.stream1[selection_adverse_reaction,], aes(x=long, y=lat, group=group, fill=norm_factor_businesses*count_adverse_reaction/TotalEstablishments),
+               color = "black", size=0.2) +
+  scale_fill_distiller(name = "norm. mentions",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5)) +
+  xlim(lon_range) +
+  ylim(lat_range) +
+  theme_nothing(legend=TRUE) +
+  labs(title=paste("Adverse reaction mentions \n(Per ",
+                   norm_factor_businesses,
+                   " Establishments)"), fill="")
+)
+adverse_reaction.summary.geo.norm
+
+ggsave(paste("adverse_reaction_map_rest_norm.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
+       width = 15, height = 15, units = "cm",
+       dpi = 300)
+
+adverse_reaction.summary.geo.norm.pop <- suppressMessages(
+  ggmap(UKrefmap, extent='device', legend="bottomleft") +
+  geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
+  geom_polygon(data = shape.df.stream1[selection_adverse_reaction,], aes(x=long, y=lat, group=group, fill=norm_factor_population*count_adverse_reaction/all_ages),
+               color = "black", size=0.2) +
+  scale_fill_distiller(name = "norm. mentions",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5)) +
+  xlim(lon_range) +
+  ylim(lat_range) +
+  theme_nothing(legend=TRUE) +
+  labs(title=paste("Adverse reaction mentions \n(Per ",
+                   norm_factor_population/1000,
+                   "k people)"), fill="")
+)
+adverse_reaction.summary.geo.norm
+
+ggsave(paste("adverse_reaction_map_pop_norm.",output_format,sep=""), plot = last_plot(), device = NULL, path = out.dir,
+       width = 15, height = 15, units = "cm",
+       dpi = 300)
 
 ######################### 14 Allergen Analysis ########################################
 # Prepare two dataframes for plotting
