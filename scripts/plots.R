@@ -452,108 +452,134 @@ ggsave(paste("labelling_reactions.", output_format, sep = ""), plot = last_plot(
 
 #######################################
 
-#Co-occurrence Heatmap for among Allergens
+#Co-occurrence Heatmap among Allergens
+
+#Creating Percentage Heatmap for Allergens with Co-occurances
 
 # to create subset for 14 allergens and other allergens
 fourteen_allergens.df.norm.subset <- labelled.df[,fourteen.allergen.names]
-other_allergens.df.norm.subset    <- labelled.df[,other.allergen.names]
-
-# creating percentage matrix for heatmap 1 for fourteen allergens
-column_names   <- colnames(fourteen_allergens.df.norm.subset)
-number_of_rows <- nrow(fourteen_allergens.df.norm.subset)
-number_of_cols <- ncol(fourteen_allergens.df.norm.subset)
-mat            <- matrix(list(), nrow=number_of_cols, ncol=number_of_cols)
-
-for(i in 1:number_of_cols) {
-  for(j in 1:number_of_cols) {
-    temp <- table(fourteen_allergens.df.norm.subset[,i] + fourteen_allergens.df.norm.subset[,j])
-
-    count_one <- table(fourteen_allergens.df.norm.subset[,i])
-    number_of_positive    <- as.vector(count_one[names(count_one) ==1])
-    count_of_both_present <- as.vector(temp[names(temp) ==2]) # 1,1 - are cases where both are present
-    if (length(count_of_both_present) == 0) {
-      count_of_both_present <- 0
-    }
-    percentage_of_2 <- 100*count_of_both_present/number_of_positive
-    mat[i,j] <- percentage_of_2
-  }
-}
-
-percentage_mat           <- data.frame(mat)
-colnames(percentage_mat) <- column_names
-rownames(percentage_mat) <- column_names
-percentage_mat           <- data.matrix(percentage_mat, rownames.force = NA)
-
-library(reshape2)
-library(ggplot2)
-melted_percentage_mat <- melt(percentage_mat)
-
-# plot with the co-occurrence matrix for the 14 allergen list
-g2  <- ggplot(data = melted_percentage_mat, aes(Var1, Var2, fill = value))+  # plot heatmap 2 for 14 Allergens
-  geom_tile(color = "white", aes(fill = value))+
-  geom_text(aes(label = round(value, 1)))+
-  scale_fill_gradient2(low = "white", high = "red", mid = "white",
-                       midpoint = 0, limit = c(0,100), space = "Lab",
-                       name="Percentage") +
-  theme_minimal()+
-  theme(axis.text.x = element_text(angle = 45, vjust = 1,
-                                   size = 12, hjust = 1))+
-  coord_fixed()
-
-g2 <-g2 + ggtitle("Co-occurance Heatmap for 14 Allergens") +
-  xlab("Allergens") + ylab("Co-occurance with")
-g2
-
-ggsave(paste("percentage_14_allergens.", output_format, sep = ""), plot = last_plot(), device = NULL, path = out.dir,
-       width = 30, height = 30, units = "cm",
-       dpi = 300)
+other_allergens.df.norm.subset <- labelled.df[,other.allergen.names]
 
 
-# creating percentage matrix for heatmap for other allergens
-drops <- c("kidney_beans")
-other_allergens.df.norm.subset <- other_allergens.df.norm.subset[,!(names(other_allergens.df.norm.subset) %in% drops)]
+# creating percentage matrix for heatmap for fourteen allergens
 
-column_names   <- colnames(other_allergens.df.norm.subset)
-number_of_rows <- nrow(other_allergens.df.norm.subset)
-number_of_cols <- ncol(other_allergens.df.norm.subset)
-mat            <- matrix(list(), nrow=number_of_cols, ncol=number_of_cols)
+column_names = colnames(fourteen_allergens.df.norm.subset)
+number_of_rows = nrow(fourteen_allergens.df.norm.subset)
+number_of_cols = ncol(fourteen_allergens.df.norm.subset)
+mat = matrix(list(), nrow=number_of_cols, ncol=number_of_cols)
 
 for (i in 1:(number_of_cols)){
   for (j in 1:number_of_cols){
-    temp      <- table(other_allergens.df.norm.subset[,i] + other_allergens.df.norm.subset[,j])
-    count_one <- table(other_allergens.df.norm.subset[,i])
-
-    number_of_positive    <- as.vector(count_one[names(count_one) ==1])
-    count_of_both_present <- as.vector(temp[names(temp) ==2]) # 1,1 - are cases where both are present
-    if (length(count_of_both_present) == 0) {
-      count_of_both_present <- 0
+    temp = table(fourteen_allergens.df.norm.subset[,i] + fourteen_allergens.df.norm.subset[,j])
+    count_one = table(fourteen_allergens.df.norm.subset[,i])
+    number_of_positive = as.vector(count_one[names(count_one) ==1])
+    count_of_both_present = as.vector(temp[names(temp) ==2]) # 1,1 - are cases where both are present
+    if (length(count_of_both_present) == 0){
+      count_of_both_present = 0
     }
     percentage_of_2 = 100*count_of_both_present/number_of_positive
+    #print(c(column_names[i],column_names[j], percentage_of_2))
     mat[i, j] = percentage_of_2
   }
 }
 
-percentage_mat              <- data.frame(mat)
-colnames(percentage_mat)    <- column_names
-rownames(percentage_mat)    <- column_names
-percentage_mat              <- data.matrix(percentage_mat, rownames.force = NA)
-melted_percentage_mat_other <- melt(percentage_mat)
+percentage_mat = data.frame(mat)
+colnames(percentage_mat) = column_names
+rownames(percentage_mat) = column_names
+percentage_mat <- data.matrix(percentage_mat, rownames.force = NA)
 
-# plot with the co-occurrence matrix for the other allergen list
-g2  <- ggplot(data = melted_percentage_mat_other, aes(Var1, Var2, fill = value))+  # plot heatmap 2 for 14 Allergens
+library(reshape2)
+library(ggplot2)
+library(stringi)
+melted_percentage_mat = melt(percentage_mat)
+
+
+melted_percentage_mat$Var1 <- stri_replace_all_fixed(melted_percentage_mat$Var1, "_", " ")
+melted_percentage_mat$Var2 <- stri_replace_all_fixed(melted_percentage_mat$Var2, "_", " ")
+
+
+g2  <- ggplot(data = melted_percentage_mat, aes(Var1, Var2, fill = value))+  
   geom_tile(color = "white", aes(fill = value))+
   geom_text(aes(label = round(value, 1)))+
   scale_fill_gradient2(low = "white", high = "red", mid = "white",
-                       midpoint = 0, limit = c(0,100), space = "Lab",
+                       midpoint = 0, limit = c(0,60), space = "Lab",
                        name="Percentage") +
   theme_minimal()+
   theme(axis.text.x = element_text(angle = 45, vjust = 1,
                                    size = 12, hjust = 1))+
   coord_fixed()
 
-g2 <-g2 + ggtitle("Co-occurance Heatmap for Other Allergens") +
-  xlab("Allergens") + ylab("Co-occurance with")
+g2 <-g2 + ggtitle("Co-occurrence Heatmap for 14 Allergens") +
+  xlab("Allergen") + ylab("Co-occurrence with")
+
+g2 <-g2 + theme(axis.text.x=element_text(size=14),
+                axis.title=element_text(size=16,face="bold"), title = element_text(size=16))
+
 g2
+# plot(p2)
+
+ggsave(paste("percentage_14_allergens.", output_format, sep = ""), plot = last_plot(), device = NULL, path = out.dir,
+       width = 30, height = 30, units = "cm",
+       dpi = 500)
+
+
+# creating percentage matrix for heatmap for other allergens
+
+drops <- c("kidney_beans")
+other_allergens.df.norm.subset <- other_allergens.df.norm.subset[ , !(names(other_allergens.df.norm.subset) %in% drops)]
+
+column_names = colnames(other_allergens.df.norm.subset)
+number_of_rows = nrow(other_allergens.df.norm.subset)
+number_of_cols = ncol(other_allergens.df.norm.subset)
+mat = matrix(list(), nrow=number_of_cols, ncol=number_of_cols)
+
+for (i in 1:(number_of_cols)){
+  for (j in 1:number_of_cols){
+    temp = table(other_allergens.df.norm.subset[,i] + other_allergens.df.norm.subset[,j])
+    count_one = table(other_allergens.df.norm.subset[,i])
+    number_of_positive = as.vector(count_one[names(count_one) ==1])
+    count_of_both_present = as.vector(temp[names(temp) ==2]) # 1,1 - are cases where both are present
+    if (length(count_of_both_present) == 0){
+      count_of_both_present = 0
+    }
+    percentage_of_2 = 100*count_of_both_present/number_of_positive
+    #print(c(column_names[j],column_names[i], percentage_of_2))
+    mat[i, j] = percentage_of_2
+  }
+}
+
+percentage_mat = data.frame(mat)
+colnames(percentage_mat) = column_names
+rownames(percentage_mat) = column_names
+percentage_mat <- data.matrix(percentage_mat, rownames.force = NA)
+melted_percentage_mat_other = melt(percentage_mat)
+
+melted_percentage_mat_other$Var1 <- stri_replace_all_fixed(melted_percentage_mat_other$Var1, "_", " ")
+melted_percentage_mat_other$Var2 <- stri_replace_all_fixed(melted_percentage_mat_other$Var2, "_", " ")
+
+
+# plot heatmap for other allergens
+
+g2  <- ggplot(data = melted_percentage_mat_other, aes(Var1, Var2, fill = value))+  # plot heatmap 2 for 14 Allergens
+  geom_tile(color = "white", aes(fill = value))+
+  geom_text(aes(label = round(value, 1)))+
+  scale_fill_gradient2(low = "white", high = "red", mid = "white",
+                       midpoint = 0, limit = c(0,60), space = "Lab",
+                       name="Percentage") +
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 45, vjust = 1,
+                                   size = 12, hjust = 1))+
+  coord_fixed()
+
+g2 <-g2 + ggtitle("Co-occurrence Heatmap for Other Allergens") +
+  xlab("Allergens") + ylab("Co-occurrence with")
+
+g2 <-g2 + theme(axis.text.x=element_text(size=14)  ,axis.text=element_text(size=14),
+                axis.title=element_text(size=16,face="bold"), title = element_text(size=16))
+
+g2
+
+# plot(p2)
 
 ggsave(paste("percentage_other_allergens.", output_format, sep = ""), plot = last_plot(), device = NULL, path = out.dir,
        width = 40, height = 40, units = "cm",
@@ -564,3 +590,5 @@ cat(paste("Finished static plots script","\n",sep=""))
 cat("\n\n")
 
 #
+
+
