@@ -77,7 +77,7 @@ number_of_businesses.geo <- suppressMessages(
   ggmap(UKrefmap, extent='device', legend="bottomleft") +
   geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
   geom_polygon(data = shape.df.nbusinesses, aes(x=long, y=lat, group=group, fill=TotalEstablishments), color = "black", size=0.2) +
-  scale_fill_distiller(name = "# businesses",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5)) +
+  scale_fill_distiller(name = "# businesses",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5), labels=comma) +
   xlim(lon_range) +
   ylim(lat_range) +
   theme_nothing(legend=TRUE) +
@@ -94,7 +94,7 @@ population.geo <- suppressMessages(
   ggmap(UKrefmap, extent='device', legend="bottomleft") +
   geom_path(data = shape.df, aes(x=long, y=lat, group=group),color="gray50", size=0.3) +
   geom_polygon(data = shape.df.population, aes(x=long, y=lat, group=group, fill=all_ages), color = "black", size=0.2) +
-  scale_fill_distiller(name = "Poulation (2016)",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5)) +
+  scale_fill_distiller(name = "Poulation (2016)",type="seq", trans="reverse", palette = "Reds", breaks=pretty_breaks(n = 5), labels=comma) +
   xlim(lon_range) +
   ylim(lat_range) +
   theme_nothing(legend=TRUE) +
