@@ -15,7 +15,6 @@ To use **GetNuts**, download or clone the repo to a folder on your computer, the
 * [magrittr](https://github.com/tidyverse/magrittr)
 * [tidyr](https://cran.r-project.org/web/packages/tidyr/index.html)
 * [ggplot2](https://ggplot2.tidyverse.org/)
-* [bookdown](https://github.com/rstudio/bookdown)
 * [leaflet](https://rstudio.github.io/leaflet/)
 * [rgdal](https://cran.r-project.org/web/packages/rgdal/index.html)
 * [sp](https://cran.r-project.org/web/packages/sp/index.html)
@@ -29,8 +28,8 @@ To use **GetNuts**, download or clone the repo to a folder on your computer, the
 ```r
 install.packages(c(
   "readxl","stringi","quanteda","magrittr",
-  "tidyr","ggplot2","ggpubr","bookdown",
-  "shiny","leaflet","sp","rgdal","spdplyr","rgeos","maptools"))
+  "tidyr","ggplot2","ggpubr","shiny","leaflet",
+  "sp","rgdal","spdplyr","rgeos","maptools"))
 ```
 
 and
