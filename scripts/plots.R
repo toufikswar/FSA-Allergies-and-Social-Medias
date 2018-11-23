@@ -309,18 +309,19 @@ other.allergen.mentions <- ggplot(other.allergen.total.long_subset,
                     breaks=c("perc_mild", "perc_severe"),
                     labels=c("% Mild", "% Severe")) +
   labs(x= "Other Allergens", y="Percentage", fill = "Severity") +
-  ggtitle("Percentage of Mild/Severe reactions over other allergens mentions") +
+  ggtitle("Percentage of Mild/Severe reactions over other allergens") +
   coord_flip() + theme_bw()
 
+other.allergen.mentions <-other.allergen.mentions + theme(axis.text.x=element_text(size=14)  ,axis.text=element_text(size=14),
+                                                          axis.title=element_text(size=16,face="bold"), title = element_text(size=14), axis.text.y =element_text(size=18),
+                                                          axis.title.x =element_text(size=16,face="bold"), axis.title.y.right =element_text(size=16,face="bold"),
+                                                          axis.title.x.bottom =element_text(size=16,face="bold")) + guides(color=guide_legend("Severity"), element_text(size=16)) 
+
+other.allergen.mentions
 
 ggsave(paste("Percentage_other_allergens_mentions_mild_severe.", output_format, sep = ""), plot = last_plot(), device = NULL, path = out.dir,
        width = 20, height = 15, units = "cm",
        dpi = 300)
-
-other.allergen.mentions
-
-
-
 
 #######
 ## Subsetting to remove "_" from the Allergy names
