@@ -87,12 +87,20 @@ library(dplyr)
 labelled.df.geo <- labelled.df[!is.na(labelled.df$latitude),]
 
 # Some entries without original longitude and latitude are assigned the generic "UK"
-# longitude and latitude of 55.37805 and -3.435973, respectively. These spuriously inflate
+# latitude and longitude of 55.37805 and -3.435973, respectively. These spuriously inflate
 # measurements in Dumfries and Galloway, so these are removed:
 lat_UKcentre  <- 55.378050
 long_UKcentre <- -3.435973
 labelled.df.geo <- subset(labelled.df.geo,
                           latitude !=  lat_UKcentre & longitude != long_UKcentre)
+
+# Some entries without original longitude and latitude are assigned the generic "London"
+# latitude and longitude of 51.50732 and -0.127647, respectively. These spuriously inflate
+# westminster district, so these are removed:
+lat_LondonCentre  <- 51.50732
+long_LondonCentre <- -0.127647
+labelled.df.geo <- subset(labelled.df.geo,
+                          round(latitude,5) !=  lat_LondonCentre & round(longitude,6) != long_LondonCentre)
 
 # Letting R know that these are specifically spatial coordinates
 sp <- SpatialPoints(labelled.df.geo[,c("longitude", "latitude")])
