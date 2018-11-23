@@ -148,6 +148,7 @@ ui <- fluidPage(
              # Second tab to display raw data
              tabPanel("Data",
                     tags$div(class = "container",
+                      # adding a row
                       fluidRow(
                         column(3,
                                # 14 allergens listing
@@ -171,6 +172,7 @@ ui <- fluidPage(
                         )                      
                       ),
                       fluidRow(
+                        # diplaying the table with data
                         dataTableOutput("raw_data")
                       )
                     )
@@ -204,16 +206,7 @@ server <- function(input, output) {
              long >= lngRng[1] & long <= lngRng[2])
   })
   
-  # This creates an output where we display the raw data that is on the map
-  
-  #temp.df <- ifelse(subset(the_data,  select=c(fourteen.allergen.names,other.allergen.names)) == 0,"No","Yes")
-  #ui.df <- (cbind(the_data[, c("id","source", "original_content","hashtags","District","lat","long")], temp.df))
-  #output$raw_data <- renderDataTable(dataInBounds())
-  #output$raw_data <- renderDataTable(ui.df)
-  
-  
-  
-  
+
   
   # This observer is responsible for maintaining the circles and legend,
   # according to the variables the user has chosen to map to color and size.
@@ -252,6 +245,9 @@ server <- function(input, output) {
     summary_data$Norm     <- rep(1,nrow(summary_data))  # raw numbers ==> no Normalization
     summary_data$District <- as.character(summary_data$District)
     
+    #
+    data.in.label <- summary_data$count
+    
     mytitle <- "Raw mentions"
     
     if(input$norm == "N. Businesses") {
@@ -261,6 +257,7 @@ server <- function(input, output) {
       restaurants_per_local_authority.df$District <- as.character(restaurants_per_local_authority.df$District)
       summary_data      <- left_join(summary_data,restaurants_per_local_authority.df[,c("District","TotalEstablishments")], by="District")
       summary_data$Norm <- summary_data$TotalEstablishments/norm_factor_businesses
+      data.in.label <- summary_data$Norm
     } else if(input$norm == "Population") {
       # set up Normalization by population if requires by the user
       mytitle <- paste("mentions per ",norm_factor_population," people",sep="")
@@ -268,6 +265,7 @@ server <- function(input, output) {
       population_per_local_authority.df$District <- as.character(population_per_local_authority.df$District)
       summary_data      <- left_join(summary_data,population_per_local_authority.df[,c("District","all_ages")],by="District")
       summary_data$Norm <- summary_data$all_ages/norm_factor_population
+      data.in.label <- summary_data$Norm
     }
     
     
@@ -275,12 +273,9 @@ server <- function(input, output) {
     
     # color pallete for scale in the map
     colorData <- radius
-    #pal       <- colorBin("viridis", c(1,66), 7, pretty = FALSE)
     pal       <- colorNumeric("viridis", NULL)
     
     # points radii
-    # radius    <- (radius / max(radius))*30000
-    # radius    <- 10000
     radius    <- 2500
     
     
@@ -290,28 +285,32 @@ server <- function(input, output) {
       
       
       addCircleMarkers(~long, ~lat,radius = 5,color = pal(colorData),stroke = TRUE, fillOpacity = 0.5, 
-                       label = paste(as.character(summary_data$District),as.character(summary_data$count))) %>%
+                       label = paste(as.character(summary_data$District)," : ",as.character(round(data.in.label))),
+                       labelOptions = labelOptions( direction = "bottom",style = list("font-size" = "14px", 
+                                                                "box-shadow" = "3px 3px rgba(0,0,0,0.25)",
+                                                                "border-color" = "rgba(0,0,0,0.5)"))) %>%
       
-      addLegend("topright", pal=pal, values=~count, title=mytitle,layerId="colorLegend")
+      addLegend("topright", pal=pal, values=~data.in.label, title=mytitle,layerId="colorLegend")
     
     
     
-    # leafletProxy("map", data = the_data[selection,]) %>%
-    #   clearMarkers() %>%
-    #   addMarkers(lat = ~latitude,lng = ~longitude,
-    #                popup = ~as.character(original_content))
-    
+
+    # Creation of an vector with TRUE values    
     selection.data <- rep(TRUE,nrow(the_data))
     
+    # 14 Allergen selection
     selection.data <- selection.data & do_inclusive_list_selection(input$fourteen2,the_data)
+    # Other Allergen selection
     selection.data <- selection.data & do_inclusive_list_selection(input$other2,the_data)
+    # Sentiment Selection
     selection.data <- selection.data & do_colvalues_selection(input$sentiment2,the_data$sentiment_class)
     
     # source selection
     selection.data <- selection.data & do_colvalues_selection(input$source2,the_data$source)
     
-    
+    # Creation of a df with the selection
     ui.df <- the_data[selection.data,c("sentiment_class","source", "original_content","hashtags","District","lat","long")]
+    # Renaming the columns more User friendly
     names(ui.df) <- c("Sentiment","Source","Content","Hashtags","District","Latitude","Longitude")
     output$raw_data <- renderDataTable(ui.df)
     
