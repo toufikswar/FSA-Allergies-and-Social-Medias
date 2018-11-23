@@ -256,7 +256,7 @@ server <- function(input, output) {
       summary_data$Norm <- summary_data$TotalEstablishments/norm_factor_businesses
     } else if(input$norm == "Population") {
       # set up Normalization by population if requires by the user
-      mytitle <- paste("mentions per ",norm_factor_population," people",sep="")
+      mytitle <- paste("mentions per ",norm_factor_population/1000,"k people",sep="")
 
       population_per_local_authority.df$District <- as.character(population_per_local_authority.df$District)
       summary_data      <- left_join(summary_data,population_per_local_authority.df[,c("District","all_ages")],by="District")
@@ -274,11 +274,12 @@ server <- function(input, output) {
     # points radii
     radius    <- 2500
 
+    summary_data <- summary_data[summary_data$count > 0,]
 
     # plots the summary information per local authority
     leafletProxy("map", data = summary_data) %>%
       clearShapes() %>%
-
+      clearMarkers() %>%
 
       addCircleMarkers(~long, ~lat,radius = 5,color = pal(colorData),stroke = TRUE, fillOpacity = 0.5,
                        label = paste(as.character(summary_data$District)," : ",as.character(round(data.in.label,4))),
@@ -287,8 +288,6 @@ server <- function(input, output) {
                                                                 "border-color" = "rgba(0,0,0,0.5)"))) %>%
 
       addLegend("topright", pal=pal, values=~data.in.label, title=mytitle,layerId="colorLegend")
-
-
 
 
     # Creation of an vector with TRUE values
