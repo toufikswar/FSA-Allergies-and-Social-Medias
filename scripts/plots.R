@@ -252,9 +252,9 @@ fourteen.allergen.mild   <- colSums(labelled.df[labelled.df$mild_reaction == 1, 
 
 
 
-# Plot with the fraction of mild/severe adverse reactions for each of the official 14 list allergens
+# Plot with the fraction of mild/severe adverse reactions for each of the official 14 list allergens 
 fourteen.allergen.mentions <- ggplot(fourteen.allergen.total.long,
-                                     aes(x = gsub("_"," ", allergen),
+                                     aes(x = reorder(gsub("_"," ", allergen), total),
                                          y = percentage, fill = severity)) +
   geom_bar(width = 0.4 ,position = "dodge", stat="identity") +
   theme_minimal() +
@@ -301,7 +301,7 @@ other.allergen.total.long_subset <- subset(other.allergen.total.long, allergen==
 
 # Plot with the fraction of mild/severe adverse reactions for each of the other allergens
 other.allergen.mentions <- ggplot(other.allergen.total.long_subset,
-                                  aes(x = gsub("_"," ", allergen),
+                                  aes(x = reorder(gsub("_"," ", allergen), total),
                                       y = percentage, fill = severity)) +
   geom_bar(width = 0.4 ,position = "dodge", stat="identity") +
   theme_minimal() +
